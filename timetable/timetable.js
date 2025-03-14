@@ -142,7 +142,7 @@
     };
     
     // Órák adatainak gyűjtése
-    document.querySelectorAll('.fc-event').forEach(event => {
+    for (const event of document.querySelectorAll('.fc-event')) {
       const timeEl = event.querySelector('.fc-time');
       const titleEl = event.querySelector('.fc-title');
       
@@ -151,11 +151,20 @@
         const [fullSubject, teacher, room] = titleEl.innerHTML.split('<br>').map(str => str.trim());
         const subject = fullSubject.split('-')[0].trim();
         
+        let originalTeacher = '';
+        if (teacher.startsWith('Helyettesítő:')) {
+          event.click();
+          originalTeacher = await waitForElement("#OraAdatokDetailTabStrip-1 > div > div:nth-child(3) > div:nth-child(2)");
+          originalTeacher = originalTeacher.innerText;
+          document.querySelector("body > div.k-widget.k-window > div.k-window-titlebar.k-header > div > a:nth-child(2)").click();
+        }
+
         timetableData.lessons.push({
           startTime,
           endTime,
           subject: subject || '',
           teacher: teacher || '',
+          originalTeacher: originalTeacher || '',
           room: (room || '').replace(/[()]/g, ''),
           day: event.closest('td').cellIndex - 1,
           isSubstituted: event.querySelector('.fc-bg2') !== null,
@@ -165,8 +174,7 @@
           homeworkDetails: event.getAttribute('data-homework') || ''
         });
       }
-    });
-    
+    }
     return timetableData;
   }
 
@@ -242,7 +250,11 @@
           <div class="lesson-details">
             <div class="detail-item">
               <span class="detail-label">Tanár:</span>
-              <span class="detail-value">${lesson.teacher}</span>
+              <span class="detail-value ${(lesson.originalTeacher != '' ? 'line-through' : '')}">${lesson.originalTeacher != '' ? lesson.originalTeacher : lesson.teacher}</span>
+            </div>
+            <div class="detail-item ${(lesson.originalTeacher != '' ? '' : 'hidden')}">
+              <span class="detail-label">Helyettesítő tanár:</span>
+              <span class="detail-value">${lesson.teacher.replace('Helyettesítő:', '')}</span>
             </div>
             <div class="detail-item">
               <span class="detail-label">Terem:</span>
