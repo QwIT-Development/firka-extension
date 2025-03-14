@@ -1,201 +1,201 @@
 (() => {
-  function getCookie(name) {
-    const cookieName = `${name}=`;
-    const decodedCookie = decodeURIComponent(document.cookie);
-    const cookieArray = decodedCookie.split(';');
-    
-    for(let i = 0; i < cookieArray.length; i++) {
-      let cookie = cookieArray[i];
-      while (cookie.charAt(0) === ' ') {
-        cookie = cookie.substring(1);
-      }
-      if (cookie.indexOf(cookieName) === 0) {
-        return cookie.substring(cookieName.length, cookie.length);
-      }
-    }
-    return null;
-  }
+    function getCookie(name) {
+        const cookieName = `${name}=`;
+        const decodedCookie = decodeURIComponent(document.cookie);
+        const cookieArray = decodedCookie.split(';');
 
-  function showLoadingScreen() {
-    const existingLoadingScreen = document.querySelector('.loading-screen');
-    if (existingLoadingScreen) return;
-  
-    const loadingScreen = document.createElement('div');
-    loadingScreen.className = 'loading-screen';
-    loadingScreen.innerHTML = `
+        for(let i = 0; i < cookieArray.length; i++) {
+            let cookie = cookieArray[i];
+            while (cookie.charAt(0) === ' ') {
+                cookie = cookie.substring(1);
+            }
+            if (cookie.indexOf(cookieName) === 0) {
+                return cookie.substring(cookieName.length, cookie.length);
+            }
+        }
+        return null;
+    }
+
+    function showLoadingScreen() {
+        const existingLoadingScreen = document.querySelector('.loading-screen');
+        if (existingLoadingScreen) return;
+
+        const loadingScreen = document.createElement('div');
+        loadingScreen.className = 'loading-screen';
+        loadingScreen.innerHTML = `
       <div class="loading-content">
         <img src="${chrome.runtime.getURL('images/firka_logo.png')}" alt="Firka" class="loading-logo">
         <div class="loading-text">Betöltés alatt...</div>
         <div class="loading-text2">Kis türelmet!</div>
       </div>
     `;
-    document.body.appendChild(loadingScreen);
-  }
-  
-  function hideLoadingScreen() {
-    const loadingScreen = document.querySelector('.loading-screen');
-    if (loadingScreen) {
-      loadingScreen.style.opacity = '0';
-      loadingScreen.addEventListener('transitionend', () => {
-        loadingScreen.remove();
-      });
+        document.body.appendChild(loadingScreen);
     }
-  }
 
-  async function transformGradesPage() {
-    try {
-        showLoadingScreen();
-
-        await waitForElement('#Osztalyzatok_7895TanuloErtekelesByTanuloGrid');
-        await new Promise(resolve => setTimeout(resolve, 1000));
-
-        const gradesData = extractGradesData();
-        const studentAverage = calculateOverallAverage(gradesData.subjects);
-        const classAverage = calculateOverallClassAverage(gradesData.subjects);
-
-        document.body.innerHTML = generatePageHTML(gradesData, studentAverage, classAverage);
-
-        const links = [
-            { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
-            { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: true },
-            { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap' },
-            { rel: 'stylesheet', href: 'https://fonts.googleapis.com/icon?family=Material+Icons+Round' }
-        ];
-
-        
-        const script = document.createElement('script');
-        script.src = chrome.runtime.getURL('grades/chart.js');
-        document.head.appendChild(script);
-
-        links.forEach(link => {
-            const linkElement = document.createElement('link');
-            Object.entries(link).forEach(([key, value]) => {
-                linkElement[key] = value;
+    function hideLoadingScreen() {
+        const loadingScreen = document.querySelector('.loading-screen');
+        if (loadingScreen) {
+            loadingScreen.style.opacity = '0';
+            loadingScreen.addEventListener('transitionend', () => {
+                loadingScreen.remove();
             });
-            document.head.appendChild(linkElement);
+        }
+    }
+
+    async function transformGradesPage() {
+        try {
+            showLoadingScreen();
+
+            await waitForElement('#Osztalyzatok_7895TanuloErtekelesByTanuloGrid');
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
+            const gradesData = extractGradesData();
+            const studentAverage = calculateOverallAverage(gradesData.subjects);
+            const classAverage = calculateOverallClassAverage(gradesData.subjects);
+
+            document.body.innerHTML = generatePageHTML(gradesData, studentAverage, classAverage);
+
+            const links = [
+                { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
+                { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: true },
+                { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap' },
+                { rel: 'stylesheet', href: 'https://fonts.googleapis.com/icon?family=Material+Icons+Round' }
+            ];
+
+
+            const script = document.createElement('script');
+            script.src = chrome.runtime.getURL('grades/chart.js');
+            document.head.appendChild(script);
+
+            links.forEach(link => {
+                const linkElement = document.createElement('link');
+                Object.entries(link).forEach(([key, value]) => {
+                    linkElement[key] = value;
+                });
+                document.head.appendChild(linkElement);
+            });
+
+            script.onload = () => {
+                setupGradesChart(gradesData.subjects);
+            };
+
+            setupEventListeners();
+            hideLoadingScreen();
+
+        } catch (error) {
+            console.error('Error transforming grades page:', error);
+            hideLoadingScreen();
+        }
+    }
+
+    function extractGradesData() {
+        const subjects = [];
+        const rows = document.querySelectorAll('#Osztalyzatok_7895TanuloErtekelesByTanuloGrid tbody tr');
+
+        rows.forEach(row => {
+            const cells = row.querySelectorAll('td');
+            if (cells.length >= 17) {
+                const subjectName = cells[2].textContent.trim();
+                if (subjectName && subjectName !== 'Magatartás/Szorgalom') {
+                    const grades = [];
+                    const months = ['Szeptember', 'Oktober', 'November', 'December', 'JanuarI', 'JanuarII', 'Februar', 'Marcius', 'Aprilis', 'Majus', 'JuniusI', 'JuniusII'];
+
+                    months.forEach((month, index) => {
+                        const gradeElements = cells[index + 3].querySelectorAll('span[data-tanuloertekelesid]');
+                        gradeElements.forEach(element => {
+                            const gradeText = element.textContent.trim();
+                            if (gradeText && gradeText !== '-') {
+                                grades.push({
+                                    value: gradeText,
+                                    date: element.getAttribute('data-datum'),
+                                    type: element.getAttribute('data-tipusmod'),
+                                    theme: element.getAttribute('data-ertekelestema').replace('Téma: ', ''),
+                                    weight: element.getAttribute('data-suly'),
+                                    teacher: element.getAttribute('data-ertekelonyomtatasinev'),
+                                    isSemesterGrade: (element.getAttribute('data-tipusmod') || '').toLowerCase().includes('félévi') ||
+                                        (element.getAttribute('data-ertekelestema') || '').toLowerCase().includes('félévi') ||
+                                        (element.getAttribute('data-tipus') || '').toLowerCase().includes('félévi')
+                                });
+                            }
+                        });
+                    });
+
+
+                    const avgText = cells[16].textContent.trim();
+                    const classAvgText = cells[17].textContent.trim();
+
+                    const average = avgText !== '-' ? parseFloat(avgText.replace(',', '.')) : 0;
+                    const classAvg = classAvgText !== '-' ? parseFloat(classAvgText.replace(',', '.')) : 0;
+
+                    if (grades.length > 0) {
+
+                        subjects.push({
+                            name: subjectName,
+                            grades: grades,
+                            average: average || 0,
+                            classAverage: classAvg || 0
+                        });
+                    }
+                }
+            }
         });
 
-        script.onload = () => {
-            setupGradesChart(gradesData.subjects);
+        return {
+            schoolInfo: {
+                id: getCookie('schoolCode') || '',
+                name: getCookie('schoolName') || 'Iskola'
+            },
+            userData: {
+                name: getCookie('userName') || 'Felhasználó',
+                time: document.querySelector('.usermenu_timer')?.textContent?.trim() || '45:00'
+            },
+            subjects: subjects
         };
-
-        setupEventListeners();
-        hideLoadingScreen();
-
-    } catch (error) {
-        console.error('Error transforming grades page:', error);
-        hideLoadingScreen();
     }
-}
 
-  function extractGradesData() {
-    const subjects = [];
-    const rows = document.querySelectorAll('#Osztalyzatok_7895TanuloErtekelesByTanuloGrid tbody tr');
-    
-    rows.forEach(row => {
-      const cells = row.querySelectorAll('td');
-      if (cells.length >= 17) {
-        const subjectName = cells[2].textContent.trim();
-        if (subjectName && subjectName !== 'Magatartás/Szorgalom') {
-          const grades = [];
-          const months = ['Szeptember', 'Oktober', 'November', 'December', 'JanuarI', 'JanuarII', 'Februar', 'Marcius', 'Aprilis', 'Majus', 'JuniusI', 'JuniusII'];
-          
-          months.forEach((month, index) => {
-            const gradeElements = cells[index + 3].querySelectorAll('span[data-tanuloertekelesid]');
-            gradeElements.forEach(element => {
-              const gradeText = element.textContent.trim();
-              if (gradeText && gradeText !== '-') {
-                grades.push({
-                  value: gradeText,
-                  date: element.getAttribute('data-datum'),
-                  type: element.getAttribute('data-tipusmod'),
-                  theme: element.getAttribute('data-ertekelestema').replace('Téma: ', ''),
-                  weight: element.getAttribute('data-suly'),
-                  teacher: element.getAttribute('data-ertekelonyomtatasinev'),
-                  isSemesterGrade: (element.getAttribute('data-tipusmod') || '').toLowerCase().includes('félévi') || 
-                                 (element.getAttribute('data-ertekelestema') || '').toLowerCase().includes('félévi') ||
-                                 (element.getAttribute('data-tipus') || '').toLowerCase().includes('félévi')
-                });
-              }
-            });
-          });
+    function calculateOverallAverage(subjects) {
+        const validSubjects = subjects.filter(s => s.average > 0);
+        if (validSubjects.length === 0) return 0;
 
-          
-          const avgText = cells[16].textContent.trim();
-          const classAvgText = cells[17].textContent.trim();
-          
-          const average = avgText !== '-' ? parseFloat(avgText.replace(',', '.')) : 0;
-          const classAvg = classAvgText !== '-' ? parseFloat(classAvgText.replace(',', '.')) : 0;
 
-          if (grades.length > 0) {
+        const weightedSum = validSubjects.reduce((sum, subject) => {
+            const validGrades = subject.grades.filter(grade => !isNaN(parseInt(grade.value)));
+            const subjectWeightedSum = validGrades.reduce((gradeSum, grade) => {
+                const value = parseInt(grade.value);
+                const weight = parseInt(grade.weight?.match(/\d+/)?.[0] || '100') / 100;
+                return gradeSum + (value * weight);
+            }, 0);
 
-            subjects.push({
-              name: subjectName,
-              grades: grades,
-              average: average || 0,
-              classAverage: classAvg || 0
-            });
-          }
-        }
-      }
-    });
+            const totalWeight = validGrades.reduce((weightSum, grade) => {
+                const weight = parseInt(grade.weight?.match(/\d+/)?.[0] || '100') / 100;
+                return weightSum + weight;
+            }, 0);
 
-    return {
-      schoolInfo: {
-        id: getCookie('schoolCode') || '',
-        name: getCookie('schoolName') || 'Iskola'
-      },
-      userData: {
-        name: getCookie('userName') || 'Felhasználó',
-        time: document.querySelector('.usermenu_timer')?.textContent?.trim() || '45:00'
-      },
-      subjects: subjects
-    };
-  }
+            return sum + (subjectWeightedSum / totalWeight);
+        }, 0);
 
-  function calculateOverallAverage(subjects) {
-    const validSubjects = subjects.filter(s => s.average > 0);
-    if (validSubjects.length === 0) return 0;
-    
-    
-    const weightedSum = validSubjects.reduce((sum, subject) => {
-      const validGrades = subject.grades.filter(grade => !isNaN(parseInt(grade.value)));
-      const subjectWeightedSum = validGrades.reduce((gradeSum, grade) => {
-        const value = parseInt(grade.value);
-        const weight = parseInt(grade.weight?.match(/\d+/)?.[0] || '100') / 100;
-        return gradeSum + (value * weight);
-      }, 0);
-      
-      const totalWeight = validGrades.reduce((weightSum, grade) => {
-        const weight = parseInt(grade.weight?.match(/\d+/)?.[0] || '100') / 100;
-        return weightSum + weight;
-      }, 0);
-      
-      return sum + (subjectWeightedSum / totalWeight);
-    }, 0);
-    
-    return weightedSum / validSubjects.length;
-  }
+        return weightedSum / validSubjects.length;
+    }
 
-  function calculateOverallClassAverage(subjects) {
-    const validSubjects = subjects.filter(s => s.classAverage > 0);
-    if (validSubjects.length === 0) return 0;
-    return validSubjects.reduce((sum, s) => sum + s.classAverage, 0) / validSubjects.length;
-  }
+    function calculateOverallClassAverage(subjects) {
+        const validSubjects = subjects.filter(s => s.classAverage > 0);
+        if (validSubjects.length === 0) return 0;
+        return validSubjects.reduce((sum, s) => sum + s.classAverage, 0) / validSubjects.length;
+    }
 
-  function shortenEvaluationName(name, maxLength = 30) {
-    if (!name) return '';
-    if (name.length <= maxLength) return name;
-    return name.substring(0, maxLength - 3) + '...';
-  }
+    function shortenEvaluationName(name, maxLength = 30) {
+        if (!name) return '';
+        if (name.length <= maxLength) return name;
+        return name.substring(0, maxLength - 3) + '...';
+    }
 
-  function generateGradeItem(grade) {
-    const semesterClass = grade.isSemesterGrade ? 'semester-grade' : '';
-    const dateObj = new Date(grade.date);
-    const monthNames = ['Január', 'Február', 'Március', 'Április', 'Május', 'Június', 'Július', 'Augusztus', 'Szeptember', 'Október', 'November', 'December'];
-    const formattedDate = `${monthNames[dateObj.getMonth()]} ${dateObj.getDate()}`;
-    const shortenedTheme = shortenEvaluationName(grade.theme);
-    return `
+    function generateGradeItem(grade) {
+        const semesterClass = grade.isSemesterGrade ? 'semester-grade' : '';
+        const dateObj = new Date(grade.date);
+        const monthNames = ['Január', 'Február', 'Március', 'Április', 'Május', 'Június', 'Július', 'Augusztus', 'Szeptember', 'Október', 'November', 'December'];
+        const formattedDate = `${monthNames[dateObj.getMonth()]} ${dateObj.getDate()}`;
+        const shortenedTheme = shortenEvaluationName(grade.theme);
+        return `
       <div class="grade-item grade-${grade.value} ${semesterClass}">
         <div class="grade-value">${grade.value}</div>
         <div class="grade-details">
@@ -205,31 +205,31 @@
         <div class="grade-date">${formattedDate}</div>
       </div>
     `;
-  }
+    }
 
-  function calculateGradeDistribution(subjects) {
-    const distribution = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0};
-    subjects.forEach(subject => {
-        subject.grades.forEach(grade => {
-            const value = parseInt(grade.value);
-            if (value >= 1 && value <= 5) {
-                distribution[value]++;
-            }
+    function calculateGradeDistribution(subjects) {
+        const distribution = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0};
+        subjects.forEach(subject => {
+            subject.grades.forEach(grade => {
+                const value = parseInt(grade.value);
+                if (value >= 1 && value <= 5) {
+                    distribution[value]++;
+                }
+            });
         });
-    });
-    return distribution;
-}
+        return distribution;
+    }
 
-function generatePageHTML(data, studentAverage, classAverage) {
-  const totalGrades = data.subjects.reduce((sum, subject) => sum + subject.grades.length, 0);
-  const gradeDistribution = calculateGradeDistribution(data.subjects);
-  const semesterGrades = extractSemesterGrades(data.subjects);
-  
-  
-  const studentGradeLevel = Math.floor(studentAverage) || 0;
-  const classGradeLevel = Math.floor(classAverage) || 0;
+    function generatePageHTML(data, studentAverage, classAverage) {
+        const totalGrades = data.subjects.reduce((sum, subject) => sum + subject.grades.length, 0);
+        const gradeDistribution = calculateGradeDistribution(data.subjects);
+        const semesterGrades = extractSemesterGrades(data.subjects);
 
-    return `
+
+        const studentGradeLevel = Math.floor(studentAverage) || 0;
+        const classGradeLevel = Math.floor(classAverage) || 0;
+
+        return `
       <div class="kreta-container">
         <header class="kreta-header">
           <div class="school-info">
@@ -338,166 +338,168 @@ function generatePageHTML(data, studentAverage, classAverage) {
         </main>
       </div>
     `;
-}
+    }
 
-function extractSemesterGrades(subjects) {
-  const semesterGrades = [];
-  subjects.forEach(subject => {
-      const semesterGrade = subject.grades.find(grade => grade.isSemesterGrade);
-      if (semesterGrade) {
-          semesterGrades.push({
-              subject: subject.name,
-              value: semesterGrade.value,
-              date: semesterGrade.date
-          });
-      }
-  });
-  return semesterGrades;
-}
+    function extractSemesterGrades(subjects) {
+        const semesterGrades = [];
+        subjects.forEach(subject => {
+            const semesterGrade = subject.grades.find(grade => grade.isSemesterGrade);
+            if (semesterGrade) {
+                semesterGrades.push({
+                    subject: subject.name,
+                    value: semesterGrade.value,
+                    date: semesterGrade.date
+                });
+            }
+        });
+        return semesterGrades;
+    }
 
-function calculateGradePoints(subjects) {
-  const allGrades = [];
-  
-  subjects.forEach(subject => {
-      subject.grades.forEach(grade => {
-          const date = new Date(grade.date);
-          const value = parseInt(grade.value);
-          const weight = parseInt(grade.weight?.match(/\d+/)?.[0] || '100') / 100;
-          allGrades.push({
-              date,
-              value,
-              weight
-          });
-      });
-  });
+    function calculateGradePoints(subjects) {
+        const allGrades = [];
 
-  
-  allGrades.sort((a, b) => a.date - b.date);
+        subjects.forEach(subject => {
+            subject.grades.forEach(grade => {
+                const date = new Date(grade.date);
+                const value = parseInt(grade.value);
+                const weight = parseInt(grade.weight?.match(/\d+/)?.[0] || '100') / 100;
+                if (date && value && weight) {
+                    allGrades.push({
+                        date,
+                        value,
+                        weight
+                    });
+                }
+            });
+        });
 
-  
-  let totalWeight = 0;
-  let weightedSum = 0;
-  return allGrades.map(grade => {
-      totalWeight += grade.weight;
-      weightedSum += grade.value * grade.weight;
-      return {
-          date: grade.date.toISOString(),
-          grade: grade.value,
-          average: weightedSum / totalWeight
-      };
-  });
-}
 
-function setupGradesChart(subjects) {
-  const ctx = document.getElementById('gradesChart');
-  if (!ctx) return;
+        allGrades.sort((a, b) => a.date - b.date);
 
-  const gradePoints = calculateGradePoints(subjects);
-  
-  new Chart(ctx, {
-      type: 'line',
-      data: {
-          labels: gradePoints.map((_, index) => ''),
-          datasets: [{
-              label: 'Átlag',
-              data: gradePoints.map(p => p.average),
-              borderWidth: 5,
-              tension: 0.5,
-              segment: {
-                  borderColor: ctx => {
-                      const curr = ctx.p1.parsed.y;
-                      if (!curr) return 'transparent';
-                      const color = getComputedStyle(document.documentElement).getPropertyValue(
-                          curr < 2 ? '--grades-1' :
-                          curr < 2.5 ? '--grades-2' :
-                          curr < 3.5 ? '--grades-3' :
-                          curr < 4.5 ? '--grades-4' : '--grades-5'
-                      ).trim() + '80';
-                      return color;
-                  }
-              },
-              fill: true,
-              backgroundColor: function(context) {
-                  const chart = context.chart;
-                  const {ctx, chartArea} = chart;
-                  if (!chartArea) return null;
-                  
-                  const gradientBg = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
-                  
-                  
-                  gradientBg.addColorStop(0, getComputedStyle(document.documentElement).getPropertyValue('--grades-1').trim() + '30');
-                  gradientBg.addColorStop(0.2, getComputedStyle(document.documentElement).getPropertyValue('--grades-2').trim() + '30');
-                  gradientBg.addColorStop(0.4, getComputedStyle(document.documentElement).getPropertyValue('--grades-3').trim() + '30');
-                  gradientBg.addColorStop(0.6, getComputedStyle(document.documentElement).getPropertyValue('--grades-4').trim() + '30');
-                  gradientBg.addColorStop(0.8, getComputedStyle(document.documentElement).getPropertyValue('--grades-5').trim() + '30');
-                  
-                  return gradientBg;
-              },
-              pointBackgroundColor: context => {
-                  const value = context.raw;
-                  return getComputedStyle(document.documentElement).getPropertyValue(
-                      value < 2 ? '--grades-1' :
-                      value < 2.5 ? '--grades-2' :
-                      value < 3.5 ? '--grades-3' :
-                      value < 4.5 ? '--grades-4' : '--grades-5'
-                  ).trim();
-              },
-              pointRadius: 0,
-              pointHoverRadius: 0
-          }]
-      },
-      options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: {
-              y: {
-                  min: 1,
-                  max: 5,
-                  ticks: {
-                      stepSize: 1,
-                      color: getComputedStyle(document.documentElement).getPropertyValue('--text-secondary')
-                  },
-                  grid: {
-                      color: getComputedStyle(document.documentElement).getPropertyValue('--text-teritary') + '20',
-                      lineWidth: 1,
-                      borderDash: [5, 5]
-                  }
-              },
-              x: {
-                  display: false
-              }
-          },
-          plugins: {
-              legend: {
-                  display: false
-              },
-              tooltip: {
-                  backgroundColor: getComputedStyle(document.documentElement).getPropertyValue('--card-card'),
-                  titleColor: getComputedStyle(document.documentElement).getPropertyValue('--text-primary'),
-                  bodyColor: getComputedStyle(document.documentElement).getPropertyValue('--text-primary'),
-                  borderColor: getComputedStyle(document.documentElement).getPropertyValue('--text-teritary') + '20',
-                  borderWidth: 1,
-                  padding: 12,
-                  displayColors: false,
-                  callbacks: {
-                      title: () => '',
-                      label: context => `Átlag: ${context.raw.toFixed(2)}`
-                  }
-              }
-          }
-      }
-  });
-}
 
-function generateSubjectCards(subjects) {
-  const sortedSubjects = [...subjects].sort((a, b) => a.grades.length - b.grades.length);
+        let totalWeight = 0;
+        let weightedSum = 0;
+        return allGrades.map(grade => {
+            totalWeight += grade.weight;
+            weightedSum += grade.value * grade.weight;
+            return {
+                date: grade.date.toISOString(),
+                grade: grade.value,
+                average: weightedSum / totalWeight
+            };
+        });
+    }
 
-  return sortedSubjects.map(subject => {
-      const regularGrades = subject.grades.filter(grade => !grade.isSemesterGrade);
-      const myGrade = Math.floor(subject.average) || 0;
-      const classGrade = Math.floor(subject.classAverage) || 0;
-      
-      return `
+    function setupGradesChart(subjects) {
+        const ctx = document.getElementById('gradesChart');
+        if (!ctx) return;
+
+        const gradePoints = calculateGradePoints(subjects);
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: gradePoints.map((_, index) => ''),
+                datasets: [{
+                    label: 'Átlag',
+                    data: gradePoints.map(p => p.average),
+                    borderWidth: 5,
+                    tension: 0.5,
+                    segment: {
+                        borderColor: ctx => {
+                            const curr = ctx.p1.parsed.y;
+                            if (!curr) return 'transparent';
+                            const color = getComputedStyle(document.documentElement).getPropertyValue(
+                                curr < 2 ? '--grades-1' :
+                                curr < 2.5 ? '--grades-2' :
+                                curr < 3.5 ? '--grades-3' :
+                                curr < 4.5 ? '--grades-4' : '--grades-5'
+                            ).trim() + '80';
+                            return color;
+                        }
+                    },
+                    fill: true,
+                    backgroundColor: function(context) {
+                        const chart = context.chart;
+                        const {ctx, chartArea} = chart;
+                        if (!chartArea) return null;
+
+                        const gradientBg = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
+
+
+                        gradientBg.addColorStop(0, getComputedStyle(document.documentElement).getPropertyValue('--grades-1').trim() + '30');
+                        gradientBg.addColorStop(0.2, getComputedStyle(document.documentElement).getPropertyValue('--grades-2').trim() + '30');
+                        gradientBg.addColorStop(0.4, getComputedStyle(document.documentElement).getPropertyValue('--grades-3').trim() + '30');
+                        gradientBg.addColorStop(0.6, getComputedStyle(document.documentElement).getPropertyValue('--grades-4').trim() + '30');
+                        gradientBg.addColorStop(0.8, getComputedStyle(document.documentElement).getPropertyValue('--grades-5').trim() + '30');
+
+                        return gradientBg;
+                    },
+                    pointBackgroundColor: context => {
+                        const value = context.raw;
+                        return getComputedStyle(document.documentElement).getPropertyValue(
+                            value < 2 ? '--grades-1' :
+                            value < 2.5 ? '--grades-2' :
+                            value < 3.5 ? '--grades-3' :
+                            value < 4.5 ? '--grades-4' : '--grades-5'
+                        ).trim();
+                    },
+                    pointRadius: 0,
+                    pointHoverRadius: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        min: 1,
+                        max: 5,
+                        ticks: {
+                            stepSize: 1,
+                            color: getComputedStyle(document.documentElement).getPropertyValue('--text-secondary')
+                        },
+                        grid: {
+                            color: getComputedStyle(document.documentElement).getPropertyValue('--text-teritary') + '20',
+                            lineWidth: 1,
+                            borderDash: [5, 5]
+                        }
+                    },
+                    x: {
+                        display: false
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: getComputedStyle(document.documentElement).getPropertyValue('--card-card'),
+                        titleColor: getComputedStyle(document.documentElement).getPropertyValue('--text-primary'),
+                        bodyColor: getComputedStyle(document.documentElement).getPropertyValue('--text-primary'),
+                        borderColor: getComputedStyle(document.documentElement).getPropertyValue('--text-teritary') + '20',
+                        borderWidth: 1,
+                        padding: 12,
+                        displayColors: false,
+                        callbacks: {
+                            title: () => '',
+                            label: context => `Átlag: ${context.raw.toFixed(2)}`
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    function generateSubjectCards(subjects) {
+        const sortedSubjects = [...subjects].sort((a, b) => a.grades.length - b.grades.length);
+
+        return sortedSubjects.map(subject => {
+            const regularGrades = subject.grades.filter(grade => !grade.isSemesterGrade);
+            const myGrade = Math.floor(subject.average) || 0;
+            const classGrade = Math.floor(subject.classAverage) || 0;
+
+            return `
         <div class="subject-card card">
           <div class="subject-header">
             <div class="subject-title">
@@ -519,68 +521,68 @@ function generateSubjectCards(subjects) {
           </div>
         </div>
       `;
-  }).join('');
-}
-
-  function setupEventListeners() {
-    
-    const userBtn = document.querySelector('.user-dropdown-btn');
-    const userDropdown = document.querySelector('.user-dropdown');
-    
-    userBtn?.addEventListener('click', (e) => {
-      e.stopPropagation();
-      userDropdown.classList.toggle('show');
-    });
-
-    document.addEventListener('click', () => {
-      userDropdown?.classList.remove('show');
-    });
-
-    
-    const timerEl = document.getElementById('logoutTimer');
-    if (timerEl) {
-      const startTime = parseInt(timerEl.textContent?.match(/\d+/)?.[0] || "45");
-      let timeLeft = startTime * 60;
-      
-      const updateTimer = () => {
-        const minutes = Math.floor(timeLeft / 60);
-        const seconds = timeLeft % 60;
-        timerEl.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-        
-        if (timeLeft <= 0) {
-          window.location.href = '/Home/Logout';
-        } else {
-          timeLeft--;
-        }
-      };
-
-      updateTimer();
-      setInterval(updateTimer, 1000);
+        }).join('');
     }
-  }
 
-  function waitForElement(selector) {
-    return new Promise(resolve => {
-      if (document.querySelector(selector)) {
-        return resolve(document.querySelector(selector));
-      }
+    function setupEventListeners() {
 
-      const observer = new MutationObserver(mutations => {
-        if (document.querySelector(selector)) {
-          observer.disconnect();
-          resolve(document.querySelector(selector));
+        const userBtn = document.querySelector('.user-dropdown-btn');
+        const userDropdown = document.querySelector('.user-dropdown');
+
+        userBtn?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            userDropdown.classList.toggle('show');
+        });
+
+        document.addEventListener('click', () => {
+            userDropdown?.classList.remove('show');
+        });
+
+
+        const timerEl = document.getElementById('logoutTimer');
+        if (timerEl) {
+            const startTime = parseInt(timerEl.textContent?.match(/\d+/)?.[0] || "45");
+            let timeLeft = startTime * 60;
+
+            const updateTimer = () => {
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                timerEl.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+                if (timeLeft <= 0) {
+                    window.location.href = '/Home/Logout';
+                } else {
+                    timeLeft--;
+                }
+            };
+
+            updateTimer();
+            setInterval(updateTimer, 1000);
         }
-      });
+    }
 
-      observer.observe(document.body, {
-        childList: true,
-        subtree: true
-      });
-    });
-  }
+    function waitForElement(selector) {
+        return new Promise(resolve => {
+            if (document.querySelector(selector)) {
+                return resolve(document.querySelector(selector));
+            }
 
-  
-  if (window.location.href.includes('/TanuloErtekeles/Osztalyzatok')) {
-    transformGradesPage();
-  }
+            const observer = new MutationObserver(mutations => {
+                if (document.querySelector(selector)) {
+                    observer.disconnect();
+                    resolve(document.querySelector(selector));
+                }
+            });
+
+            observer.observe(document.body, {
+                childList: true,
+                subtree: true
+            });
+        });
+    }
+
+
+    if (window.location.href.includes('/TanuloErtekeles/Osztalyzatok')) {
+        transformGradesPage();
+    }
 })();

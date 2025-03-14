@@ -1,50 +1,50 @@
 @font-face {
-  font-family: 'Montserrat';
-  font-style: normal;
-  font-weight: 400;
-  src: url(chrome-extension://__MSG_@@extension_id__/fonts/Montserrat-SemiBold.woff2) format('woff2');
+    font-family: 'Montserrat';
+    font-style: normal;
+    font-weight: 400;
+    src: url(chrome-extension://__MSG_@@extension_id__/fonts/Montserrat-SemiBold.woff2) format('woff2');
 }
 
 @font-face {
-  font-family: 'Montserrat';
-  font-style: normal;
-  font-weight: 500;
-  src: url(chrome-extension://__MSG_@@extension_id__/fonts/Montserrat-Regular.woff2) format('woff2');
+    font-family: 'Montserrat';
+    font-style: normal;
+    font-weight: 500;
+    src: url(chrome-extension://__MSG_@@extension_id__/fonts/Montserrat-Regular.woff2) format('woff2');
 }
 
 @font-face {
-  font-family: 'Montserrat';
-  font-style: normal;
-  font-weight: 600;
-  src: url(chrome-extension://__MSG_@@extension_id__/fonts/Montserrat-Medium.woff2) format('woff2');
+    font-family: 'Montserrat';
+    font-style: normal;
+    font-weight: 600;
+    src: url(chrome-extension://__MSG_@@extension_id__/fonts/Montserrat-Medium.woff2) format('woff2');
 }
 
 @font-face {
-  font-family: 'Figtree';
-  src: url('chrome-extension://__MSG_@@extension_id__/fonts/Figtree-Regular.woff2') format('woff2');
-  font-weight: 400;
-  font-style: normal;
+    font-family: 'Figtree';
+    src: url('chrome-extension://__MSG_@@extension_id__/fonts/Figtree-Regular.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
 }
 
 * {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
 body {
-  margin: 0;
-  padding: 0;
-  color: var(--text-primary);
-  background-color: var(--background) !important;
-  font-family: "Montserrat", serif !important;
-  min-height: 100vh;
-  font-size: 16px;
+    margin: 0;
+    padding: 0;
+    color: var(--text-primary);
+    background-color: var(--background) !important;
+    font-family: "Montserrat", serif !important;
+    min-height: 100vh;
+    font-size: 16px;
 }
 .kreta-container {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 .grades-chart {
     width: 100%;
@@ -56,558 +56,559 @@ body {
     overflow-y: auto;
 }
 .overall-averages {
-    margin-bottom: 2rem;
     padding: 1.5rem;
     background: var(--card-card);
     border-radius: 24px;
     box-shadow: 0px 1px var(--shadow-blur) 0px var(--accent-shadow);
 }
 .average-details {
-  display: flex;
-  gap: 2rem;
-  justify-content: center;
+    display: flex;
+    gap: 2rem;
+    justify-content: center;
 }
 .average-item {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
 }
 .average-label {
-  color: var(--text-secondary);
-  font-size: 1.1rem;
-  font-weight: 500;
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    font-weight: 500;
 }
 .average-value {
-  font-size: 1.5rem;
-  font-weight: 600;
+    font-size: 1.5rem;
+    font-weight: 600;
 }
 .average-value.warning {
-  color: var(--error-accent);
+    color: var(--error-accent);
 }
 
 .grades-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 400px), 1fr));
-  gap: 1.5rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 400px), 1fr));
+    gap: 1.5rem;
 }
 .subject-card {
-  background: var(--card-card);
-  border-radius: 24px;
-  padding: 1.5rem;
-  box-shadow: 0px 1px var(--shadow-blur) 0px var(--accent-shadow);
+    background: var(--card-card);
+    border-radius: 24px;
+    padding: 1.5rem;
+    box-shadow: 0px 1px var(--shadow-blur) 0px var(--accent-shadow);
 }
 .subject-title {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 0.5rem;
-  width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    width: 100%;
 }
 
 .subject-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
 }
 .subject-title h3 {
-  padding: 1rem;
-  margin-bottom: 0px !important;
-  margin-top: 0px !important;
-  color: var(--text-primary);
-  font-family: Montserrat;
-  font-size: 16px;
-  font-style: normal;
-  font-weight: 600;
-  line-height: normal;
+    padding: 1rem;
+    margin-bottom: 0px !important;
+    margin-top: 0px !important;
+    color: var(--text-primary);
+    font-family: Montserrat;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
 }
 .subject-averages .average-circle {
-  display: flex;
-  width: 48px;
-  height: 26px;
-  padding: 6px 8px;
-  justify-content: center;
-  align-items: center;
-  gap: 14px;
-  border-radius: 16px;
-  background-color: var(--background-secondary);
+    display: flex;
+    width: 48px;
+    height: 26px;
+    padding: 6px 8px;
+    justify-content: center;
+    align-items: center;
+    gap: 14px;
+    border-radius: 16px;
+    background-color: var(--background-secondary);
 }
 .subject-averages .class-average[data-grade="1"] {
-  border: 2px solid var(--grades-1);
-  color: var(--grades-1);
+    border: 2px solid var(--grades-1);
+    color: var(--grades-1);
 }
 .subject-averages .class-average[data-grade="2"] {
-  border: 2px solid var(--grades-2);
-  color: var(--grades-2);
+    border: 2px solid var(--grades-2);
+    color: var(--grades-2);
 }
 .subject-averages .class-average[data-grade="3"] {
-  border: 2px solid var(--grades-3);
-  color: var(--grades-3);
+    border: 2px solid var(--grades-3);
+    color: var(--grades-3);
 }
 .subject-averages .class-average[data-grade="4"] {
-  border: 2px solid var(--grades-4);
-  color: var(--grades-4);
+    border: 2px solid var(--grades-4);
+    color: var(--grades-4);
 }
 .subject-averages .class-average[data-grade="5"] {
-  border: 2px solid var(--grades-5);
-  color: var(--grades-5);
+    border: 2px solid var(--grades-5);
+    color: var(--grades-5);
 }.subject-averages .average-label {
-  font-size: 0.625rem;
-  color: var(--text-secondary);
+    font-size: 0.625rem;
+    color: var(--text-secondary);
 }
 .subject-averages .average-value {
-  font-size: 0.875rem;
-  font-weight: 600;
+    font-size: 0.875rem;
+    font-weight: 600;
 }
 
 .subject-averages .my-average[data-grade] .average-value,
 .subject-averages .class-average[data-grade] .average-value {
-  color: inherit;
+    color: inherit;
 }
 
 .subject-averages {
-  display: flex;
-  gap: 0.75rem;
-  align-items: center;
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
 }
 
 .grades-list {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    overflow: auto;
+    max-height: calc(71.5px* 5 - 10px); 
 }
 .grade-item {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  gap: 1rem;
-  padding: 1rem;
-  border-radius: 12px;
-  align-items: start;
-  position: relative;
-  background-color: var(--card-card);
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 1rem;
+    padding: 1rem;
+    border-radius: 12px;
+    align-items: start;
+    position: relative;
+    background-color: var(--card-card);
 }
 .grade-value {
-  display: flex;
-  width: 24px;
-  height: 24px;
-  padding: 7.5px 0px;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  border-radius: 12px;
-  font-family: Montserrat;
-  font-size: 18px;
-  font-style: normal;
-  font-weight: 700;
-  line-height: normal;
-  text-align: center;
+    display: flex;
+    width: 24px;
+    height: 24px;
+    padding: 7.5px 0px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: 12px;
+    font-family: Montserrat;
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+    text-align: center;
 }
 .grade-details {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
 }
 .grade-theme {
-  overflow: hidden;
-  color: var(--text-primary);
-  text-overflow: ellipsis;
-  font-family: Figtree;
-  font-size: 16px;
-  font-style: normal;
-  font-weight: 600;
-  line-height: 130%;
+    overflow: hidden;
+    color: var(--text-primary);
+    text-overflow: ellipsis;
+    font-family: Figtree;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 130%;
 }
 .grade-meta, .grade-date {
-  overflow: hidden;
-  color: var(--text-secondary);
-  text-overflow: ellipsis;
-  font-family: Figtree;
-  font-size: 14px;
-  font-style: normal;
-  font-weight: 500;
-  line-height: 130%;
+    overflow: hidden;
+    color: var(--text-secondary);
+    text-overflow: ellipsis;
+    font-family: Figtree;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 130%;
 }
 
 .grade-date {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  text-align: center;
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    text-align: center;
 }
 
 .grade-1 .grade-value {
-  background-color: var(--grades-background-1);
-  color: var(--grades-1);
+    background-color: var(--grades-background-1);
+    color: var(--grades-1);
 }
 .grade-2 .grade-value {
-  background-color: var(--grades-background-2);
-  color: var(--grades-2);
+    background-color: var(--grades-background-2);
+    color: var(--grades-2);
 }
 .grade-3 .grade-value {
-  background-color: var(--grades-background-3);
-  color: var(--grades-3);
+    background-color: var(--grades-background-3);
+    color: var(--grades-3);
 }
 .grade-4 .grade-value {
-  background-color: var(--grades-background-4);
-  color: var(--grades-4);
+    background-color: var(--grades-background-4);
+    color: var(--grades-4);
 }
 .grade-5 .grade-value {
-  background-color: var(--grades-background-5);
-  color: var(--grades-5);
+    background-color: var(--grades-background-5);
+    color: var(--grades-5);
 }
 
 .semester-grade {
-  background-color: var(--button-secondaryFill) !important;
-  border: 2px solid var(--accent-accent) !important;
-  position: relative;
-  padding-top: 1.5rem !important;
-  box-shadow: 0px 1px var(--shadow-blur) 0px var(--accent-shadow);
+    background-color: var(--button-secondaryFill) !important;
+    border: 2px solid var(--accent-accent) !important;
+    position: relative;
+    padding-top: 1.5rem !important;
+    box-shadow: 0px 1px var(--shadow-blur) 0px var(--accent-shadow);
 }
 .semester-grade::before {
-  content: "Félévi értékelés";
-  position: absolute;
-  top: 0.25rem;
-  left: 50%;
-  transform: translateX(-50%);
-  background: var(--accent-accent);
-  color: var(--button-secondaryFill);
-  padding: 2px 12px;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 500;
-  white-space: nowrap;
-  z-index: 1;
+    content: "Félévi értékelés";
+    position: absolute;
+    top: 0.25rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--accent-accent);
+    color: var(--button-secondaryFill);
+    padding: 2px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+    z-index: 1;
 }
 
 .user-profile {
-  position: relative;
-  justify-self: flex-end;
+    position: relative;
+    justify-self: flex-end;
 }
 .user-dropdown-btn {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0.5rem;
-  border-radius: 8px;
-  transition: background-color 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 8px;
+    transition: background-color 0.2s;
 }
 .user-dropdown-btn:hover {
-  background: var(--card-card);
+    background: var(--card-card);
 }
 .user-info {
-  text-align: right;
+    text-align: right;
 }
 .user-name {
-  display: block;
-  color: var(--text-primary);
-  font-size: 16px;
-  font-weight: 500;
+    display: block;
+    color: var(--text-primary);
+    font-size: 16px;
+    font-weight: 500;
 }
 .user-time {
-  display: block;
-  color: var(--text-secondary);
-  font-size: 14px;
+    display: block;
+    color: var(--text-secondary);
+    font-size: 14px;
 }
 .user-dropdown {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  margin-top: 0.5rem;
-  background: var(--card-card);
-  border-radius: 12px;
-  box-shadow: 0px 1px var(--shadow-blur) 0px var(--accent-shadow);
-  width: 200px;
-  display: none;
-  z-index: 1000;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 0.5rem;
+    background: var(--card-card);
+    border-radius: 12px;
+    box-shadow: 0px 1px var(--shadow-blur) 0px var(--accent-shadow);
+    width: 200px;
+    display: none;
+    z-index: 1000;
 }
 .user-dropdown.show {
-  display: block;
-  animation: dropdownShow 0.2s ease;
+    display: block;
+    animation: dropdownShow 0.2s ease;
 }
 .dropdown-item {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem 1rem;
-  color: var(--text-primary);
-  text-decoration: none;
-  transition: background-color 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    color: var(--text-primary);
+    text-decoration: none;
+    transition: background-color 0.2s;
 }
 .dropdown-item:hover {
-  background: var(--button-secondaryFill);
+    background: var(--button-secondaryFill);
 }
 
 .nav-links {
-  display: flex;
-  gap: clamp(0.5rem, 2vw, 1rem);
-  padding: 0.25rem;
-  justify-content: center;
+    display: flex;
+    gap: clamp(0.5rem, 2vw, 1rem);
+    padding: 0.25rem;
+    justify-content: center;
 }
 .nav-links a {
-  color: var(--text-secondary);
-  text-decoration: none;
-  padding: clamp(0.5rem, 1.5vw, 1rem) 0.5rem;
-  font-weight: 500;
-  white-space: nowrap;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  border-radius: 8px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    padding: clamp(0.5rem, 1.5vw, 1rem) 0.5rem;
+    font-weight: 500;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-radius: 8px;
 }
 .nav-links a:hover {
-  color: var(--text-primary);
-  background-color: var(--card-card);
+    color: var(--text-primary);
+    background-color: var(--card-card);
 }
 .nav-links a.active {
-  color: var(--accent-accent);
+    color: var(--accent-accent);
 }
 
 .kreta-main {
-  flex: 1;
-  padding: clamp(1rem, 3vw, 2rem);
-  max-width: 1400px;
-  margin: 0 auto;
-  width: 100%;
+    flex: 1;
+    padding: clamp(1rem, 3vw, 2rem);
+    max-width: 1400px;
+    margin: 0 auto;
+    width: 100%;
 }
 
 @keyframes dropdownShow {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 @media (max-width: 768px) {
-  body {
-    font-size: 14px;
-  }
+    body {
+        font-size: 14px;
+    }
 .average-details {
-    flex-direction: column;
-    align-items: center;
-    gap: 1rem;
-  }
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+    }
 .nav-links {
-    justify-content: flex-start;
-    width: 100%;
-    gap: 0.25rem;
-  }
+        justify-content: flex-start;
+        width: 100%;
+        gap: 0.25rem;
+    }
 .nav-links a {
-    padding: 0.5rem;
-    font-size: 13px;
-  }
+        padding: 0.5rem;
+        font-size: 13px;
+    }
 }
 
 .loading-screen {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: var(--background);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--background);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
 }
 
 .loading-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
 }
 
 .loading-logo {
-  width: 48px;
-  height: 48px;
-  border-radius: 16px;
+    width: 48px;
+    height: 48px;
+    border-radius: 16px;
 }
 
 .loading-text {
-  color: var(--text-primary);
-  text-align: center;
-  font-family: Montserrat;
-  font-size: 20px;
-  font-style: normal;
-  font-weight: 700;
-  line-height: normal;
+    color: var(--text-primary);
+    text-align: center;
+    font-family: Montserrat;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
 }
 
 .loading-text2 {
-  align-self: stretch;
-  color: var(--text-secondary);
-  text-align: center;
-  font-family: Figtree;
-  font-size: 16px;
-  font-style: normal;
-  font-weight: 500;
-  line-height: 130%;
+    align-self: stretch;
+    color: var(--text-secondary);
+    text-align: center;
+    font-family: Figtree;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 130%;
 }
 
 .material-icons-round {
-  font-size: 20px;
-  vertical-align: middle;
+    font-size: 20px;
+    vertical-align: middle;
 }
 
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+    width: 8px;
+    height: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--background);
+    background: var(--background);
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--text-secondary);
-  border-radius: 4px;
+    background: var(--text-secondary);
+    border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--text-primary);
+    background: var(--text-primary);
 }
 
 .chart-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  padding: 1rem;
-  position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 1rem;
+    position: relative;
 }
 
 .chart-title {
-  white-space: nowrap;
-  color: var(--text-primary);
-  font-family: Montserrat;
-  font-size: 16px;
-  font-style: normal;
-  font-weight: 600;
-  line-height: normal;
+    white-space: nowrap;
+    color: var(--text-primary);
+    font-family: Montserrat;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
 }
 
 .chart-averages {
-  display: flex;
-  gap: 1rem;
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
+    display: flex;
+    gap: 1rem;
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
 }
 
 .average-circle {
-  display: flex;
-  width: 48px;
-  height: 26px;
-  padding: 6px 8px;
-  justify-content: center;
-  align-items: center;
-  gap: 14px;
-  border-radius: 16px;
+    display: flex;
+    width: 48px;
+    height: 26px;
+    padding: 6px 8px;
+    justify-content: center;
+    align-items: center;
+    gap: 14px;
+    border-radius: 16px;
 }
 .average-circle[data-grade="1"],
 .my-average[data-grade="1"] {
-  background-color: var(--grades-background-1);
-  color: var(--grades-1);
+    background-color: var(--grades-background-1);
+    color: var(--grades-1);
 }
 .class-average[data-grade="1"] {
-  background-color: transparent;
-  border: 2px solid var(--grades-1);
-  color: var(--grades-1);
+    background-color: transparent;
+    border: 2px solid var(--grades-1);
+    color: var(--grades-1);
 }
 
 .average-circle[data-grade="2"],
 .my-average[data-grade="2"] {
-  background-color: var(--grades-background-2);
-  color: var(--grades-2);
+    background-color: var(--grades-background-2);
+    color: var(--grades-2);
 }
 .class-average[data-grade="2"] {
-  background-color: transparent;
-  border: 2px solid var(--grades-2);
-  color: var(--grades-2);
+    background-color: transparent;
+    border: 2px solid var(--grades-2);
+    color: var(--grades-2);
 }
 
 .average-circle[data-grade="3"],
 .my-average[data-grade="3"] {
-  background-color: var(--grades-background-3);
-  color: var(--grades-3);
+    background-color: var(--grades-background-3);
+    color: var(--grades-3);
 }
 .class-average[data-grade="3"] {
-  background-color: transparent;
-  border: 2px solid var(--grades-3);
-  color: var(--grades-3);
+    background-color: transparent;
+    border: 2px solid var(--grades-3);
+    color: var(--grades-3);
 }
 
 .average-circle[data-grade="4"],
 .my-average[data-grade="4"] {
-  background-color: var(--grades-background-4);
-  color: var(--grades-4);
+    background-color: var(--grades-background-4);
+    color: var(--grades-4);
 }
 .class-average[data-grade="4"] {
-  background-color: transparent;
-  border: 2px solid var(--grades-4);
-  color: var(--grades-4);
+    background-color: transparent;
+    border: 2px solid var(--grades-4);
+    color: var(--grades-4);
 }
 
 .average-circle[data-grade="5"],
 .my-average[data-grade="5"] {
-  background-color: var(--grades-background-5);
-  color: var(--grades-5);
+    background-color: var(--grades-background-5);
+    color: var(--grades-5);
 }
 .class-average[data-grade="5"] {
-  background-color: transparent;
-  border: 2px solid var(--grades-5);
-  color: var(--grades-5);
+    background-color: transparent;
+    border: 2px solid var(--grades-5);
+    color: var(--grades-5);
 }
 .average-circle .average-label {
-  font-size: 0.75rem;
-  color: var(--text-secondary);
+    font-size: 0.75rem;
+    color: var(--text-secondary);
 }
 
 .average-circle .average-value {
-  text-align: center;
-  font-family: Figtree;
-  font-size: 14px;
-  font-style: normal;
-  font-weight: 500;
-  line-height: 130%;
+    text-align: center;
+    font-family: Figtree;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 130%;
 }
 
 .grade-distribution {
-  display: flex;
-  gap: 1rem;
-  padding: 1rem;
+    display: flex;
+    gap: 1rem;
+    padding: 1rem;
 }
 
 .grade-count {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 8px 4px 4px;
-  border-radius: 16px;
-  border: 1px solid var(--accent-15);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 8px 4px 4px;
+    border-radius: 16px;
+    border: 1px solid var(--accent-15);
 }
 
 .grade-count .grade-value {
-  font-weight: 700;
-  text-align: center;
-  font-family: Montserrat;
-  font-size: 18px;
-  font-style: normal;
-  line-height: 130%;
+    font-weight: 700;
+    text-align: center;
+    font-family: Montserrat;
+    font-size: 18px;
+    font-style: normal;
+    line-height: 130%;
 }
 .grade-count .grade-amount {
-  color: var(--text-primary);
-  text-align: center;
-  font-family: Montserrat;
-  font-size: 14px;
-  font-style: normal;
-  font-weight: 500;
-  line-height: 130%;
+    color: var(--text-primary);
+    text-align: center;
+    font-family: Montserrat;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 130%;
 }
 
 .grade-count.grade-1 { color: var(--grades-1); }
@@ -617,100 +618,101 @@ body {
 .grade-count.grade-5 { color: var(--grades-5); }
 
 .grades-overview {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 1.5rem;
-  margin-bottom: 2rem;
-  align-items: stretch;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    align-items: stretch;
+    overflow-y: auto;
 }
 .semester-grades {
-  width: 300px;
-  height: 400px;
-  padding: 1.5rem;
-  background: var(--card-card);
-  border-radius: 24px;
-  box-shadow: 0px 1px var(--shadow-blur) 0px var(--accent-shadow);
-  display: flex;
-  flex-direction: column;
+    width: 300px;
+    height: 400px;
+    padding: 1.5rem;
+    background: var(--card-card);
+    border-radius: 24px;
+    box-shadow: 0px 1px var(--shadow-blur) 0px var(--accent-shadow);
+    display: flex;
+    flex-direction: column;
 }
 .semester-grades h3 {
-  padding: 1rem;
-  margin-bottom: 0px !important;
-  margin-top: 0px !important;
-  color: var(--text-primary);
-  font-family: Montserrat;
-  font-size: 16px;
-  font-style: normal;
-  font-weight: 600;
-  line-height: normal;
+    padding: 1rem;
+    margin-bottom: 0px !important;
+    margin-top: 0px !important;
+    color: var(--text-primary);
+    font-family: Montserrat;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
 }
 .semester-grade-item {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  gap: 1rem;
-  padding: 1rem;
-  border-radius: 12px;
-  align-items: center;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 1rem;
+    padding: 1rem;
+    border-radius: 12px;
+    align-items: center;
 }
 .semester-grade-item:hover {
-  background: var(--button-secondaryFill);
+    background: var(--button-secondaryFill);
 }
 .semester-grades-list {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  overflow-y: auto;
-  padding-right: 0.5rem;
-  flex: 1;
-  margin: -0.5rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+    flex: 1;
+    margin: -0.5rem 0;
 }
 .semester-grade-subject {
-  overflow: hidden;
-  color: var(--text-primary);
-  text-overflow: ellipsis;
-  font-family: Figtree;
-  font-size: 16px;
-  font-style: normal;
-  font-weight: 600;
-  line-height: 130%;
+    overflow: hidden;
+    color: var(--text-primary);
+    text-overflow: ellipsis;
+    font-family: Figtree;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 130%;
 }
 .semester-grade-value {
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 16px;
-  font-weight: 700;
-  font-size: 22px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 16px;
+    font-weight: 700;
+    font-size: 22px;
 }
 .semester-grade-item.grade-1 .semester-grade-value { 
-  background-color: var(--grades-background-1);
-  color: var(--grades-1); 
+    background-color: var(--grades-background-1);
+    color: var(--grades-1); 
 }
 .semester-grade-item.grade-2 .semester-grade-value { 
-  background-color: var(--grades-background-2);
-  color: var(--grades-2); 
+    background-color: var(--grades-background-2);
+    color: var(--grades-2); 
 }
 .semester-grade-item.grade-3 .semester-grade-value { 
-  background-color: var(--grades-background-3);
-  color: var(--grades-3); 
+    background-color: var(--grades-background-3);
+    color: var(--grades-3); 
 }
 .semester-grade-item.grade-4 .semester-grade-value { 
-  background-color: var(--grades-background-4);
-  color: var(--grades-4); 
+    background-color: var(--grades-background-4);
+    color: var(--grades-4); 
 }
 .semester-grade-item.grade-5 .semester-grade-value { 
-  background-color: var(--grades-background-5);
-  color: var(--grades-5); 
+    background-color: var(--grades-background-5);
+    color: var(--grades-5); 
 }
 
 @media (max-width: 1024px) {
-  .grades-overview {
-      grid-template-columns: 1fr;
-  }
-  
-  .semester-grades {
-      width: 100%;
-  }
+    .grades-overview {
+            grid-template-columns: 1fr;
+    }
+    
+    .semester-grades {
+            width: 100%;
+    }
 }

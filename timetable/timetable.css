@@ -352,6 +352,11 @@ body {
   width: 100%;
 }
 
+/* Disable Kréta styles */
+.k-overlay, .k-widget.k-window {
+  display: none !important;
+}
+
 /* Card styles */
 .card {
   border-radius: 24px;
@@ -419,10 +424,8 @@ body {
   border-radius: 12px;
   padding: 8px;
   transition: transform 0.2s ease;
-}
-
-.lesson-slot:hover {
-  transform: scale(1.02);
+  display: grid;
+  grid-gap: 16px;
 }
 
 .lesson-card {
@@ -627,7 +630,7 @@ body {
 }
 
 .lesson-modal.show {
-  display: flex;
+  display: flex !important;
   opacity: 1;
 }
 
@@ -734,6 +737,14 @@ body {
   padding: 1rem;
   border-radius: 8px;
   color: var(--text-primary);
+}
+
+.detail-item .line-through {
+  text-decoration: line-through;
+}
+
+.detail-item.hidden {
+  display: none;
 }
 
 /* Animations */
