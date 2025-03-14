@@ -419,10 +419,8 @@ body {
   border-radius: 12px;
   padding: 8px;
   transition: transform 0.2s ease;
-}
-
-.lesson-slot:hover {
-  transform: scale(1.02);
+  display: grid;
+  grid-gap: 16px;
 }
 
 .lesson-card {
