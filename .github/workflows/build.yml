@@ -3,7 +3,7 @@ name: Package and Release Extension
 on:
   push:
     branches:
-      - main
+      - test
 
 jobs:
   build-and-release:
