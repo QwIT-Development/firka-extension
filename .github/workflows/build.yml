@@ -1,0 +1,56 @@
+name: Package and Release Extension
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Get current date
+        id: date
+        run: echo "::set-output name=date::$(date +'%Y-%m-%d-%H-%M')"
+
+      - name: Create ZIP file
+        run: |
+          zip -r "firxa-${{ steps.date.outputs.date }}.zip" . -x "*.git*" "*.github*"
+
+      - name: Delete previous pre-release
+        uses: dev-drprasad/delete-tag-and-release@v0.2.1
+        with:
+          delete_release: true
+          tag_name: pre-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        continue-on-error: true
+
+      - name: Create new pre-release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        with:
+          tag_name: pre-release
+          release_name: Fejlesztői build
+          body: |
+            A build automatikusan készült ${{ steps.date.outputs.date }}-án/én.
+            Ez egy kiadás előtti build, amely minden egyes, a commitelés után frissül.
+          draft: false
+          prerelease: true
+
+      - name: Upload ZIP to release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./firxa-${{ steps.date.outputs.date }}.zip
+          asset_name: firxa-${{ steps.date.outputs.date }}.zip
+          asset_content_type: application/zip
