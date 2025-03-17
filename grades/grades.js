@@ -1,52 +1,7 @@
 (() => {
-    function getCookie(name) {
-        const cookieName = `${name}=`;
-        const decodedCookie = decodeURIComponent(document.cookie);
-        const cookieArray = decodedCookie.split(';');
-
-        for(let i = 0; i < cookieArray.length; i++) {
-            let cookie = cookieArray[i];
-            while (cookie.charAt(0) === ' ') {
-                cookie = cookie.substring(1);
-            }
-            if (cookie.indexOf(cookieName) === 0) {
-                return cookie.substring(cookieName.length, cookie.length);
-            }
-        }
-        return null;
-    }
-
-    function showLoadingScreen() {
-        const existingLoadingScreen = document.querySelector('.loading-screen');
-        if (existingLoadingScreen) return;
-
-        const loadingScreen = document.createElement('div');
-        loadingScreen.className = 'loading-screen';
-        loadingScreen.innerHTML = `
-      <div class="loading-content">
-        <img src="${chrome.runtime.getURL('images/firka_logo.png')}" alt="Firka" class="loading-logo">
-        <div class="loading-text">Betöltés alatt...</div>
-        <div class="loading-text2">Kis türelmet!</div>
-      </div>
-    `;
-        document.body.appendChild(loadingScreen);
-    }
-
-    function hideLoadingScreen() {
-        const loadingScreen = document.querySelector('.loading-screen');
-        if (loadingScreen) {
-            loadingScreen.style.opacity = '0';
-            loadingScreen.addEventListener('transitionend', () => {
-                loadingScreen.remove();
-            });
-        }
-    }
-
     async function transformGradesPage() {
         try {
-            showLoadingScreen();
-
-            await waitForElement('#Osztalyzatok_7895TanuloErtekelesByTanuloGrid');
+            await helper.waitForElement('#Osztalyzatok_7895TanuloErtekelesByTanuloGrid');
             await new Promise(resolve => setTimeout(resolve, 1000));
 
             const gradesData = extractGradesData();
@@ -55,36 +10,22 @@
 
             document.body.innerHTML = generatePageHTML(gradesData, studentAverage, classAverage);
 
-            const links = [
-                { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
-                { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: true },
-                { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap' },
-                { rel: 'stylesheet', href: 'https://fonts.googleapis.com/icon?family=Material+Icons+Round' }
-            ];
-
+            createTemplate.importFonts();
 
             const script = document.createElement('script');
             script.src = chrome.runtime.getURL('grades/chart.js');
             document.head.appendChild(script);
-
-            links.forEach(link => {
-                const linkElement = document.createElement('link');
-                Object.entries(link).forEach(([key, value]) => {
-                    linkElement[key] = value;
-                });
-                document.head.appendChild(linkElement);
-            });
 
             script.onload = () => {
                 setupGradesChart(gradesData.subjects);
             };
 
             setupEventListeners();
-            hideLoadingScreen();
+            loadingScreen.hide();
 
         } catch (error) {
             console.error('Error transforming grades page:', error);
-            hideLoadingScreen();
+            loadingScreen.hide();
         }
     }
 
@@ -142,11 +83,11 @@
 
         return {
             schoolInfo: {
-                id: getCookie('schoolCode') || '',
-                name: getCookie('schoolName') || 'Iskola'
+                id: cookieManager.get('schoolCode') || '',
+                name: cookieManager.get('schoolName') || 'Iskola'
             },
             userData: {
-                name: getCookie('userName') || 'Felhasználó',
+                name: cookieManager.get('userName') || 'Felhasználó',
                 time: document.querySelector('.usermenu_timer')?.textContent?.trim() || '45:00'
             },
             subjects: subjects
@@ -225,69 +166,15 @@
         const gradeDistribution = calculateGradeDistribution(data.subjects);
         const semesterGrades = extractSemesterGrades(data.subjects);
 
-
         const studentGradeLevel = Math.floor(studentAverage) || 0;
         const classGradeLevel = Math.floor(classAverage) || 0;
 
+        schoolNameFull = `${data.schoolInfo.id} - ${data.schoolInfo.name}`;
+        shortenedSchoolName = helper.shortenSchoolName(schoolNameFull);
+
         return `
       <div class="kreta-container">
-        <header class="kreta-header">
-          <div class="school-info">
-            <p class="logo-text">
-              <img src="${chrome.runtime.getURL('images/firka_logo.png')}" alt="Firka" class="logo">
-              Firka
-            </p>
-            <div class="school-details">
-              <span>${data.schoolInfo.id} - ${data.schoolInfo.name}</span>
-            </div>
-          </div>
-          <nav class="kreta-nav">
-            <div class="nav-links">
-              <a href="/Intezmeny/Faliujsag" data-page="dashboard" class="nav-item">
-                <img src="${chrome.runtime.getURL('icons/dashboard-inactive.svg')}" alt="Kezdőlap">
-                Kezdőlap
-              </a>
-              <a href="/TanuloErtekeles/Osztalyzatok" data-page="grades" class="nav-item active">
-                <img src="${chrome.runtime.getURL('icons/grades-active.svg')}" alt="Jegyek">
-                Jegyek
-              </a>
-              <a href="/Orarend/InformaciokOrarend" data-page="timetable" class="nav-item">
-                <img src="${chrome.runtime.getURL('icons/timetable-inactive.svg')}" alt="Órarend">
-                Órarend
-              </a>
-              <a href="/Hianyzas/Hianyzasok" data-page="absences" class="nav-item">
-                <img src="${chrome.runtime.getURL('icons/absences-inactive.svg')}" alt="Mulasztások">
-                Mulasztások
-              </a>
-              <a href="/Tanulo/TanuloHaziFeladat" data-page="other" class="nav-item">
-                <img src="${chrome.runtime.getURL('icons/others.svg')}" alt="Egyéb">
-                Egyéb
-              </a>
-            </div>
-          </nav>
-          <div class="user-profile">
-            <button class="user-dropdown-btn">
-              <div class="user-info">
-                <span class="user-name">${data.userData.name}</span>
-                <span class="nav-logout-timer" id="logoutTimer">${data.userData.time}</span>
-              </div>
-            </button>
-            <div class="user-dropdown">
-              <a href="/Adminisztracio/Profil" data-page="profile" class="dropdown-item">
-                <img src="${chrome.runtime.getURL('icons/profile.svg')}" alt="Profil">
-                Profil
-              </a>
-              <a href="#" class="dropdown-item" id="settingsBtn">
-                <img src="${chrome.runtime.getURL('icons/settings.svg')}" alt="Beállítások">
-                Beállítások
-              </a>
-              <a href="/Home/Logout" data-page="logout" class="dropdown-item">
-                <img src="${chrome.runtime.getURL('icons/logout.svg')}" alt="Kijelentkezés">
-                Kijelentkezés
-              </a>
-            </div>
-          </div>
-        </header>
+        ${createTemplate.header()}
 
         <main class="kreta-main">
           <div class="grades-overview">
@@ -560,27 +447,6 @@
             setInterval(updateTimer, 1000);
         }
     }
-
-    function waitForElement(selector) {
-        return new Promise(resolve => {
-            if (document.querySelector(selector)) {
-                return resolve(document.querySelector(selector));
-            }
-
-            const observer = new MutationObserver(mutations => {
-                if (document.querySelector(selector)) {
-                    observer.disconnect();
-                    resolve(document.querySelector(selector));
-                }
-            });
-
-            observer.observe(document.body, {
-                childList: true,
-                subtree: true
-            });
-        });
-    }
-
 
     if (window.location.href.includes('/TanuloErtekeles/Osztalyzatok')) {
         transformGradesPage();

@@ -1,17 +1,4 @@
 const utils = {
-  shortenSchoolName(name, maxLength = 50) {
-    if (!name || name.length <= maxLength) return name || '';
-    
-    const [code, fullName] = name.split(' - ');
-    if (fullName) {
-      const maxFullNameLength = maxLength - code.length - 3;
-      if (fullName.length > maxFullNameLength) {
-        return `${code} - ${fullName.substring(0, maxFullNameLength)}...`;
-      }
-    }
-    return `${name.substring(0, maxLength - 3)}...`;
-  },
-
   formatGradeValue(value) {
     return value?.trim() || '';
   },
@@ -26,10 +13,8 @@ const utils = {
     const dateParts = dateStr.trim().split('.');
     if (dateParts.length < 3) return dateStr;
     
-    
     const month = parseInt(dateParts[1], 10);
     const day = parseInt(dateParts[2], 10);
-    
     
     if (isNaN(month) || month < 1 || month > 12) return dateStr;
     
@@ -37,7 +22,6 @@ const utils = {
       'január', 'február', 'március', 'április', 'május', 'június',
       'július', 'augusztus', 'szeptember', 'október', 'november', 'december'
     ];
-    
     
     return `${hungarianMonths[month - 1]} ${day}.`;
   }
@@ -192,82 +176,18 @@ class DashboardUI {
     this.data = {
       ...data,
       schoolInfo: {
-        name: cookies.getCookie(COOKIE_KEYS.SCHOOL_NAME) || DEFAULT_VALUES.SCHOOL,
-        id: cookies.getCookie(COOKIE_KEYS.SCHOOL_CODE) || ''
+        name: cookieManager.get(COOKIE_KEYS.SCHOOL_NAME) || DEFAULT_VALUES.SCHOOL,
+        id: cookieManager.get(COOKIE_KEYS.SCHOOL_CODE) || ''
       },
       userData: {
-        name: cookies.getCookie(COOKIE_KEYS.USER_NAME) || DEFAULT_VALUES.USER,
+        name: cookieManager.get(COOKIE_KEYS.USER_NAME) || DEFAULT_VALUES.USER,
         time: document.querySelector('.usermenu_timer')?.textContent?.trim() || DEFAULT_VALUES.TIMER
       }
     };
     this.schoolNameFull = `${this.data.schoolInfo.id} - ${this.data.schoolInfo.name}`;
-    this.shortenedSchoolName = utils.shortenSchoolName(this.schoolNameFull);
+    this.shortenedSchoolName = helper.shortenSchoolName(this.schoolNameFull);
   }
 
-  
-  static generateHeaderHTML(data, schoolNameFull, shortenedSchoolName) {
-      return `
-        <header class="kreta-header">
-          <div class="school-info">
-            <p class="logo-text">
-              <img src="${chrome.runtime.getURL('images/firka_logo.png')}" alt="Firka" class="logo">
-              Firka
-            </p>
-            <div class="school-details" title="${schoolNameFull}">
-              ${shortenedSchoolName}
-            </div>
-          </div>
-          
-          <nav class="kreta-nav">
-            <div class="nav-links">
-              <a href="/Intezmeny/Faliujsag" data-page="dashboard" class="nav-item active">
-                <img src="${chrome.runtime.getURL('icons/dashboard-active.svg')}" alt="Kezdőlap">
-                Kezdőlap
-              </a>
-              <a href="/TanuloErtekeles/Osztalyzatok" data-page="grades" class="nav-item">
-                <img src="${chrome.runtime.getURL('icons/grades-inactive.svg')}" alt="Jegyek">
-                Jegyek
-              </a>
-              <a href="/Orarend/InformaciokOrarend" data-page="timetable" class="nav-item">
-                <img src="${chrome.runtime.getURL('icons/timetable-inactive.svg')}" alt="Órarend">
-                Órarend
-              </a>
-              <a href="/Hianyzas/Hianyzasok" data-page="absences" class="nav-item">
-                <img src="${chrome.runtime.getURL('icons/absences-inactive.svg')}" alt="Mulasztások">
-                Mulasztások
-              </a>
-              <a href="/Tanulo/TanuloHaziFeladat" data-page="other" class="nav-item">
-                <img src="${chrome.runtime.getURL('icons/others.svg')}" alt="Egyéb">
-                Egyéb
-              </a>
-            </div>
-          </nav>
-          
-          <div class="user-profile">
-            <button class="user-dropdown-btn">
-              <div class="user-info">
-                <span class="user-name">${data.userData.name}</span>
-                <span class="nav-logout-timer" id="logoutTimer">${data.userData.time}</span>
-              </div>
-            </button>
-            <div class="user-dropdown">
-              <a href="/Adminisztracio/Profil" data-page="profile" class="dropdown-item">
-                <img src="${chrome.runtime.getURL('icons/profile.svg')}" alt="Profil">
-                Profil
-              </a>
-              <a href="#" class="dropdown-item" id="settingsBtn">
-                <img src="${chrome.runtime.getURL('icons/settings.svg')}" alt="Beállítások">
-                Beállítások
-              </a>
-              <a href="/Home/Logout" data-page="logout" class="dropdown-item">
-                <img src="${chrome.runtime.getURL('icons/logout.svg')}" alt="Kijelentkezés">
-                Kijelentkezés
-              </a>
-            </div>
-          </div>
-        </header>
-      `;
-    }
   generateMainContentHTML() {
     return `
       <main class="kreta-main">
@@ -369,58 +289,13 @@ class DashboardUI {
   render() {
     document.body.innerHTML = `
       <div class="kreta-container">
-        ${DashboardUI.generateHeaderHTML(this.data, this.schoolNameFull, this.shortenedSchoolName)}
+        ${createTemplate.header()}
         ${this.generateMainContentHTML()}
       </div>
     `;
     setupUserDropdown();
-    setupLogoutTimer();
   }
 }
-
-
-function setupLogoutTimer() {
-  const timerElement = document.querySelector('.nav-logout-timer');
-  if (!timerElement) return;
-  
-  const timeString = timerElement.textContent;
-  const startTime = parseInt(timeString?.match(/\d+/)?.[0] || "45");
-  let timeLeft = startTime * 60;
-  
-  const updateTimer = () => {
-    const minutes = Math.floor(timeLeft / 60);
-    const seconds = timeLeft % 60;
-    timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-    
-    if (timeLeft <= 0) {
-      window.location.href = '/Home/Logout';
-    }
-    timeLeft--;
-  };
-
-  updateTimer();
-  setInterval(updateTimer, 1000);
-}
-
-class FontLoader {
-  static loadFonts() {
-    const links = [
-      { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
-      { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: true },
-      { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap' },
-      { rel: 'stylesheet', href: 'https://fonts.googleapis.com/icon?family=Material+Icons+Round' }
-    ];
-
-    links.forEach(link => {
-      const linkElement = document.createElement('link');
-      Object.entries(link).forEach(([key, value]) => {
-        linkElement[key] = value;
-      });
-      document.head.appendChild(linkElement);
-    });
-  }
-}
-
 
 class DashboardApp {
   constructor() {
@@ -433,7 +308,7 @@ class DashboardApp {
     try {
       const dataExtractor = new DashboardDataExtractor();
       const dashboardData = dataExtractor.extractAll();
-      FontLoader.loadFonts();
+      createTemplate.importFonts();
       const ui = new DashboardUI(dashboardData);
       ui.render();
     } catch (error) {

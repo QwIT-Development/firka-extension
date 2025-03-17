@@ -1,34 +1,4 @@
-(() => {
-    function getCookie(name) {
-      const cookieName = `${name}=`;
-      const decodedCookie = decodeURIComponent(document.cookie);
-      const cookieArray = decodedCookie.split(';');
-      
-      for(let i = 0; i < cookieArray.length; i++) {
-        let cookie = cookieArray[i];
-        while (cookie.charAt(0) === ' ') {
-          cookie = cookie.substring(1);
-        }
-        if (cookie.indexOf(cookieName) === 0) {
-          return cookie.substring(cookieName.length, cookie.length);
-        }
-      }
-      return null;
-    }
-  
-    function shortenSchoolName(name) {
-      if (!name) return '';
-      const maxLength = 30;
-      if (name.length <= maxLength) return name;
-      
-      const parts = name.split(' - ');
-      if (parts.length === 2) {
-        const [code, fullName] = parts;
-        return `${code} - ${fullName.substring(0, maxLength - code.length - 5)}...`;
-      }
-      return name.substring(0, maxLength - 3) + '...';
-    }
-  
+(() => {  
     function createSecurityTab() {
       return `
         <div class="security-content">
@@ -196,8 +166,8 @@
       const saveButton = form.querySelector('#saveContacts');
   
       
-      emailInput.value = getCookie('userEmail') || '';
-      phoneInput.value = getCookie('userPhone') || '';
+      emailInput.value = cookieManager.get('userEmail') || '';
+      phoneInput.value = cookieManager.get('userPhone') || '';
   
       saveButton?.addEventListener('click', async () => {
         const email = emailInput.value.trim();
@@ -371,67 +341,10 @@
       }
     }
   
-    function createProfileHTML(data) {
-      const schoolNameFull = `${data.schoolInfo.id} - ${data.schoolInfo.name}`;
-      const shortenedSchoolName = shortenSchoolName(schoolNameFull);
-  
+    function createProfileHTML() {
       return `
         <div class="kreta-container">
-          <header class="kreta-header">
-            <div class="school-info">
-              <p class="logo-text">
-                <img src=${chrome.runtime.getURL('images/firka_logo.png')} alt="Firka" class="logo">
-                Firka
-              </p>
-              <div class="school-details" title="${schoolNameFull}">
-                ${shortenedSchoolName}
-              </div>
-            </div>
-            
-            <nav class="kreta-nav">
-              <div class="nav-links">
-                <a href="/Intezmeny/Faliujsag">
-                  <span class="material-icons-round">calendar_today</span>
-                  Kezdőlap
-                </a>
-                <a href="/TanuloErtekeles/Osztalyzatok">
-                  <span class="material-icons-round">bookmark_border</span>
-                  Jegyek
-                </a>
-                <a href="/Orarend/InformaciokOrarend">
-                  <span class="material-icons-round">home</span>
-                  Órarend
-                </a>
-                <a href="/Hianyzas/Hianyzasok">
-                  <span class="material-icons-round">schedule</span>
-                  Hiányok
-                </a>
-              </div>
-            </nav>
-  
-            <div class="user-profile">
-              <button class="user-dropdown-btn">
-                <div class="user-info">
-                  <span class="user-name">${data.userData.name}</span>
-                  <span class="user-time" id="logoutTimer">${data.userData.time}</span>
-                </div>
-              </button>
-              <div class="user-dropdown">
-                <a href="/Adminisztracio/Profil" class="dropdown-item">
-                  <span class="material-icons-round">person</span>
-                  Profil
-                </a>
-                <a href="#" class="dropdown-item" id="settingsBtn">
-                  <span class="material-icons-round">settings</span>
-                  Beállítások
-                </a>
-                <a href="/Home/Logout" class="dropdown-item">
-                  <span class="material-icons-round">logout</span>
-                  Kijelentkezés
-                </a>
-              </div>
-            </div>
-          </header>
+          ${createTemplate.header()}
   
           <main class="kreta-main">
             <div class="card">
@@ -469,34 +382,9 @@
     async function init() {
       if (window.location.pathname.includes('/Adminisztracio/Profil')) {
         
-        const links = [
-          { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
-          { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: true },
-          { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap' },
-          { rel: 'stylesheet', href: 'https://fonts.googleapis.com/icon?family=Material+Icons+Round' }
-        ];
+        createTemplate.importFonts();
   
-        links.forEach(link => {
-          const linkElement = document.createElement('link');
-          Object.entries(link).forEach(([key, value]) => {
-            linkElement[key] = value;
-          });
-          document.head.appendChild(linkElement);
-        });
-  
-        const userData = {
-          schoolInfo: {
-            name: getCookie('schoolName') || 'Iskola',
-            id: getCookie('schoolCode') || ''
-          },
-          userData: {
-            name: getCookie('userName') || 'Felhasználó',
-            time: document.querySelector('.usermenu_timer')?.textContent?.trim() || '45:00',
-            email: getCookie('userEmail') || ''
-          }
-        };
-  
-        document.body.innerHTML = createProfileHTML(userData);
+        document.body.innerHTML = createProfileHTML();
         setupEventListeners();
         setupContactForm();
       }

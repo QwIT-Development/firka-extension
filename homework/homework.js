@@ -1,65 +1,14 @@
-function getCookie(name) {
-  const cookieName = `${name}=`;
-  const decodedCookie = decodeURIComponent(document.cookie);
-  const cookieArray = decodedCookie.split(';');
-  
-  for(let i = 0; i < cookieArray.length; i++) {
-    let cookie = cookieArray[i];
-    while (cookie.charAt(0) === ' ') {
-      cookie = cookie.substring(1);
-    }
-    if (cookie.indexOf(cookieName) === 0) {
-      return cookie.substring(cookieName.length, cookie.length);
-    }
-  }
-  return null;
-}
-
-function shortenSchoolName(name, maxLength = 50) {
-  if (!name) return '';
-  if (name.length <= maxLength) return name;
-  
-  const parts = name.split(' - ');
-  if (parts.length === 2) {
-    const [code, fullName] = parts;
-    if (fullName.length > maxLength - code.length - 3) {
-      return `${code} - ${fullName.substring(0, maxLength - code.length - 6)}...`;
-    }
-  }
-  return name.substring(0, maxLength - 3) + '...';
-}
-
-async function waitForElement(selector) {
-  return new Promise(resolve => {
-    if (document.querySelector(selector)) {
-      return resolve(document.querySelector(selector));
-    }
-
-    const observer = new MutationObserver(mutations => {
-      if (document.querySelector(selector)) {
-        observer.disconnect();
-        resolve(document.querySelector(selector));
-      }
-    });
-
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true
-    });
-  });
-}
-
 async function collectHomeworkData() {
-  await waitForElement('#TanulotHaziFeladatkGrid');
+  await helper.waitForElement('#TanulotHaziFeladatkGrid');
   await new Promise(resolve => setTimeout(resolve, 1000));
 
   const basicData = {
     schoolInfo: {
-      name: getCookie('schoolName') || 'Iskola',
-      id: getCookie('schoolCode') || ''
+      name: cookieManager.get('schoolName') || 'Iskola',
+      id: cookieManager.get('schoolCode') || ''
     },
     userData: {
-      name: getCookie('userName') || 'Felhasználó',
+      name: cookieManager.get('userName') || 'Felhasználó',
       time: document.querySelector('.usermenu_timer')?.textContent?.trim() || '45:00'
     }
   };
@@ -93,29 +42,6 @@ async function collectHomeworkData() {
   return { basicData, homeworkItems, groupedHomework };
 }
 
-function showLoadingScreen() {
-  const loadingHTML = `
-    <div class="loading-overlay">
-      <div class="loading-container">
-        <img src="${chrome.runtime.getURL('images/firka_logo.png')}" alt="Firka" class="loading-logo">
-        <div class="loading-text">Betöltés alatt...</div>
-        <p class="loading-text2">Kis türelmet</p>
-      </div>
-    </div>
-  `;
-  
-  document.body.insertAdjacentHTML('beforeend', loadingHTML);
-}
-
-function hideLoadingScreen() {
-  const loadingOverlay = document.querySelector('.loading-overlay');
-  if (loadingOverlay) {
-    loadingOverlay.style.opacity = '0';
-    loadingOverlay.style.transition = 'opacity 0.3s ease';
-    setTimeout(() => loadingOverlay.remove(), 300);
-  }
-}
-
 function isTomorrow(dateStr) {
   if (!dateStr) return false;
   
@@ -143,74 +69,16 @@ function isTomorrow(dateStr) {
 }
 
 async function transformHomeworkPage() {
-  showLoadingScreen();
+  //loadingScreen.show();
   const { basicData, homeworkItems, groupedHomework } = await collectHomeworkData();
 
   
   const schoolNameFull = `${basicData.schoolInfo.id} - ${basicData.schoolInfo.name}`;
-  const shortenedSchoolName = shortenSchoolName(schoolNameFull);
+  const shortenedSchoolName = helper.shortenSchoolName(schoolNameFull);
 
   document.body.innerHTML = `
     <div class="kreta-container">
-      <header class="kreta-header">
-        <div class="school-info">
-          <p class="logo-text">
-            <img src="${chrome.runtime.getURL('images/firka_logo.png')}" alt="Firka" class="logo">
-            Firka
-          </p>
-          <div class="school-details" title="${schoolNameFull}">
-            ${shortenedSchoolName}
-          </div>
-        </div>
-        
-        <nav class="kreta-nav">
-          <div class="nav-links">
-            <a href="/Intezmeny/Faliujsag" data-page="dashboard" class="nav-item">
-              <img src="${chrome.runtime.getURL('icons/dashboard-inactive.svg')}" alt="Kezdőlap">
-              Kezdőlap
-            </a>
-            <a href="/TanuloErtekeles/Osztalyzatok" data-page="grades" class="nav-item">
-              <img src="${chrome.runtime.getURL('icons/grades-inactive.svg')}" alt="Jegyek">
-              Jegyek
-            </a>
-            <a href="/Orarend/InformaciokOrarend" data-page="timetable" class="nav-item">
-              <img src="${chrome.runtime.getURL('icons/timetable-inactive.svg')}" alt="Órarend">
-              Órarend
-            </a>
-            <a href="/Hianyzas/Hianyzasok" data-page="absences" class="nav-item">
-              <img src="${chrome.runtime.getURL('icons/absences-inactive.svg')}" alt="Mulasztások">
-              Mulasztások
-            </a>
-            <a href="/Tanulo/TanuloHaziFeladat" data-page="other" class="nav-item active">
-              <img src="${chrome.runtime.getURL('icons/others.svg')}" alt="Egyéb">
-              Egyéb
-            </a>
-          </div>
-        </nav>
-
-        <div class="user-profile">
-          <button class="user-dropdown-btn">
-            <div class="user-info">
-              <span class="user-name">${basicData.userData.name}</span>
-              <span class="nav-logout-timer" id="logoutTimer">${basicData.userData.time}</span>
-            </div>
-          </button>
-          <div class="user-dropdown">
-            <a href="/Adminisztracio/Profil" data-page="profile" class="dropdown-item">
-              <img src="${chrome.runtime.getURL('icons/profile.svg')}" alt="Profil">
-              Profil
-            </a>
-            <a href="#" class="dropdown-item" id="settingsBtn">
-              <img src="${chrome.runtime.getURL('icons/settings.svg')}" alt="Beállítások">
-              Beállítások
-            </a>
-            <a href="/Home/Logout" data-page="logout" class="dropdown-item">
-              <img src="${chrome.runtime.getURL('icons/logout.svg')}" alt="Kijelentkezés">
-              Kijelentkezés
-            </a>
-          </div>
-        </div>
-      </header>
+      ${createTemplate.header()}
 
       <main class="kreta-main">
         <div class="filter-card">
@@ -268,8 +136,7 @@ async function transformHomeworkPage() {
 
   setupFilters(homeworkItems, groupedHomework);
   setupUserDropdown();
-  setupLogoutTimer();
-  hideLoadingScreen();
+  loadingScreen.hide();
 }
 
 function renderHomeworkList(groupedHomework) {
@@ -531,39 +398,7 @@ function setupUserDropdown() {
   document.addEventListener('click', () => {
     userDropdown?.classList.remove('show');
   });
-  
-  
-  document.getElementById('settingsBtn')?.addEventListener('click', (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    const url = chrome.runtime.getURL('settings/index.html');
-    window.open(url, '_blank', 'width=400,height=600');
-  });
 }
-
-function setupLogoutTimer() {
-  const timerElement = document.querySelector('.nav-logout-timer');
-  if (!timerElement) return;
-  
-  const timeString = timerElement.textContent;
-  const startTime = parseInt(timeString?.match(/\d+/)?.[0] || "45");
-  let timeLeft = startTime * 60;
-  
-  const updateTimer = () => {
-    const minutes = Math.floor(timeLeft / 60);
-    const seconds = timeLeft % 60;
-    timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-    
-    if (timeLeft <= 0) {
-      window.location.href = '/Home/Logout';
-    }
-    timeLeft--;
-  };
-
-  updateTimer();
-  setInterval(updateTimer, 1000);
-}
-
 
 if (window.location.href.includes('/Tanulo/TanuloHaziFeladat')) {
   transformHomeworkPage().catch(error => {

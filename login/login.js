@@ -1,12 +1,10 @@
 async function transformLoginPage() {
   try {
-    
     if (document.readyState !== 'complete') {
       await new Promise(resolve => {
         window.addEventListener('load', resolve);
       });
     }
-    
     
     const existingForm = document.querySelector('form');
     const formData = {
@@ -15,7 +13,6 @@ async function transformLoginPage() {
       instituteCode: document.querySelector('#instituteCode')?.value || '',
       requestToken: document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
     };
-
     
     const titleElement = document.querySelector('.page-title');
     const schoolInfo = {
@@ -23,7 +20,6 @@ async function transformLoginPage() {
       kretaId: '',
       omCode: ''
     };
-
     
     const spanElement = titleElement?.querySelector('span');
     if (spanElement) {
@@ -31,11 +27,9 @@ async function transformLoginPage() {
       schoolInfo.kretaId = lines[0] || '';
       schoolInfo.omCode = (lines[1] || '').replace('KRÉTA azonosító: ', '');
     }
-
     
     const rawSystemMessage = document.querySelector('.alert-primary')?.textContent?.trim() || '';
     const systemMessage = rawSystemMessage.replace('Rendszerértesítés', '').trim();
-
     
     const newHTML = `
       <div class="login-container">
@@ -100,10 +94,8 @@ async function transformLoginPage() {
         </footer>
       </div>
     `;
-
     
     document.body.innerHTML = newHTML;
-
     
     setupEventListeners();
 
@@ -117,7 +109,6 @@ function setupEventListeners() {
   const passwordInput = document.getElementById('Password');
   const togglePasswordBtn = document.querySelector('.show-password');
   const formInputs = document.querySelectorAll('.form-control');
-
   
   if (togglePasswordBtn && passwordInput) {
     togglePasswordBtn.addEventListener('click', () => {
