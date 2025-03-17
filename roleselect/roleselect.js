@@ -1,11 +1,4 @@
 (() => {
-  
-  const setCookie = (name, value, days = 365) => {
-    const date = new Date();
-    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-    document.cookie = `${name}=${value}; expires=${date.toUTCString()}; path=/; domain=.e-kreta.hu`;
-  };
-
   const startLogoutTimer = () => {
     let timeLeft = 45 * 60;
     const timerElement = document.getElementById('logoutTimer');
@@ -124,30 +117,18 @@
 
       
       if (schoolCode && fullSchoolName) {
-        setCookie('schoolCode', schoolCode);
-        setCookie('schoolName', fullSchoolName);
-        setCookie('schoolSubdomain', schoolSubdomain);
+        cookieManager.set('schoolCode', schoolCode);
+        cookieManager.set('schoolName', fullSchoolName);
+        cookieManager.set('schoolSubdomain', schoolSubdomain);
       }
       if (userName) {
-        setCookie('userName', userName);
+        cookieManager.set('userName', userName);
       }
 
       
       document.body.innerHTML = createHTML(schoolCode, fullSchoolName, userName);
 
-      
-      const links = [
-        { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
-        { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: true },
-        { href: 'https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Figtree:wght@300..900&display=swap', rel: 'stylesheet' }
-      ];
-
-      links.forEach(link => {
-        const linkElement = document.createElement('link');
-        Object.entries(link).forEach(([key, value]) => linkElement[key] = value);
-        document.head.appendChild(linkElement);
-      });
-
+      createTemplate.importFonts();
       
       const timerInterval = startLogoutTimer();
 

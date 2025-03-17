@@ -27,8 +27,9 @@
       "matches": [
         "https://*.e-kreta.hu/*"
       ],
-      "js": ["global/maintenance.js", "global/theme.js", "global/navigation.js"],
-      "css": ["global/theme.css", "global/navigation.css"],
+      "js": ["tools/cookieManager.js", "tools/helper.js", "tools/loadingScreen.js", "tools/createTemplate.js",
+              "global/maintenance.js", "global/theme.js", "global/navigation.js"],
+      "css": ["tools/loadingScreen.css", "global/theme.css", "global/navigation.css"],
       "run_at": "document_start"
     },
     {

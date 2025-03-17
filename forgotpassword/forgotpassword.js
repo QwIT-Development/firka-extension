@@ -1,9 +1,7 @@
 (() => {
     const transformForgotPasswordPage = () => {
-      
       const isDarkMode = localStorage.getItem('darkMode') === 'true';
       document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
-  
       
       chrome.runtime.onMessage.addListener((message) => {
         if (message.action === 'toggleTheme') {
@@ -11,7 +9,6 @@
           localStorage.setItem('darkMode', message.darkMode);
         }
       });
-  
       
       document.body.innerHTML = `
         <div class="forgot-container">
@@ -103,7 +100,6 @@
       const form = event.target;
       const inputs = form.querySelectorAll('.form-control[required]');
       let isValid = true;
-  
       
       inputs.forEach(input => {
         if (!validateInput(input, true)) {
@@ -144,7 +140,6 @@
         submitButton.disabled = false;
       }
     };
-  
     
     if (window.location.href.includes('/Adminisztracio/ElfelejtettJelszo')) {
       transformForgotPasswordPage();

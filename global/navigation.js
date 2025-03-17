@@ -11,26 +11,15 @@ const DEFAULT_VALUES = {
     TIMER: '45:00'
 };
 
-const cookies = {
-    getCookie(name) {
-        const value = `; ${document.cookie}`;
-        const parts = value.split(`; ${name}=`);
-        return parts.length === 2 ? parts.pop().split(';').shift() : null;
-    }
-};
-
-
-
-
 function updateHeaderInfo() {
     const schoolName = document.querySelector('.nav-school-name');
     const userName = document.querySelector('.nav-user-name');
     const logoutTimer = document.querySelector('.nav-logout-timer');
     
     const userData = {
-        schoolName: cookies.getCookie(COOKIE_KEYS.SCHOOL_NAME) || DEFAULT_VALUES.SCHOOL,
-        schoolId: cookies.getCookie(COOKIE_KEYS.SCHOOL_CODE) || '',
-        name: cookies.getCookie(COOKIE_KEYS.USER_NAME) || DEFAULT_VALUES.USER,
+        schoolName: cookieManager.get(COOKIE_KEYS.SCHOOL_NAME) || DEFAULT_VALUES.SCHOOL,
+        schoolId: cookieManager.get(COOKIE_KEYS.SCHOOL_CODE) || '',
+        name: cookieManager.get(COOKIE_KEYS.USER_NAME) || DEFAULT_VALUES.USER,
         time: document.querySelector('.usermenu_timer')?.textContent?.trim() || DEFAULT_VALUES.TIMER
     };
     
@@ -94,7 +83,6 @@ function setupSettingsButton() {
         window.open(url, '_blank', 'width=400,height=600');
     });
 }
-
 
 document.addEventListener('DOMContentLoaded', () => {
     updateHeaderInfo();
