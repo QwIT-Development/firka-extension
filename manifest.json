@@ -37,7 +37,7 @@
         "https://*.e-kreta.hu/*"
       ],
       "css": ["global/maintenance.css"],
-      "run_at": "document_end"
+      "run_at": "document_start"
     },
     {
       "matches": ["https://idp.e-kreta.hu/Account/Login*"],
@@ -48,8 +48,63 @@
       "matches": [
         "https://*.e-kreta.hu/Hianyzas/Hianyzasok*"
       ],
-      "js": ["absences/absences.js"],
       "css": ["absences/absences.css"],
+      "run_at": "document_start"
+    },
+    {
+      "matches": [
+        "https://idp.e-kreta.hu/Account/Logout*"
+      ],
+      "css": ["logout/logout.css"],
+      "run_at": "document_start"
+    },
+    {
+      "matches": [
+        "https://*.e-kreta.hu/Adminisztracio/BelepesKezelo*"
+      ],
+      "css": ["roleselect/roleselect.css"],
+      "run_at": "document_start"
+    },
+    {
+      "matches": [
+        "https://*.e-kreta.hu/Adminisztracio/ElfelejtettJelszo*"
+      ],
+      "css": ["forgotpassword/forgotpassword.css"],
+      "run_at": "document_start"
+    },
+    {
+      "matches": [
+        "https://*.e-kreta.hu/Intezmeny/Faliujsag*"
+      ],
+      "css": ["dashboard/dashboard.css"],
+      "run_at": "document_start"
+    },
+    {
+      "matches": [
+        "https://*.e-kreta.hu/Orarend/InformaciokOrarend*"
+      ],
+      "css": ["timetable/timetable.css"],
+      "run_at": "document_start"
+    },
+    {
+      "matches": [
+        "https://*.e-kreta.hu/Adminisztracio/Profil*"
+      ],
+      "css": ["profile/profile.css"],
+      "run_at": "document_start"
+    },
+    {
+      "matches": [
+        "https://*.e-kreta.hu/Tanulo/TanuloHaziFeladat*"
+      ],
+      "css": ["homework/homework.css"],
+      "run_at": "document_start"
+    },
+    {
+      "matches": [
+        "https://*.e-kreta.hu/Hianyzas/Hianyzasok*"
+      ],
+      "js": ["absences/absences.js"],
       "run_at": "document_end"
     },
     {
@@ -57,7 +112,6 @@
         "https://idp.e-kreta.hu/Account/Logout*"
       ],
       "js": ["logout/logout.js"],
-      "css": ["logout/logout.css"],
       "run_at": "document_end"
     },
     {
@@ -65,7 +119,6 @@
         "https://*.e-kreta.hu/Adminisztracio/BelepesKezelo*"
       ],
       "js": ["roleselect/roleselect.js"],
-      "css": ["roleselect/roleselect.css"],
       "run_at": "document_end"
     },
     {
@@ -73,7 +126,6 @@
         "https://*.e-kreta.hu/Adminisztracio/ElfelejtettJelszo*"
       ],
       "js": ["forgotpassword/forgotpassword.js"],
-      "css": ["forgotpassword/forgotpassword.css"],
       "run_at": "document_end"
     },
     {
@@ -81,7 +133,6 @@
         "https://*.e-kreta.hu/Intezmeny/Faliujsag*"
       ],
       "js": ["dashboard/dashboard.js"],
-      "css": ["dashboard/dashboard.css"],
       "run_at": "document_end"
     },
     {
@@ -89,7 +140,7 @@
         "https://*.e-kreta.hu/TanuloErtekeles/Osztalyzatok*"
       ],
       "js": ["grades/grades.js", "grades/chart.js"],
-      "css": ["grades/grades.css"],
+	  "css": ["grades/grades.css"],
       "run_at": "document_end"
     },
     {
@@ -97,7 +148,6 @@
         "https://*.e-kreta.hu/Orarend/InformaciokOrarend*"
       ],
       "js": ["timetable/timetable.js"],
-      "css": ["timetable/timetable.css"],
       "run_at": "document_end"
     },
     {
@@ -105,7 +155,6 @@
         "https://*.e-kreta.hu/Adminisztracio/Profil*"
       ],
       "js": ["profile/profile.js"],
-      "css": ["profile/profile.css"],
       "run_at": "document_end"
     },
     {
@@ -113,7 +162,6 @@
         "https://*.e-kreta.hu/Tanulo/TanuloHaziFeladat*"
       ],
       "js": ["homework/homework.js"],
-      "css": ["homework/homework.css"],
       "run_at": "document_end"
     }
   ]
