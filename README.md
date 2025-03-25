@@ -65,8 +65,8 @@ A bővítmény jelenleg az alábbi e-KRÉTA oldalakat támogatja:
 ## 👥 Csapat
 
 - **[Zan1456](https://github.com/Zan1456)** - Vezető Fejlesztő
-- **[BalazsManus](https://github.com/BalazsManus)** - Fejlesztő
-- **[Xou](https://github.com/Xou)** - Designer
+- **[BalazsManus](https://github.com/olajcsere)** - Fejlesztő
+- **[Xou](https://yoursit.ee/xou)** - Designer
 
 ## 🤝 Közreműködés
 
@@ -80,7 +80,7 @@ A bővítmény jelenleg az alábbi e-KRÉTA oldalakat támogatja:
 
 ## 📝 Licensz
 
-A projekt [GNU General Public License v3.0](LICENSE) alatt jelent meg. További információért lásd a LICENSE fájlt.
+A projekt [GNU Affero General Public License v3.0](LICENSE) alatt jelent meg. További információért lásd a LICENSE fájlt.
 
 ## 💬 Kapcsolat
 
