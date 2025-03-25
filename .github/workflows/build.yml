@@ -1,6 +1,7 @@
 name: Package and Release Extension
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
@@ -54,3 +55,14 @@ jobs:
           asset_path: ./firxa-${{ steps.date.outputs.date }}.zip
           asset_name: firxa-${{ steps.date.outputs.date }}.zip
           asset_content_type: application/zip
+
+  check-links:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Link Checker
+        id: lychee
+        uses: lycheeverse/lychee-action@v2
+        with:
+          fail: false
