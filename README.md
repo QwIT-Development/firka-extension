@@ -35,12 +35,19 @@
 ## 🚀 Telepítés
 
 1. Töltsd le a legfrissebb verziót a [Releases](https://github.com/Zan1456/Firkaextension/releases) oldalról
+### Chromium alapú böngészők esetén
 2. Csomagold ki a letöltött fájlt
-3. Chrome böngészőben navigálj a `chrome://extensions` oldalra
+3. Navigálj a `chrome://extensions` oldalra
 4. Kapcsold be a "Fejlesztői mód"-ot a jobb felső sarokban
 5. Kattints a "Kicsomagolt bővítmény betöltése" gombra
 6. Válaszd ki a kicsomagolt mappát
-7. Kész! A bővítmény automatikusan működésbe lép, amikor megnyitod az e-KRÉTA oldalt
+### Firefox alapú böngészők esetén
+2. Navigálj az `about:addons` oldalra
+3. Kattints rá a fogaskerék ikonra (⚙️) a jobb felső sarokban
+4. Ebben a menüben válaszd a(z) "Kiegészítő telepítése fájlból..."/"Install Add-on From File..."
+5. Válaszd ki a `.zip` fájlt amit letöltöttél
+### Kész!
+7. A bővítmény automatikusan működésbe lép, amikor megnyitod az e-KRÉTA oldalt
 
 ## ⚙️ Beállítások
 
