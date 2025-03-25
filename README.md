@@ -80,7 +80,7 @@ A bővítmény jelenleg az alábbi e-KRÉTA oldalakat támogatja:
 
 ## 📝 Licensz
 
-A projekt [GNU General Public License v3.0](LICENSE) alatt jelent meg. További információért lásd a LICENSE fájlt.
+A projekt [GNU Affero General Public License v3.0](LICENSE) alatt jelent meg. További információért lásd a LICENSE fájlt.
 
 ## 💬 Kapcsolat
 
