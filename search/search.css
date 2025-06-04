@@ -164,9 +164,13 @@ form {
   transition: background-color 0.2s ease-in-out !important;
 }
 
-.dropdown-item:hover, .dropdown-item:focus {
+li.dropdown-item:hover, li.dropdown-item:focus {
   background-color: var(--accent-15) !important;
   color: var(--text-primary) !important;
+}
+
+a.dropdown-item:hover, a.dropdown-item:focus {
+  background-color: #00000000 !important;
 }
 
 .dropdown-item.active {

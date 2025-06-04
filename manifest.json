@@ -120,6 +120,14 @@
       "js": ["homework/homework.js"],
       "css": ["homework/homework.css"],
       "run_at": "document_end"
+    },
+    {
+      "matches": [
+        "https://intezmenykereso.e-kreta.hu/"
+      ],
+      "js": ["search/search.js"],
+      "css": ["search/search.css"],
+      "run_at": "document_end"
     }
   ]
 }
