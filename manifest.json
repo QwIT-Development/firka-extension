@@ -40,6 +40,14 @@
       "run_at": "document_end"
     },
     {
+      "matches": [
+        "https://intezmenykereso.e-kreta.hu/*"
+      ],
+      "js": ["search/search.js"],
+      "css": ["search/search.css"],
+      "run_at": "document_end"
+    },
+    {
       "matches": ["https://idp.e-kreta.hu/Account/Login*"],
       "js": ["login/login.js"],
       "css": ["login/login.css"]
