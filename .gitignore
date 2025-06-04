@@ -7,3 +7,5 @@ META-INF/cose.sig
 META-INF/manifest.mf
 META-INF/mozilla.sf
 dashboard/KRÉTA Iskolai Alaprendszer.html
+*.xml
+*.xml
