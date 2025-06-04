@@ -14,11 +14,6 @@ async function transformLoginPage() {
       requestToken: document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
     };
     
-    // Check for reCAPTCHA elements
-    const recaptchaDiv = document.querySelector('.g-recaptcha');
-    const recaptchaPublicKey = document.querySelector('#ReCaptchaPublicKey')?.value || '';
-    const showRecaptcha = document.querySelector('#ShowReCaptcha')?.value === 'True';
-    
     const titleElement = document.querySelector('.page-title');
     const schoolInfo = {
       name: titleElement?.querySelector('b')?.textContent?.trim() || '',
@@ -72,13 +67,6 @@ async function transformLoginPage() {
               </button>
               <div class="error-message">Kérjük, add meg a jelszavad.</div>
             </div>
-            
-            ${showRecaptcha ? `
-            <div class="form-group recaptcha-container">
-              <div class="g-recaptcha" data-sitekey="${recaptchaPublicKey}"></div>
-              <input type="hidden" id="ReCaptchaPublicKey" name="ReCaptchaPublicKey" value="${recaptchaPublicKey}">
-              <input type="hidden" id="ShowReCaptcha" name="ShowReCaptcha" value="True">
-            </div>` : ''}
 
             <div class="form-actions">
               <button type="submit" class="btn-login">
@@ -108,15 +96,6 @@ async function transformLoginPage() {
     `;
     
     document.body.innerHTML = newHTML;
-    
-    // If reCAPTCHA is needed, load the script
-    if (showRecaptcha && recaptchaPublicKey) {
-      const recaptchaScript = document.createElement('script');
-      recaptchaScript.src = 'https://www.google.com/recaptcha/api.js';
-      recaptchaScript.async = true;
-      recaptchaScript.defer = true;
-      document.head.appendChild(recaptchaScript);
-    }
     
     setupEventListeners();
 
@@ -187,27 +166,6 @@ function handleSubmit(event) {
       isValid = false;
     }
   });
-
-  // Check if reCAPTCHA is present and validate it
-  const recaptchaContainer = form.querySelector('.g-recaptcha');
-  if (recaptchaContainer && window.grecaptcha) {
-    const recaptchaResponse = grecaptcha.getResponse();
-    if (!recaptchaResponse) {
-      // Show reCAPTCHA error
-      const errorDiv = document.createElement('div');
-      errorDiv.className = 'error-message show';
-      errorDiv.textContent = 'reCAPTCHA validáció szükséges!';
-      
-      // Remove any existing error message
-      const existingError = recaptchaContainer.nextElementSibling;
-      if (existingError && existingError.classList.contains('error-message')) {
-        existingError.remove();
-      }
-      
-      recaptchaContainer.parentNode.insertBefore(errorDiv, recaptchaContainer.nextSibling);
-      isValid = false;
-    }
-  }
 
   if (!isValid) {
     return;

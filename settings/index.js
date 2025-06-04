@@ -1,8 +1,10 @@
 document.addEventListener('DOMContentLoaded', async () => {
+  
   function getCookie(name) {
       const cookieName = `${name}=`;
       const decodedCookie = decodeURIComponent(document.cookie);
       const cookieArray = decodedCookie.split(';');
+      
       for(let i = 0; i < cookieArray.length; i++) {
           let cookie = cookieArray[i];
           while (cookie.charAt(0) === ' ') {
@@ -15,6 +17,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       return null;
   }
 
+  
   function setCookie(name, value, days = 365) {
       const date = new Date();
       date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
@@ -37,36 +40,80 @@ document.addEventListener('DOMContentLoaded', async () => {
       document.querySelectorAll('.theme-option').forEach(button => {
           const theme = button.dataset.theme;
           button.classList.toggle('active', theme === currentTheme);
+          
+          
+          /*if (theme === 'light-blue' || theme === 'dark-blue' || theme === 'default') {
+              button.classList.add('disabled');
+              button.setAttribute('disabled', 'true');
+          }*/
       });
   }
   
+  
+  function isThemeDisabled(theme) {
+      return theme === 'default' || theme === 'dark-blue';
+  }
+  
   async function applyTheme(theme) {
+      
+      if (isThemeDisabled(theme)) {
+          alert('Ez a téma jelenleg nem elérhető.');
+          return;
+      }
+      
+      
       setCookie('themePreference', theme);
       localStorage.setItem('themePreference', theme);
+      
+      
       document.documentElement.setAttribute('data-theme', theme);
+      
+      
       updateThemeButtons(theme);
+      
+      
       const tabs = await chrome.tabs.query({});
       tabs.forEach(tab => {
           chrome.tabs.sendMessage(tab.id, {
               action: 'changeTheme',
               theme: theme
           }).catch(() => {
+              
               console.log('Tab not ready for theme change:', tab.id);
           });
       });
   }
   
+  
   const themeButtons = document.querySelectorAll('.theme-option');
   themeButtons.forEach(button => {
       button.addEventListener('click', () => {
           const theme = button.dataset.theme;
+          
+          
+          if (button.hasAttribute('disabled')) {
+              alert('Ez a téma jelenleg nem elérhető.');
+              return;
+          }
+          
           applyTheme(theme);
       });
   });
   
-  let initialTheme = localStorage.getItem('themePreference') || getCookie('themePreference') || await getCurrentTheme() || 'light-green';
+  
+  let initialTheme = localStorage.getItem('themePreference') || 
+                      getCookie('themePreference') || 
+                      await getCurrentTheme() || 
+                      'light-green';
+  
+  
+  if (isThemeDisabled(initialTheme)) {
+      initialTheme = 'light-green';
+  }
+  
   
   await applyTheme(initialTheme);
+  
   
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       if (message.action === 'themeChanged') {
@@ -75,6 +122,20 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
   });
   
+  
   const manifest = chrome.runtime.getManifest();
   document.getElementById('version').textContent = `v${manifest.version}`;
+  
+  
+  themeButtons.forEach(button => {
+      button.addEventListener('mouseover', () => {
+          if (!button.hasAttribute('disabled')) {
+              button.style.transform = 'translateY(-2px)';
+          }
+      });
+      
+      button.addEventListener('mouseout', () => {
+          button.style.transform = 'translateY(0)';
+      });
+  });
 });

@@ -222,12 +222,6 @@ body {
   color: var(--text-teritary);
 }
 
-.recaptcha-container {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 16px;
-}
-
 .btn-login {
   width: 100%;
   padding: 12px;
