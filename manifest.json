@@ -20,7 +20,7 @@
       "icons/*.svg",
       "grades/chart.js"
     ],
-    "matches": ["https://*.e-kreta.hu/*"]
+    "matches": ["https://*.e-kreta.hu/*", "https://idp.e-kreta.hu/*"]
   }],
   "content_scripts": [
     {
@@ -43,6 +43,11 @@
       "matches": ["https://idp.e-kreta.hu/Account/Login*"],
       "js": ["login/login.js"],
       "css": ["login/login.css"]
+    },
+    {
+      "matches": ["https://idp.e-kreta.hu/account/loginwithtwofactor*"],
+      "js": ["login/twofactor.js"],
+      "css": ["login/twofactor.css"]
     },
     {
       "matches": [
