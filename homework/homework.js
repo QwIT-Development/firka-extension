@@ -382,19 +382,7 @@ function setupFilters(homeworkItems, groupedHomework) {
   deadlineFilter.addEventListener('change', applyFilters);
 }
 
-function setupUserDropdown() {
-  const userBtn = document.querySelector('.user-dropdown-btn');
-  const userDropdown = document.querySelector('.user-dropdown');
-  
-  userBtn?.addEventListener('click', (e) => {
-    e.stopPropagation();
-    userDropdown?.classList.toggle('show');
-  });
 
-  document.addEventListener('click', () => {
-    userDropdown?.classList.remove('show');
-  });
-}
 
 if (window.location.href.includes('/Tanulo/TanuloHaziFeladat')) {
   transformHomeworkPage().catch(error => {

@@ -249,18 +249,6 @@
       });
     });
 
-    const userBtn = document.querySelector('.user-dropdown-btn');
-    const userDropdown = document.querySelector('.user-dropdown');
-    
-    userBtn?.addEventListener('click', (e) => {
-      e.stopPropagation();
-      userDropdown?.classList.toggle('show');
-    });
-
-    document.addEventListener('click', () => {
-      userDropdown?.classList.remove('show');
-    });
-
     const prevBtn = document.querySelector('.prev-week');
     const nextBtn = document.querySelector('.next-week');
     const weekSelect = document.querySelector('.week-select');

@@ -414,20 +414,6 @@
     }
 
     function setupEventListeners() {
-
-        const userBtn = document.querySelector('.user-dropdown-btn');
-        const userDropdown = document.querySelector('.user-dropdown');
-
-        userBtn?.addEventListener('click', (e) => {
-            e.stopPropagation();
-            userDropdown.classList.toggle('show');
-        });
-
-        document.addEventListener('click', () => {
-            userDropdown?.classList.remove('show');
-        });
-
-
         const timerEl = document.getElementById('logoutTimer');
         if (timerEl) {
             const startTime = parseInt(timerEl.textContent?.match(/\d+/)?.[0] || "45");
