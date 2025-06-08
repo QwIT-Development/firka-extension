@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Firxa",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "KRÉTA webes verziójának újraírása",
   "icons": {
     "128": "images/firka_logo_128.png"
