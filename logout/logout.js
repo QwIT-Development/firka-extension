@@ -10,7 +10,7 @@
   }
   function transformLogoutPage() {
     // Get current theme and school ID from cookies
-    const theme = cookieManager.get('themePreference') || localStorage.getItem('themePreference') || 'light-blue';
+    const theme = cookieManager.get('themePreference') || localStorage.getItem('themePreference') || 'light-green';
     const instituteCode = cookieManager.get('schoolSubdomain');
     document.documentElement.setAttribute('data-theme', theme);
     

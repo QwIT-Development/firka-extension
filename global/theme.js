@@ -47,7 +47,7 @@
         const cookieTheme = cookieManager.get('themePreference');
         const localStorageTheme = localStorage.getItem('themePreference');
         
-        const theme = cookieTheme || localStorageTheme || 'light-blue';
+        const theme = cookieTheme || localStorageTheme || 'light-green';
         
         setTheme(theme);
         setPageTitleAndFavicon();
@@ -75,7 +75,7 @@
         }
         
         if (message.action === 'getTheme') {
-            const currentTheme = document.documentElement.getAttribute('data-theme') || 'light-blue';
+            const currentTheme = document.documentElement.getAttribute('data-theme') || 'light-green';
             sendResponse({ theme: currentTheme });
         }
 

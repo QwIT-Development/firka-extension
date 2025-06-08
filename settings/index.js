@@ -1,5 +1,26 @@
 document.addEventListener('DOMContentLoaded', async () => {
   
+  function isThemeDisabled(theme) {
+      const blueThemesUnlocked = localStorage.getItem('blueThemesUnlocked') === 'true';
+      return (theme === 'default' || theme === 'light-blue' || theme === 'dark-blue') && !blueThemesUnlocked;
+  }
+  
+  function updateThemeAvailability() {
+       const blueThemesUnlocked = localStorage.getItem('blueThemesUnlocked') === 'true';
+       document.querySelectorAll('.theme-option').forEach(button => {
+           const theme = button.dataset.theme;
+           if (theme === 'default' || theme === 'light-blue' || theme === 'dark-blue') {
+               if (blueThemesUnlocked) {
+                   button.style.display = 'block';
+                   button.classList.remove('disabled');
+                   button.removeAttribute('disabled');
+               } else {
+                   button.style.display = 'none';
+               }
+           }
+       });
+   }
+  
   function getCookie(name) {
       const cookieName = `${name}=`;
       const decodedCookie = decodeURIComponent(document.cookie);
@@ -25,43 +46,21 @@ document.addEventListener('DOMContentLoaded', async () => {
       document.cookie = `${name}=${value}; ${expires}; path=/; domain=.e-kreta.hu`;
   }
   
-  async function getCurrentTheme() {
-      try {
-          const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-          const response = await chrome.tabs.sendMessage(tab.id, { action: 'getTheme' });
-          return response.theme;
-      } catch (error) {
-          console.error('Error getting current theme:', error);
-          return 'default';
-      }
+  function getCurrentTheme() {
+      return localStorage.getItem('themePreference') || 
+             getCookie('themePreference') || 
+             'light-green';
   }
   
   function updateThemeButtons(currentTheme) {
       document.querySelectorAll('.theme-option').forEach(button => {
           const theme = button.dataset.theme;
           button.classList.toggle('active', theme === currentTheme);
-          
-          
-          /*if (theme === 'light-blue' || theme === 'dark-blue' || theme === 'default') {
-              button.classList.add('disabled');
-              button.setAttribute('disabled', 'true');
-          }*/
       });
-  }
-  
-  
-  function isThemeDisabled(theme) {
-      return theme === 'default' || theme === 'dark-blue';
+      updateThemeAvailability();
   }
   
   async function applyTheme(theme) {
-      
-      if (isThemeDisabled(theme)) {
-          alert('Ez a téma jelenleg nem elérhető.');
-          return;
-      }
-      
-      
       setCookie('themePreference', theme);
       localStorage.setItem('themePreference', theme);
       
@@ -101,10 +100,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
   
   
-  let initialTheme = localStorage.getItem('themePreference') || 
-                      getCookie('themePreference') || 
-                      await getCurrentTheme() || 
-                      'light-green';
+  let initialTheme = getCurrentTheme();
   
   
   if (isThemeDisabled(initialTheme)) {
@@ -112,6 +108,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
   
   
+  updateThemeAvailability();
   await applyTheme(initialTheme);
   
   
@@ -124,7 +121,56 @@ document.addEventListener('DOMContentLoaded', async () => {
   
   
   const manifest = chrome.runtime.getManifest();
-  document.getElementById('version').textContent = `v${manifest.version}`;
+  const versionElement = document.getElementById('version');
+  versionElement.textContent = `v${manifest.version}`;
+  
+  
+  let clickCount = 0;
+  versionElement.addEventListener('click', () => {
+      clickCount++;
+      if (clickCount >= 5) {
+          localStorage.setItem('blueThemesUnlocked', 'true');
+          updateThemeAvailability();
+          
+          
+          const notification = document.createElement('div');
+          notification.style.cssText = `
+              position: fixed;
+              top: 20px;
+              right: 20px;
+              background: var(--accent-accent);
+              color: white;
+              padding: 12px 20px;
+              border-radius: 8px;
+              font-family: 'Montserrat', sans-serif;
+              font-weight: 500;
+              z-index: 10000;
+              box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+              animation: slideIn 0.3s ease-out;
+          `;
+          notification.textContent = 'Kék témák feloldva! 🎉';
+          
+          
+          const style = document.createElement('style');
+          style.textContent = `
+              @keyframes slideIn {
+                  from { transform: translateX(100%); opacity: 0; }
+                  to { transform: translateX(0); opacity: 1; }
+              }
+          `;
+          document.head.appendChild(style);
+          
+          document.body.appendChild(notification);
+          
+          
+          setTimeout(() => {
+              notification.remove();
+              style.remove();
+          }, 3000);
+          
+          clickCount = 0;
+      }
+  });
   
   
   themeButtons.forEach(button => {

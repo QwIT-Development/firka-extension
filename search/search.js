@@ -19,7 +19,7 @@ if (document.readyState === 'complete' || document.readyState === 'interactive')
 
 function applyFirkaStyling() {
   try {
-    const theme = cookieManager.get('themePreference') || localStorage.getItem('themePreference') || 'light-blue';
+    const theme = cookieManager.get('themePreference') || localStorage.getItem('themePreference') || 'light-green';
     document.documentElement.setAttribute('data-theme', theme);
     if (typeof loadingScreen !== 'undefined') {
       loadingScreen.hide();
