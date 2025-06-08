@@ -72,10 +72,10 @@ body {
 
 @media (max-width: 768px) {
   .kreta-header {
-    grid-template-columns: 1fr auto;
+    grid-template-columns: 1fr auto auto;
     grid-template-areas: 
-      "school user"
-      "nav nav";
+      "school toggle user"
+      "nav nav nav";
     padding: 1rem;
     gap: 0.5rem;
   }
@@ -140,81 +140,6 @@ body {
   }
 }
 
-/* Updated navigation styles */
-.kreta-nav {
-  padding: 0 clamp(0.5rem, 3vw, 1.5rem);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  display: flex;
-  justify-content: center;
-}
-
-@media (max-width: 768px) {
-  .kreta-nav {
-    grid-area: nav;
-    padding: 0;
-    margin-top: 0.5rem;
-  }
-}
-
-.kreta-nav::-webkit-scrollbar {
-  display: none;
-}
-
-.nav-links {
-  display: flex;
-  gap: clamp(0.5rem, 2vw, 1rem);
-  padding: 0.25rem;
-  justify-content: center;
-}
-
-@media (max-width: 768px) {
-  .nav-links {
-    justify-content: flex-start;
-    width: 100%;
-    gap: 0.25rem;
-  }
-}
-
-.nav-links a {
-  color: var(--text-secondary);
-  text-decoration: none;
-  padding: clamp(0.5rem, 1.5vw, 1rem) 0.5rem;
-  font-weight: 500;
-  white-space: nowrap;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  border-radius: 8px;
-}
-
-@media (max-width: 768px) {
-  .nav-links a {
-    padding: 0.5rem;
-    font-size: 13px;
-  }
-  
-  .nav-links a .material-icons-round {
-    font-size: 20px;
-  }
-}
-
-.nav-links a:hover {
-  color: var(--text-primary);
-  text-decoration: none;
-  background-color: var(--card-card);
-}
-
-.nav-links a.active {
-  color: var(--accent-accent);
-}
-
 /* User profile styles */
 .user-profile {
   position: relative;
@@ -245,19 +170,6 @@ body {
 
 .user-info {
   text-align: right;
-}
-
-.user-name {
-  display: block;
-  color: var(--text-primary);
-  font-size: 16px;
-  font-weight: 500;
-}
-
-.user-time {
-  display: block;
-  color: var(--text-secondary);
-  font-size: 14px;
 }
 
 .user-dropdown {
@@ -292,7 +204,6 @@ body {
   background: var(--button-secondaryFill);
 }
 
-/* Main content styles */
 .kreta-main {
   flex: 1;
   padding: clamp(1rem, 3vw, 2rem);
@@ -301,12 +212,10 @@ body {
   width: 100%;
 }
 
-/* Disable Kréta styles */
 .k-overlay, .k-widget.k-window {
   display: none !important;
 }
 
-/* Card styles */
 .card {
   border-radius: 24px;
   overflow: hidden;
@@ -314,7 +223,6 @@ body {
   margin-bottom: 1rem;
 }
 
-/* Timetable specific styles */
 .timetable-grid {
   display: grid;
   grid-template-columns: 80px repeat(5, 1fr);
@@ -489,7 +397,6 @@ body {
   font-size: 14px;
 }
 
-/* Week selector styling */
 .week-controls {
   display: flex;
   gap: 16px;
@@ -530,7 +437,6 @@ body {
   color: var(--accent-accent);
 }
 
-/* Responsive adjustments */
 @media (max-width: 1024px) {
   .timetable-grid {
     grid-template-columns: 60px repeat(5, minmax(200px, 1fr));
@@ -561,7 +467,6 @@ body {
   }
 }
 
-/* Modal styles */
 .lesson-modal {
   display: none;
   position: fixed;
@@ -741,25 +646,9 @@ body {
     text-align: center;
   }
 
-  .nav-links {
-    justify-content: start;
-    overflow-x: auto;
-    padding-bottom: 0.5rem;
-  }
-
-  .nav-links::-webkit-scrollbar {
-    display: none;
-  }
-
   .lesson-cell {
     min-width: 200px;
   }
-}
-
-/* Material Icons */
-.material-icons-round {
-  font-size: 20px;
-  vertical-align: middle;
 }
 
 /* Scrollbar styling */

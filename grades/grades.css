@@ -302,17 +302,7 @@ body {
 .user-info {
     text-align: right;
 }
-.user-name {
-    display: block;
-    color: var(--text-primary);
-    font-size: 16px;
-    font-weight: 500;
-}
-.user-time {
-    display: block;
-    color: var(--text-secondary);
-    font-size: 14px;
-}
+
 .user-dropdown {
     position: absolute;
     top: 100%;
@@ -342,32 +332,6 @@ body {
     background: var(--button-secondaryFill);
 }
 
-.nav-links {
-    display: flex;
-    gap: clamp(0.5rem, 2vw, 1rem);
-    padding: 0.25rem;
-    justify-content: center;
-}
-.nav-links a {
-    color: var(--text-secondary);
-    text-decoration: none;
-    padding: clamp(0.5rem, 1.5vw, 1rem) 0.5rem;
-    font-weight: 500;
-    white-space: nowrap;
-    transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    border-radius: 8px;
-}
-.nav-links a:hover {
-    color: var(--text-primary);
-    background-color: var(--card-card);
-}
-.nav-links a.active {
-    color: var(--accent-accent);
-}
-
 .kreta-main {
     flex: 1;
     padding: clamp(1rem, 3vw, 2rem);
@@ -395,15 +359,6 @@ body {
         flex-direction: column;
         align-items: center;
         gap: 1rem;
-    }
-.nav-links {
-        justify-content: flex-start;
-        width: 100%;
-        gap: 0.25rem;
-    }
-.nav-links a {
-        padding: 0.5rem;
-        font-size: 13px;
     }
 }
 

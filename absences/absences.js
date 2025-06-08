@@ -130,6 +130,8 @@ async function transformAbsencesPage() {
   `;
 
   createTemplate.importFonts();
+  setupUserDropdown();
+  setupMobileNavigation();
 
   setupEventListeners();
   setupFilters();
@@ -206,16 +208,6 @@ function setupFilters() {
           
           let showGroup = true;
 
-          
-          // if (selectedDate && dateFilterValue) {
-          //   // Compare year, month, and day to ignore time
-          //   showGroup = groupDate.getFullYear() === selectedDate.getFullYear() && 
-          //              groupDate.getMonth() === selectedDate.getMonth() && 
-          //              groupDate.getDate() === selectedDate.getDate();
-          //   
-          //   console.log(`Comparing dates: ${groupDate.toDateString()} vs ${selectedDate.toDateString()}, match: ${showGroup}`);
-          // }
-
           const absenceItems = group.querySelectorAll('.absence-item');
           let visibleItems = 0;
 
@@ -242,15 +234,9 @@ function setupFilters() {
     };
     
     
-    // if (!filters.dateFilter.value) {
-    //   const today = new Date();
-    //   filters.dateFilter.value = today.toISOString().split('T')[0]; // Set date to today by default
-    // }
-    
-    
     Object.values(filters).forEach(filter => {
       try {
-        if (filter && filter !== filters.dateFilter) { // Don't add event listener to dateFilter
+        if (filter && filter !== filters.dateFilter) {
           filter.addEventListener('change', filterAbsences);
         }
       } catch (err) {

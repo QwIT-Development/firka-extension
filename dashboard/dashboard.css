@@ -120,6 +120,7 @@ body {
 .grade-3 {color: var(--grades-3); background-color: var(--grades-background-3);}
 .grade-4 {color: var(--grades-4); background-color: var(--grades-background-4);}
 .grade-5 {color: var(--grades-5); background-color: var(--grades-background-5);}
+.grade-Sz {color: var(--grades-3); background-color: var(--grades-background-3);}
 
 @keyframes fadeIn {
   from {

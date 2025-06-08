@@ -385,6 +385,8 @@
         createTemplate.importFonts();
   
         document.body.innerHTML = createProfileHTML();
+        setupUserDropdown();
+        setupMobileNavigation();
         setupEventListeners();
         setupContactForm();
       }

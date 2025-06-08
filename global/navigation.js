@@ -84,8 +84,39 @@ function setupSettingsButton() {
     });
 }
 
+function setupMobileNavigation() {
+    setTimeout(() => {
+        const navToggle = document.querySelector('.nav-toggle');
+        const nav = document.querySelector('.kreta-nav');
+        
+        if (!navToggle || !nav) {
+            return;
+        }
+        
+        navToggle.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            nav.classList.toggle('show');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!nav.contains(e.target) && !navToggle.contains(e.target)) {
+                nav.classList.remove('show');
+            }
+        });
+
+        const navItems = document.querySelectorAll('.nav-item');
+        navItems.forEach(item => {
+            item.addEventListener('click', () => {
+                nav.classList.remove('show');
+            });
+        });
+    }, 100);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     updateHeaderInfo();
     setupUserDropdown();
     setupSettingsButton();
+    setupMobileNavigation();
 });

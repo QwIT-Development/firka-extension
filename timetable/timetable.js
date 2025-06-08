@@ -1,27 +1,20 @@
 (() => {
-  // Órarendi adatok gyűjtése
   async function collectTimetableData() {
     await helper.waitForElement('#Calendar');
     await helper.waitForElement('.modalBckgroundMain:not(.isOverlayActiv)');
 
-    const calendar = document.querySelector('#Calendar');
     const dates = Array.from(document.querySelectorAll('.fc-day-header')).map(header => {
       const fullText = header.textContent.trim();
-      // Remove the day name from the beginning and clean up the format
       const dateText = fullText.replace(/^(hétfő|kedd|szerda|csütörtök|péntek)/, '').trim();
       return {
         date: fullText,
         formattedDate: dateText
       };
     });
-    // Fix the Thursday issue by ensuring we have all 5 days
     if (dates.length === 4) {
-      // Get Wednesday's date parts
       const wedDate = dates[2].formattedDate;
       const [month, day] = wedDate.split(' ');
       const dayNum = parseInt(day.replace('.', ''));
-      
-      // Create Thursday's date
       const thursdayDate = `${month} ${dayNum + 1}.`;
       
       dates.splice(3, 0, {
@@ -29,9 +22,8 @@
         formattedDate: thursdayDate
       });
     }
-    // Set week selector based on the current date
     const weekOptions = Array.from(document.querySelectorAll('#Calendar_tanevHetek_listbox li'));
-    const currentDate = dates[0]?.formattedDate; // Using Monday's date
+    const currentDate = dates[0]?.formattedDate;
     const matchingWeek = weekOptions.find(opt => opt.textContent.includes(currentDate));
     
     if (matchingWeek) {
@@ -60,11 +52,10 @@
             selected: li.classList.contains('k-state-selected')
           }))
       },
-      weekDates: dates,  // Add the dates to the data object
+      weekDates: dates,
       lessons: []
     };
-    
-    // Órák adatainak gyűjtése
+
     for (const event of document.querySelectorAll('.fc-event')) {
       const timeEl = event.querySelector('.fc-time');
       const titleEl = event.querySelector('.fc-title');
@@ -101,7 +92,6 @@
     return timetableData;
   }
 
-  // Grid generálása
   function generateTimeGrid(lessons, weekDates) {
     const times = [...new Set(lessons.map(l => l.startTime))].sort((a, b) => {
       const timeA = helper.convertTimeToMinutes(a);
@@ -157,7 +147,6 @@
       `).join('')}
     `;
   }
-  // Óra részletek modal
   function showLessonModal(lesson) {
     const modal = document.createElement('div');
     modal.className = 'lesson-modal';
@@ -229,7 +218,6 @@
 
     document.body.appendChild(modal);
     
-    // Modal bezárás
     const closeModal = () => {
       modal.classList.remove('show');
       setTimeout(() => modal.remove(), 300);
@@ -240,7 +228,6 @@
       if (e.target === modal) closeModal();
     });
 
-    // ESC gomb kezelése
     const handleEscape = (e) => {
       if (e.key === 'Escape') {
         closeModal();
@@ -249,15 +236,12 @@
     };
     document.addEventListener('keydown', handleEscape);
 
-    // Animáció
     requestAnimationFrame(() => {
       modal.classList.add('show');
     });
   }
 
-  // Eseménykezelők beállítása
   function setupEventListeners(data) {
-    // Órakártyák
     document.querySelectorAll('.lesson-card').forEach(card => {
       card.addEventListener('click', () => {
         const lessonData = JSON.parse(card.dataset.lesson);
@@ -265,7 +249,6 @@
       });
     });
 
-    // Felhasználói menü
     const userBtn = document.querySelector('.user-dropdown-btn');
     const userDropdown = document.querySelector('.user-dropdown');
     
@@ -278,7 +261,6 @@
       userDropdown?.classList.remove('show');
     });
 
-    // Hét navigáció
     const prevBtn = document.querySelector('.prev-week');
     const nextBtn = document.querySelector('.next-week');
     const weekSelect = document.querySelector('.week-select');
@@ -313,8 +295,6 @@
       }
     });
   }
-
-  // Oldal transzformáció
   async function transformTimetablePage() {
     try {
       const data = await collectTimetableData();
@@ -322,9 +302,6 @@
         loadingScreen.hide();
         return;
       }
-
-      const schoolNameFull = `${data.schoolInfo.id} - ${data.schoolInfo.name}`;
-      const shortenedSchoolName = helper.shortenSchoolName(schoolNameFull);
 
       document.body.innerHTML = `
         <div class="kreta-container">
@@ -357,6 +334,8 @@
       `;
 
       createTemplate.importFonts();
+      setupUserDropdown();
+      setupMobileNavigation();
 
       setupEventListeners(data);
       loadingScreen.hide();

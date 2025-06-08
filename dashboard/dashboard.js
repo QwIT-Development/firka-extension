@@ -1,6 +1,10 @@
 const utils = {
   formatGradeValue(value) {
-    return value?.trim() || '';
+    const trimmedValue = value?.trim() || '';
+    if (trimmedValue.toLowerCase() === 'szöveges') {
+      return 'Sz';
+    }
+    return trimmedValue;
   },
 
   parseDate(dateStr) {

@@ -11,6 +11,8 @@
             document.body.innerHTML = generatePageHTML(gradesData, studentAverage, classAverage);
 
             createTemplate.importFonts();
+            setupUserDropdown();
+            setupMobileNavigation();
 
             const script = document.createElement('script');
             script.src = chrome.runtime.getURL('grades/chart.js');

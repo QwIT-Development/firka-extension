@@ -50,7 +50,7 @@ function isTomorrow(dateStr) {
   if (parts.length < 3) return false;
   
   const year = parseInt(parts[0].trim());
-  const month = parseInt(parts[1].trim()) - 1; // JS months are 0-indexed
+  const month = parseInt(parts[1].trim()) - 1;
   const day = parseInt(parts[2].trim());
   
   const homeworkDate = new Date(year, month, day);
@@ -69,12 +69,7 @@ function isTomorrow(dateStr) {
 }
 
 async function transformHomeworkPage() {
-  //loadingScreen.show();
   const { basicData, homeworkItems, groupedHomework } = await collectHomeworkData();
-
-  
-  const schoolNameFull = `${basicData.schoolInfo.id} - ${basicData.schoolInfo.name}`;
-  const shortenedSchoolName = helper.shortenSchoolName(schoolNameFull);
 
   document.body.innerHTML = `
     <div class="kreta-container">
@@ -136,6 +131,7 @@ async function transformHomeworkPage() {
 
   setupFilters(homeworkItems, groupedHomework);
   setupUserDropdown();
+  setupMobileNavigation();
   loadingScreen.hide();
 }
 
@@ -304,11 +300,11 @@ function setupFilters(homeworkItems, groupedHomework) {
           
           
           const startOfWeek = new Date(today);
-          const dayOfWeek = today.getDay() || 7; // Convert Sunday from 0 to 7
-          startOfWeek.setDate(today.getDate() - dayOfWeek + 1); // Monday
+          const dayOfWeek = today.getDay() || 7;
+          startOfWeek.setDate(today.getDate() - dayOfWeek + 1);
           
           const endOfWeek = new Date(startOfWeek);
-          endOfWeek.setDate(startOfWeek.getDate() + 6); // Sunday
+          endOfWeek.setDate(startOfWeek.getDate() + 6);
           
           
           const startOfNextWeek = new Date(endOfWeek);

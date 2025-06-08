@@ -191,14 +191,40 @@
   }
 }
 
+/* Hamburger menu styles */
+.nav-toggle {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 8px;
+  transition: background-color 0.2s;
+}
+
+.nav-toggle:hover {
+  background: var(--hover);
+}
+
+.nav-toggle svg {
+  width: 24px;
+  height: 24px;
+  fill: var(--text-primary);
+}
+
 @media (max-width: 768px) {
   .kreta-header {
-    grid-template-columns: 1fr auto;
+    grid-template-columns: 1fr auto auto;
     grid-template-areas: 
-      "school user"
-      "nav nav";
+      "school toggle user"
+      "nav nav nav";
     padding: 1rem;
     gap: 0.5rem;
+  }
+
+  .nav-toggle {
+    display: block;
+    grid-area: toggle;
   }
 
   .school-info {
@@ -211,21 +237,24 @@
 
   .logo-text {
     margin: 0;
-    font-size: 20px;
+    font-size: 18px;
   }
 
   .school-details {
-    font-size: 12px;
+    font-size: 11px;
+    max-width: 200px;
   }
 
   .kreta-nav {
     grid-area: nav;
     padding: 0;
     margin-top: 0.5rem;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
+    display: none;
+  }
+
+  .kreta-nav.show {
+    display: flex;
+    animation: slideDown 0.3s ease;
   }
 
   .kreta-nav::-webkit-scrollbar {
@@ -233,25 +262,140 @@
   }
 
   .nav-links {
-    justify-content: flex-start;
+    flex-direction: column;
     width: 100%;
-    gap: 0.25rem;
+    gap: 0.5rem;
+    background: var(--card-card);
+    border-radius: 12px;
+    padding: 1rem;
+    box-shadow: 0px 1px var(--shadow-blur) 0px var(--accent-shadow);
   }
 
   .nav-item {
-    padding: 0.5rem;
-    font-size: 13px;
+    width: 100%;
+    justify-content: flex-start;
+    padding: 0.75rem;
+    font-size: 14px;
   }
 
   .user-profile {
     grid-area: user;
   }
 
+  .user-info {
+    text-align: right;
+    max-width: 120px;
+  }
+
   .user-name {
-    font-size: 14px;
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .nav-logout-timer {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 480px) {
+  .kreta-header {
+    grid-template-columns: 1fr auto auto;
+    grid-template-areas: 
+      "school toggle user"
+      "nav nav nav";
+    padding: 0.75rem;
+    gap: 0.25rem;
+  }
+
+  .school-info {
+    min-width: 0;
+    flex: 1;
+  }
+
+  .logo-text {
+    font-size: 16px;
+  }
+
+  .school-details {
+    font-size: 10px;
+    max-width: 150px;
+  }
+
+  .kreta-nav {
+    display: none;
+  }
+
+  .kreta-nav.show {
+    display: flex;
+    animation: slideDown 0.3s ease;
+  }
+
+  .nav-links {
+    flex-direction: column;
+    width: 100%;
+    gap: 0.5rem;
+    background: var(--card-card);
+    border-radius: 12px;
+    padding: 1rem;
+    box-shadow: 0px 1px var(--shadow-blur) 0px var(--accent-shadow);
+  }
+
+  .nav-item {
+    width: 100%;
+    justify-content: flex-start;
+    padding: 0.75rem;
+    font-size: 14px;
+  }
+
+  .user-info {
+    max-width: 100px;
+  }
+
+  .user-name {
     font-size: 12px;
+  }
+
+  .nav-logout-timer {
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 360px) {
+  .kreta-header {
+    padding: 0.5rem;
+  }
+
+  .logo-text {
+    font-size: 14px;
+  }
+
+  .school-details {
+    font-size: 9px;
+    max-width: 120px;
+  }
+
+  .user-info {
+    max-width: 80px;
+  }
+
+  .user-name {
+    font-size: 11px;
+  }
+
+  .nav-logout-timer {
+    font-size: 9px;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

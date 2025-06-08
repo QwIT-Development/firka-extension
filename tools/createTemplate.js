@@ -28,6 +28,12 @@ const createTemplate = {
                 </div>
             </div>
             
+            <button class="nav-toggle" aria-label="Navigáció megnyitása">
+                <svg viewBox="0 0 24 24">
+                    <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+                </svg>
+            </button>
+            
             <nav class="kreta-nav">
             <div class="nav-links">
                 <a href="/Intezmeny/Faliujsag" data-page="dashboard" class="nav-item ${( location.pathname == '/Intezmeny/Faliujsag' ? 'active' : '')}">
@@ -77,7 +83,6 @@ const createTemplate = {
             </div>
         </header>`
 
-        // Kijelentkezés időzítő
         const startTime = parseInt(data.userData.time?.match(/\d+/)?.[0] || "45");
         let timeLeft = startTime * 60;
         
