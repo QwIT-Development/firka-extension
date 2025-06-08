@@ -11,11 +11,8 @@
                 action: 'themeChanged',
                 theme: actualTheme
             }).catch(() => {
-                
-                console.log('Extension context not available for theme sync');
+
             });
-            
-            console.log('Theme set to:', actualTheme);
         } catch (error) {
             console.error('Error setting theme:', error);
         }
@@ -41,8 +38,6 @@
                 shortcutIcon.href = chrome.runtime.getURL('images/firka_logo_128.png');
                 document.head.appendChild(shortcutIcon);
             }
-            
-            console.log('Page title and favicon updated to Firka');
         } catch (error) {
             console.error('Error setting page title and favicon:', error);
         }
