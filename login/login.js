@@ -11,7 +11,9 @@ async function transformLoginPage() {
       action: existingForm?.getAttribute('action') || '',
       returnUrl: document.querySelector('#ReturnUrl')?.value || '',
       instituteCode: document.querySelector('#instituteCode')?.value || '',
-      requestToken: document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+      requestToken: document.querySelector('input[name="__RequestVerificationToken"]')?.value || '',
+      userName: document.querySelector('#UserName')?.value || '',
+      password: document.querySelector('#Password')?.value || ''
     };
     
     const recaptchaDiv = document.querySelector('.g-recaptcha');
@@ -59,13 +61,13 @@ async function transformLoginPage() {
 
             <div class="form-group">
               <input class="form-control" type="text" id="UserName" name="UserName" 
-                     placeholder="Felhasználónév" maxlength="256" autocomplete="username" required>
+                     placeholder="Felhasználónév" maxlength="256" autocomplete="username" required value="${formData.userName}">
               <div class="error-message">Kérjük, add meg a felhasználóneved.</div>
             </div>
 
             <div class="form-group password-group">
               <input class="form-control" type="password" id="Password" name="Password" 
-                     placeholder="Jelszó" maxlength="256" autocomplete="current-password" required>
+                     placeholder="Jelszó" maxlength="256" autocomplete="current-password" required value="${formData.password}">
               <button type="button" class="show-password" aria-label="Jelszó mutatása">
                 <img src="${chrome.runtime.getURL('icons/eye-off.svg')}" alt="Show password" class="icon-eye">
               </button>
