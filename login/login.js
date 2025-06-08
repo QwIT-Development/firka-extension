@@ -16,10 +16,6 @@ async function transformLoginPage() {
       password: document.querySelector('#Password')?.value || ''
     };
     
-    const recaptchaDiv = document.querySelector('.g-recaptcha');
-    const recaptchaPublicKey = document.querySelector('#ReCaptchaPublicKey')?.value || '';
-    const showRecaptcha = document.querySelector('#ShowReCaptcha')?.value === 'True';
-    
     const titleElement = document.querySelector('.page-title');
     const schoolInfo = {
       name: titleElement?.querySelector('b')?.textContent?.trim() || '',
@@ -103,14 +99,6 @@ async function transformLoginPage() {
     
     document.body.innerHTML = newHTML;
     
-    if (showRecaptcha && recaptchaPublicKey) {
-      const recaptchaScript = document.createElement('script');
-      recaptchaScript.src = 'https://www.google.com/recaptcha/api.js';
-      recaptchaScript.async = true;
-      recaptchaScript.defer = true;
-      document.head.appendChild(recaptchaScript);
-    }
-    
     setupEventListeners();
 
   } catch (error) {
@@ -180,29 +168,6 @@ function handleSubmit(event) {
       isValid = false;
     }
   });
-
-  const recaptchaContainer = form.querySelector('.g-recaptcha');
-  if (recaptchaContainer && window.grecaptcha) {
-    const recaptchaResponse = grecaptcha.getResponse();
-    if (!recaptchaResponse) {
-      const errorDiv = document.createElement('div');
-      errorDiv.className = 'error-message show';
-      errorDiv.textContent = 'reCAPTCHA hitelesítés szükséges!';
-      
-      const existingError = recaptchaContainer.nextElementSibling;
-      if (existingError && existingError.classList.contains('error-message')) {
-        existingError.remove();
-      }
-      
-      recaptchaContainer.parentNode.insertBefore(errorDiv, recaptchaContainer.nextSibling);
-      isValid = false;
-    }
-  }
-
-  if (!isValid) {
-    return;
-  }
-
   
   const submitButton = form.querySelector('.btn-login');
   const spinner = submitButton.querySelector('.spinner');
