@@ -67,7 +67,7 @@ A bővítmény jelenleg az alábbi e-KRÉTA oldalakat támogatja:
 - Hiányzások
 - Házi feladatok
 - Jegyek
-- Inézménykereső
+- Intézménykereső
 
 ## 👥 Csapat
 
