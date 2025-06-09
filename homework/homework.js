@@ -1,7 +1,32 @@
-async function collectHomeworkData() {
-  await helper.waitForElement('#TanulotHaziFeladatkGrid');
-  await new Promise(resolve => setTimeout(resolve, 1000));
+async function fetchHomeworkData() {
+  try {
+    const currentDomain = window.location.hostname;
+    const apiUrl = `https://${currentDomain}/api/TanuloHaziFeladatApi/GetTanulotHaziFeladatGrid?sort=HaziFeladatHatarido-asc&page=1&pageSize=100&group=&filter=&data=%7B%22RegiHaziFeladatokElrejtese%22%3Afalse%7D&_=${Date.now()}`;
+    
+    const response = await fetch(apiUrl, {
+      method: 'GET',
+      credentials: 'include',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      }
+    });
 
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error fetching homework data:', error);
+    return { Data: [], Total: 0 };
+  }
+}
+
+async function collectHomeworkData() {
+  const apiData = await fetchHomeworkData();
+  
   const basicData = {
     schoolInfo: {
       name: cookieManager.get('schoolName') || 'Iskola',
@@ -14,25 +39,25 @@ async function collectHomeworkData() {
   };
 
   const homeworkItems = [];
-  const rows = document.querySelectorAll('#TanulotHaziFeladatkGrid .k-grid-content tr');
-  rows.forEach(row => {
-    const cells = row.querySelectorAll('td');
-    if (cells.length >= 7) {
-      homeworkItems.push({
-        subject: cells[3]?.textContent?.trim() || '',
-        teacher: cells[4]?.textContent?.trim() || '',
-        description: cells[5]?.textContent?.trim() || '',
-        createdDate: cells[6]?.textContent?.trim() || '',
-        deadline: cells[7]?.textContent?.trim() || ''
-      });
-    }
-  });
-
   
+  if (apiData.Data && Array.isArray(apiData.Data)) {
+    apiData.Data.forEach(item => {
+      homeworkItems.push({
+        id: item.ID,
+        subject: item.TantargyNev || '',
+        teacher: item.TanarNeve || '',
+        description: item.HaziFeladatSzoveg || '',
+        createdDate: formatApiDate(item.HaziFeladatRogzitesDatuma),
+        deadline: formatApiDate(item.HaziFeladatHatarido),
+        completed: item.MegoldottHF_BOOL || false,
+        classGroup: item.OsztalyCsoport || ''
+      });
+    });
+  }
+
   const groupedHomework = {};
   homeworkItems.forEach(homework => {
-    
-    const deadlineDate = homework.deadline.split(' ').slice(0, 3).join(' ');
+    const deadlineDate = homework.deadline.split(' ')[0];
     if (!groupedHomework[deadlineDate]) {
       groupedHomework[deadlineDate] = [];
     }
@@ -40,6 +65,23 @@ async function collectHomeworkData() {
   });
 
   return { basicData, homeworkItems, groupedHomework };
+}
+
+function formatApiDate(dateString) {
+  if (!dateString) return '';
+  
+  try {
+    const date = new Date(dateString);
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    
+    const dayNames = ['vasárnap', 'hétfő', 'kedd', 'szerda', 'csütörtök', 'péntek', 'szombat'];
+    const dayName = dayNames[date.getDay()];
+    
+    return `${month}.${day}. (${dayName})`;
+  } catch (error) {
+    return dateString;
+  }
 }
 
 function isTomorrow(dateStr) {
@@ -136,11 +178,25 @@ async function transformHomeworkPage() {
 }
 
 function renderHomeworkList(groupedHomework) {
-  
   const sortedDates = Object.keys(groupedHomework).sort((a, b) => {
-    const dateA = new Date(a.replace(/\./g, ''));
-    const dateB = new Date(b.replace(/\./g, ''));
-    return dateA - dateB;
+    const partsA = a.split('.');
+    const partsB = b.split('.');
+    
+    const monthA = parseInt(partsA[0]) - 1;
+    const dayA = parseInt(partsA[1]);
+    const monthB = parseInt(partsB[0]) - 1;
+    const dayB = parseInt(partsB[1]);
+    
+    const currentYear = new Date().getFullYear();
+    const currentMonth = new Date().getMonth();
+
+    const yearA = monthA < currentMonth ? currentYear + 1 : currentYear;
+    const yearB = monthB < currentMonth ? currentYear + 1 : currentYear;
+    
+    const dateA = new Date(yearA, monthA, dayA);
+    const dateB = new Date(yearB, monthB, dayB);
+    
+    return dateB - dateA;
   });
 
   if (sortedDates.length === 0) {
@@ -166,7 +222,7 @@ function renderHomeworkList(groupedHomework) {
             <div class="homework-item ${isTomorrowClass}" data-subject="${homework.subject}" data-teacher="${homework.teacher}">
               <div class="homework-header">
                 <div class="homework-subject">${homework.subject}</div>
-                <div class="homework-deadline ${urgentClass}">${formatDeadline(homework.deadline)}</div>
+                <div class="homework-deadline ${urgentClass}">${homework.deadline}</div>
               </div>
               <div class="homework-content">${formatHomeworkDescription(homework.description)}</div>
               <div class="homework-footer">
@@ -190,14 +246,13 @@ function formatDateHeader(dateStr) {
   tomorrow.setDate(tomorrow.getDate() + 1);
   
   const parts = dateStr.split('.');
-  if (parts.length < 3) return dateStr;
+  if (parts.length < 2) return dateStr;
   
-  const year = parseInt(parts[0].trim());
-  const month = parseInt(parts[1].trim()) - 1;
-  const day = parseInt(parts[2].trim());
+  const month = parseInt(parts[0].trim()) - 1;
+  const day = parseInt(parts[1].trim());
+  const currentYear = today.getFullYear();
   
-  const date = new Date(year, month, day);
-  
+  const date = new Date(currentYear, month, day);
   
   if (date.toDateString() === today.toDateString()) {
     return 'Ma - ' + dateStr;
@@ -205,20 +260,8 @@ function formatDateHeader(dateStr) {
     return 'Holnap - ' + dateStr;
   }
   
-  
   const weekdays = ['Vasárnap', 'Hétfő', 'Kedd', 'Szerda', 'Csütörtök', 'Péntek', 'Szombat'];
   return `${weekdays[date.getDay()]} - ${dateStr}`;
-}
-
-function formatDeadline(dateStr) {
-  if (!dateStr) return '';
-  
-  
-  if (isTomorrow(dateStr)) {
-    return `Határidő: ${dateStr} (holnap!)`;
-  }
-  
-  return `Határidő: ${dateStr}`;
 }
 
 function formatDate(dateStr) {
@@ -228,14 +271,6 @@ function formatDate(dateStr) {
 
 function formatHomeworkDescription(description) {
   if (!description) return '';
-  
-  
-  description = description.replace(/(\d+\.)\s*(\w[^\n.]*)/g, '<strong>$1 $2</strong>');
-  
-  
-  description = description.replace(/(Határidő:)\s*([^\n]+)/g, '<div class="homework-requirement"><span class="requirement-label">$1</span> $2</div>');
-  description = description.replace(/(MS\s+[^\n.]+szerint\s+adható\s+be\.)/g, '<div class="homework-requirement"><span class="requirement-label">Beadás:</span> $1</div>');
-  
   
   description = description.replace(/\n/g, '<br>');
   
