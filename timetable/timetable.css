@@ -376,8 +376,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 20px;
-  height: 20px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   background: var(--accent-15);
   color: var(--accent-accent);
@@ -394,14 +394,15 @@ body {
 }
 
 .lesson-indicator .material-icons-round {
-  font-size: 14px;
+  font-size: 18px;
 }
 
 .week-controls {
   display: flex;
   gap: 16px;
   align-items: center;
-  margin: 16px;
+  justify-content: center;
+  margin: 16px auto;
   background: var(--card-card);
   border-radius: 24px;
   max-width: 400px;
@@ -437,6 +438,56 @@ body {
   color: var(--accent-accent);
 }
 
+/* Day navigation for mobile */
+.day-navigation {
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  padding: 0 1rem;
+}
+
+.day-nav-btn {
+  background: var(--card-card);
+  border: 1px solid var(--accent-15);
+  border-radius: 12px;
+  padding: 12px 16px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.day-nav-btn:hover {
+  background: var(--accent-15);
+  color: var(--accent-accent);
+}
+
+.day-nav-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.current-day-info {
+  text-align: center;
+  flex: 1;
+  margin: 0 1rem;
+}
+
+.current-day-name {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.current-day-date {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
 @media (max-width: 1024px) {
   .timetable-grid {
     grid-template-columns: 60px repeat(5, minmax(200px, 1fr));
@@ -448,9 +499,33 @@ body {
 }
 
 @media (max-width: 768px) {
+  .day-navigation {
+    display: flex;
+  }
+  
   .timetable-container {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
+    overflow: hidden;
+  }
+  
+  .timetable-grid {
+    grid-template-columns: 60px 1fr;
+    overflow: visible;
+  }
+  
+  .grid-header:not(:first-child) {
+    display: none;
+  }
+  
+  .grid-header.active {
+    display: flex !important;
+  }
+  
+  .lesson-slot {
+    display: none;
+  }
+  
+  .lesson-slot.active {
+    display: block;
   }
   
   .lesson-card {
@@ -668,4 +743,87 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--text-primary);
+}
+
+/* Speciális napok stílusai */
+.grid-header.special-day {
+  background: linear-gradient(135deg, #F99F50, #FF8C42);
+  color: white;
+  position: relative;
+}
+
+.special-day-indicator {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 500;
+  margin-top: 2px;
+  opacity: 0.9;
+  text-align: center;
+}
+
+.special-day-card {
+  background: #F99F50;
+  color: white;
+  padding: 12px;
+  border-radius: 8px;
+  margin: 4px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.special-day-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.special-day-title {
+  font-weight: 600;
+  font-size: 1.1rem;
+  margin-bottom: 4px;
+}
+
+.special-day-subtitle {
+  font-size: 0.9rem;
+  opacity: 0.9;
+  font-weight: 400;
+}
+
+/* Week selector improvements */
+.week-select {
+  min-width: 200px;
+  max-width: 300px;
+}
+
+@media (max-width: 768px) {
+  .special-day-indicator {
+    font-size: 0.6rem;
+  }
+  
+  .special-day-card {
+    padding: 8px;
+    margin: 2px;
+  }
+  
+  .special-day-title {
+    font-size: 0.8rem;
+  }
+  
+  .special-day-subtitle {
+    font-size: 0.7rem;
+  }
+}
+
+.more-link {
+  margin-top: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--accent-accent);
+  text-decoration: none;
+  font-weight: 500;
+  padding-top: 16px;
+  transition: gap 0.2s ease;
+  font-size: clamp(0.875rem, 1.5vw, 1rem);
 }
