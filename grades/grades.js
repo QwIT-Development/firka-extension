@@ -23,6 +23,7 @@
             };
 
             setupEventListeners();
+            setupGradesListScrolling();
             loadingScreen.hide();
 
         } catch (error) {
@@ -384,7 +385,7 @@
         const sortedSubjects = [...subjects].sort((a, b) => a.grades.length - b.grades.length);
 
         return sortedSubjects.map(subject => {
-            const regularGrades = subject.grades.filter(grade => !grade.isSemesterGrade);
+            const regularGrades = subject.grades.filter(grade => !grade.isSemesterGrade).reverse();
             const myGrade = Math.floor(subject.average) || 0;
             const classGrade = Math.floor(subject.classAverage) || 0;
 
@@ -423,17 +424,43 @@
                 const minutes = Math.floor(timeLeft / 60);
                 const seconds = timeLeft % 60;
                 timerEl.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                timeLeft--;
 
-                if (timeLeft <= 0) {
-                    window.location.href = '/Home/Logout';
-                } else {
-                    timeLeft--;
+                if (timeLeft < 0) {
+                    window.location.href = chrome.runtime.getURL('logout/logout.html');
                 }
             };
 
-            updateTimer();
             setInterval(updateTimer, 1000);
         }
+    }
+
+    function setupGradesListScrolling() {
+        const gradesLists = document.querySelectorAll('.grades-list');
+        
+        gradesLists.forEach(list => {
+            const checkScrollable = () => {
+                if (list.scrollHeight > list.clientHeight) {
+                    list.classList.add('scrollable', 'has-more');
+                    
+                    const handleScroll = () => {
+                        const isAtBottom = list.scrollTop + list.clientHeight >= list.scrollHeight - 5;
+                        if (isAtBottom) {
+                            list.classList.remove('has-more');
+                        } else {
+                            list.classList.add('has-more');
+                        }
+                    };
+                    
+                    list.addEventListener('scroll', handleScroll);
+                    handleScroll();
+                } else {
+                    list.classList.remove('scrollable', 'has-more');
+                }
+            };
+            
+            checkScrollable();
+        });
     }
 
     if (window.location.href.includes('/TanuloErtekeles/Osztalyzatok')) {
