@@ -34,7 +34,7 @@
 
 ## 🚀 Telepítés
 
-1. Töltsd le a legfrissebb verziót a [Releases](https://github.com/QwIT-Development/firka-extension/releases/) vagy [Chrome Webstore](https://chromewebstore.google.com/detail/firxa/emafoaifbfppcccgfmpcoheonhjnpldj?hl=hu) oldalról
+1. Töltsd le a legfrissebb verziót a [Releases](https://github.com/QwIT-Development/firka-extension/releases/), [Firefox Addonstore](https://addons.mozilla.org/hu/firefox/addon/firxa/) vagy [Chrome Webstore](https://chromewebstore.google.com/detail/firxa/emafoaifbfppcccgfmpcoheonhjnpldj?hl=hu) oldalról
 ### Chromium alapú böngészők esetén
 2. Navigálj a `chrome://extensions` oldalra
 3. Kapcsold be a "Fejlesztői mód"-ot a jobb felső sarokban
