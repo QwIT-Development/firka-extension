@@ -19,6 +19,15 @@
   </a>
 </p>
 
+<p align="center">
+  <a href="https://chromewebstore.google.com/detail/firxa/emafoaifbfppcccgfmpcoheonhjnpldj?hl=hu">
+    <img src="https://github.com/QwIT-Development/firka-extension/blob/main/images/chrome.png?raw=true" alt="Elérhető a Chrome Web Store-on" width="200">
+  </a>
+  <a href="https://addons.mozilla.org/hu/firefox/addon/firxa/">
+    <img src="https://github.com/QwIT-Development/firka-extension/blob/main/images/firefox.png?raw=true" alt="Elérhető a Firefox add-ons oldalon" width="200">
+  </a>
+</p>
+
 ## 📱 Funkciók
 
 - **Modern Dizájn**: Teljesen újratervezett, modern felhasználói felület
@@ -34,19 +43,7 @@
 
 ## 🚀 Telepítés
 
-1. Töltsd le a legfrissebb verziót a [Releases](https://github.com/QwIT-Development/firka-extension/releases/), [Firefox Addonstore](https://addons.mozilla.org/hu/firefox/addon/firxa/) vagy [Chrome Webstore](https://chromewebstore.google.com/detail/firxa/emafoaifbfppcccgfmpcoheonhjnpldj?hl=hu) oldalról
-### Chromium alapú böngészők esetén
-2. Navigálj a `chrome://extensions` oldalra
-3. Kapcsold be a "Fejlesztői mód"-ot a jobb felső sarokban
-4. Keresd meg a letöltött zip fájlt
-5. Húzd a letöltött zip fájlt a böngészőbe
-### Firefox alapú böngészők esetén
-2. Navigálj az `about:addons` oldalra
-3. Kattints rá a fogaskerék ikonra (⚙️) a jobb felső sarokban
-4. Ebben a menüben válaszd a(z) "Kiegészítő telepítése fájlból..."/"Install Add-on From File..."
-5. Válaszd ki a `.zip` fájlt amit letöltöttél
-### Kész!
-6. A bővítmény automatikusan működésbe lép, amikor megnyitod az e-KRÉTA oldalt
+1. Töltsd le a legfrissebb verziót a fenti gombok segítségével a böngésződnek megfelelően.
 
 ## ⚙️ Beállítások
 
