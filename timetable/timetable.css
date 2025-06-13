@@ -55,7 +55,6 @@ body {
   flex-direction: column;
 }
 
-/* Update header styles to match dashboard */
 .kreta-header {
   padding: clamp(1rem, 3vw, 2rem);
   display: grid;
@@ -140,7 +139,6 @@ body {
   }
 }
 
-/* User profile styles */
 .user-profile {
   position: relative;
   justify-self: flex-end;
@@ -399,24 +397,52 @@ body {
 
 .week-controls {
   display: flex;
-  gap: 16px;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   margin: 16px auto;
   background: var(--card-card);
   border-radius: 24px;
-  max-width: 400px;
+  max-width: 800px;
+  padding: 20px;
 }
 
-.week-select {
-  flex: 1;
-  padding: 12px;
+.week-selector-container {
+  width: 100%;
+  position: relative;
+}
+
+.expand-week-view-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
   border: none;
-  border-radius: 12px;
+  border-radius: 8px;
   background: var(--button-secondaryFill);
   color: var(--text-primary);
-  font-family: inherit;
   cursor: pointer;
+  transition: all 0.2s ease;
+  margin-left: 12px;
+}
+
+.expand-week-view-btn:hover {
+  background: var(--accent-15);
+  color: var(--accent-accent);
+  transform: scale(1.05);
+}
+
+.expand-week-view-btn .material-icons-round {
+  font-size: 18px;
+}
+
+.week-selector {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  max-width: 100%;
 }
 
 .week-nav-btn {
@@ -426,19 +452,292 @@ body {
   width: 40px;
   height: 40px;
   border: none;
-  border-radius: 12px;
+  border-radius: 8px;
   background: var(--button-secondaryFill);
-  color: var(--text-secondary);
+  color: var(--text-primary);
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
-.week-nav-btn:hover {
+.week-nav-btn:hover:not(:disabled) {
+  background: var(--accent-15);
+  color: var(--accent-accent);
+  transform: scale(1.05);
+}
+
+.week-nav-btn .material-icons-round {
+  font-size: 20px;
+}
+
+.week-display {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.week-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 50px;
+  border: 2px solid var(--button-secondaryFill);
+  border-radius: 8px;
+  background: var(--button-secondaryFill);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  gap: 2px;
+}
+
+.week-cell:hover {
+  background: var(--accent-15);
+  border-color: var(--accent-accent);
+  color: var(--accent-accent);
+  transform: scale(1.05);
+}
+
+.week-cell.selected {
+  background: var(--accent-accent);
+  border-color: var(--accent-accent);
+  color: white;
+  font-weight: 600;
+}
+
+.week-cell.selected:hover {
+  background: var(--accent-accent);
+  transform: scale(1.05);
+}
+
+.week-cell.current-week {
+  border-color: var(--accent-accent);
+  box-shadow: 0 0 0 1px var(--accent-accent);
+}
+
+.week-cell.current-week.selected {
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5);
+}
+
+.week-number {
+  font-size: 14px;
+  font-weight: inherit;
+}
+
+.current-indicator {
+  font-size: 8px;
+  color: var(--accent-accent);
+  line-height: 1;
+}
+
+.week-cell.selected .current-indicator {
+  color: white;
+}
+
+.week-tooltip {
+  position: absolute;
+  background: var(--card-card);
+  border: 1px solid var(--border-border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 14px;
+  color: var(--text-primary);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  z-index: 1000;
+  white-space: nowrap;
+}
+
+.week-tooltip.show {
+  opacity: 1;
+}
+
+.week-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.week-modal-content {
+  background: var(--card-card);
+  border-radius: 16px;
+  max-width: 1000px;
+  max-height: 70vh;
+  width: 100%;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.week-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border-border);
+}
+
+.week-modal-grid {
+  display: grid;
+  grid-template-columns: repeat(13, 1fr);
+  gap: 8px;
+  padding: 20px;
+  max-height: calc(70vh - 80px);
+  overflow-y: auto;
+}
+
+.modal-week-cell {
+  width: 40px;
+  height: 40px;
+  font-size: 12px;
+}
+
+
+
+@media (max-width: 768px) {
+  .week-modal-content {
+    max-width: 95vw;
+    max-height: 80vh;
+  }
+  
+  .week-modal-grid {
+    grid-template-columns: repeat(10, 1fr);
+    gap: 6px;
+    padding: 16px;
+    max-height: calc(80vh - 80px);
+  }
+  
+  .modal-week-cell {
+    width: 35px;
+    height: 35px;
+    font-size: 11px;
+  }
+}
+
+.week-modal-header h3 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.week-modal-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 8px;
+  background: var(--button-secondaryFill);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.week-modal-close:hover {
   background: var(--accent-15);
   color: var(--accent-accent);
 }
 
-/* Day navigation for mobile */
+.week-modal-close .material-icons-round {
+  font-size: 24px;
+}
+
+.week-modal-grid {
+  display: grid;
+  grid-template-columns: repeat(13, 1fr);
+  gap: 8px;
+  padding: 24px;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.week-modal-grid .week-cell {
+  width: 60px;
+  height: 50px;
+  font-size: 14px;
+}
+
+@media (max-width: 1200px) {
+  .week-modal-grid {
+    grid-template-columns: repeat(10, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .week-modal-grid {
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+  }
+  
+  .week-modal-grid .week-cell {
+    width: 50px;
+    height: 45px;
+    font-size: 12px;
+  }
+  
+  .week-modal-content {
+    margin: 10px;
+  }
+  
+  .week-modal-header {
+    padding: 16px 20px;
+  }
+  
+  .week-modal-grid {
+    padding: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .week-grid {
+    grid-template-columns: repeat(10, 1fr);
+    gap: 6px;
+  }
+  
+  .week-cell {
+    width: 40px;
+    height: 35px;
+    font-size: 12px;
+  }
+  
+  .week-controls {
+    max-width: 600px;
+    padding: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .week-grid {
+    grid-template-columns: repeat(8, 1fr);
+    gap: 4px;
+  }
+  
+  .week-cell {
+    width: 35px;
+    height: 30px;
+    font-size: 11px;
+  }
+  
+  .week-controls {
+    max-width: 400px;
+    padding: 12px;
+  }
+}
+
 .day-navigation {
   display: none;
   align-items: center;
@@ -465,10 +764,7 @@ body {
   color: var(--accent-accent);
 }
 
-.day-nav-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
+
 
 .current-day-info {
   text-align: center;
@@ -676,7 +972,6 @@ body {
   display: none;
 }
 
-/* Animations */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -710,7 +1005,6 @@ body {
   }
 }
 
-/* Responsive adjustments */
 @media (max-width: 768px) {
   .kreta-header {
     flex-direction: column;
@@ -726,7 +1020,6 @@ body {
   }
 }
 
-/* Scrollbar styling */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -745,7 +1038,6 @@ body {
   background: var(--text-primary);
 }
 
-/* Speciális napok stílusai */
 .grid-header.special-day {
   background: linear-gradient(135deg, #F99F50, #FF8C42);
   color: white;
@@ -790,7 +1082,6 @@ body {
   font-weight: 400;
 }
 
-/* Week selector improvements */
 .week-select {
   min-width: 200px;
   max-width: 300px;

@@ -34,7 +34,7 @@
       }
     } catch (error) {
       console.error('Error changing role:', error);
-      alert('Hiba történt a szerepkör váltása közben.');
+      alert(LanguageManager.t('roleselect.role_change_error'));
     }
   };
 
@@ -66,8 +66,8 @@
                 <img src="${chrome.runtime.getURL('icons/naplo.svg')}" alt="Napló ikon">
               </div>
               <div class="role-text">
-                Ellenőrzőkönyv
-                <div class="role-description">Jegyek, hiányzások, órarended és egyéb információk megtekintése.</div>
+                ${LanguageManager.t('roleselect.student_book')}
+                <div class="role-description">${LanguageManager.t('roleselect.student_description')}</div>
               </div>
             </div>
           </div>
@@ -78,8 +78,8 @@
                 <img src="${chrome.runtime.getURL('icons/dkt.svg')}" alt="DKT ikon">
               </div>
               <div class="role-text">
-                Digitális Kollaborációs Tér (DKT)
-                <div class="role-description">Osztálytermi kommunikáció és feladatok.</div>
+                ${LanguageManager.t('roleselect.dkt_title')}
+                <div class="role-description">${LanguageManager.t('roleselect.dkt_description')}</div>
               </div>
             </div>
 
@@ -88,8 +88,8 @@
                 <img src="${chrome.runtime.getURL('icons/logout.svg')}" alt="Kijelentkezés ikon">
               </div>
               <div class="role-text">
-                Kijelentkezés
-                <div class="role-description">Kilépés a rendszerből</div>
+                ${LanguageManager.t('roleselect.logout_title')}
+                <div class="role-description">${LanguageManager.t('roleselect.logout_description')}</div>
               </div>
             </div>
           </div>
@@ -113,7 +113,7 @@
       const schoolSubdomain = window.location.hostname.split('.')[0];
 
       const userNameEl = document.querySelector('.UserName');
-      const userName = userNameEl?.textContent.trim() || 'Felhasználónév';
+      const userName = userNameEl?.textContent.trim() || LanguageManager.t('common.username');
 
       
       if (schoolCode && fullSchoolName) {

@@ -6,8 +6,8 @@ const COOKIE_KEYS = {
 };
 
 const DEFAULT_VALUES = {
-    SCHOOL: 'Iskola',
-    USER: 'Felhasználó',
+    SCHOOL: LanguageManager.t('navigation.school_default'),
+    USER: LanguageManager.t('navigation.user_default'),
     TIMER: '45:00'
 };
 

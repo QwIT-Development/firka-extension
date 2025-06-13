@@ -13,12 +13,12 @@
       });
       
       if (!response.ok) {
-        throw new Error(`API hiba: ${response.status}`);
+        throw new Error(`${LanguageManager.t('common.api_error')}: ${response.status}`);
       }
       
       return await response.json();
     } catch (error) {
-      console.error('Hiba az API adatok betöltése során:', error);
+      console.error(LanguageManager.t('common.api_load_error'), error);
       return [];
     }
   }
@@ -26,7 +26,7 @@
   function generateWeekDates(startDate) {
     const start = new Date(startDate);
     const dates = [];
-    const dayNames = ['Hétfő', 'Kedd', 'Szerda', 'Csütörtök', 'Péntek'];
+    const dayNames = [LanguageManager.t('common.monday'), LanguageManager.t('common.tuesday'), LanguageManager.t('common.wednesday'), LanguageManager.t('common.thursday'), LanguageManager.t('common.friday')];
     
     for (let i = 0; i < 5; i++) {
       const date = new Date(start);
@@ -47,238 +47,72 @@
 
   function convertAPIDataToLessons(apiData, weekDates) {
     const lessons = [];
-
-    apiData.forEach(event => {
-      const eventDate = new Date(event.start);
-      const dayIndex = weekDates.findIndex(date => 
-        new Date(date.fullDate).toDateString() === eventDate.toDateString()
-      );
-      
-      if (dayIndex === -1) {
-        console.log('Nem található nap az eseményhez:', event.start);
-        return;
-      }
-      
-      if (event.oraType === 5) {
-        lessons.push({
-          startTime: 'Egész nap',
-          endTime: '',
-          subject: event.title,
-          teacher: '',
-          originalTeacher: '',
-          room: '',
-          day: dayIndex,
-          isSubstituted: false,
-          isCancelled: false,
-          hasHomework: false,
-          testInfo: event.Tema || '',
-          homeworkDetails: '',
-          isSpecialDay: true,
-          color: event.color
-        });
-      } else if (event.oraType === 2) {
-        const startTime = new Date(event.start);
-        const endTime = new Date(event.end);
-        const startTimeStr = startTime.toLocaleTimeString('hu-HU', { hour: '2-digit', minute: '2-digit' });
-        const endTimeStr = endTime.toLocaleTimeString('hu-HU', { hour: '2-digit', minute: '2-digit' });
-        const titleParts = event.title.split('\n');
-        const teacher = titleParts[1] || '';
-        const room = titleParts[2] ? titleParts[2].replace(/[()]/g, '') : '';
+    apiData.forEach((event, index) => {
+      try {
+        const eventDate = new Date(event.start);
+        const dayIndex = weekDates.findIndex(date => 
+          new Date(date.fullDate).toDateString() === eventDate.toDateString()
+        );
         
-        lessons.push({
-          startTime: startTimeStr,
-          endTime: endTimeStr,
-          subject: event.Tantargy || event.TantargyKategoria,
-          teacher: teacher,
-          originalTeacher: event.helyettesitoId ? teacher : '',
-          room: room,
-          day: dayIndex,
-          isSubstituted: !!event.helyettesitoId,
-          isCancelled: event.isElmaradt || false,
-          hasHomework: event.hasHaziFeladat || false,
-          testInfo: event.hasBejelentettSzamonkeres ? (event.Tema || 'Számonkérés') : '',
-          homeworkDetails: '',
-          isSpecialDay: false,
-          color: event.color
-        });
-      }
-    });
-
-    return lessons;
-  }
-
-  async function collectTimetableData() {
-    await helper.waitForElement('#Calendar');
-    await helper.waitForElement('.modalBckgroundMain:not(.isOverlayActiv)');
-
-    const dates = Array.from(document.querySelectorAll('.fc-day-header')).map(header => {
-      const fullText = header.textContent.trim();
-      const dateText = fullText.replace(/^(hétfő|kedd|szerda|csütörtök|péntek)/, '').trim();
-      return {
-        date: fullText,
-        formattedDate: dateText
-      };
-    });
-    if (dates.length === 4) {
-      const wedDate = dates[2].formattedDate;
-      const [month, day] = wedDate.split(' ');
-      const dayNum = parseInt(day.replace('.', ''));
-      const thursdayDate = `${month} ${dayNum + 1}.`;
-      
-      dates.splice(3, 0, {
-        date: `csütörtök${thursdayDate}`,
-        formattedDate: thursdayDate
-      });
-    }
-    const weekOptions = Array.from(document.querySelectorAll('#Calendar_tanevHetek_listbox li'));
-    
-    const kendoCombo = document.querySelector('#Calendar_tanevHetek')?.__kendoWidget;
-    let currentWeekIndex = 0;
-    
-    if (kendoCombo) {
-      const currentValue = kendoCombo.value();
-      const selectedIndex = kendoCombo.selectedIndex;
-      
-      console.log('Kendo widget értékek:', { currentValue, selectedIndex, weekOptionsLength: weekOptions.length });
-      
-      if (currentValue !== null && currentValue !== undefined && currentValue !== '') {
-        currentWeekIndex = parseInt(currentValue);
-      } else if (selectedIndex !== -1) {
-        currentWeekIndex = selectedIndex;
-      } else {
-        const today = new Date();
-        let foundWeekIndex = -1;
-
-        for (let i = 0; i < weekOptions.length; i++) {
-          const weekText = weekOptions[i].textContent.trim();
-          console.log(`Vizsgált hét ${i}: ${weekText}`);
+        if (dayIndex === -1) {
+          return;
+        }
+        
+        if (event.oraType === 5) {
+          const lesson = {
+            startTime: LanguageManager.t('timetable.all_day'),
+            endTime: '',
+            subject: event.title || 'Különleges nap',
+            teacher: '',
+            originalTeacher: '',
+            room: '',
+            day: dayIndex,
+            isSubstituted: false,
+            isCancelled: false,
+            hasHomework: false,
+            testInfo: event.Tema || '',
+            homeworkDetails: '',
+            isSpecialDay: true,
+            color: event.color
+          };
+          lessons.push(lesson);
+        } else if (event.oraType === 2 || event.oraType === 1 || event.oraType === 3 || event.oraType === 4) {
+          const startTime = new Date(event.start);
+          const endTime = new Date(event.end);
+          const startTimeStr = startTime.toLocaleTimeString('hu-HU', { hour: '2-digit', minute: '2-digit' });
+          const endTimeStr = endTime.toLocaleTimeString('hu-HU', { hour: '2-digit', minute: '2-digit' });
+          const titleParts = event.title ? event.title.split('\n') : [];
+          const teacher = titleParts[1] || '';
+          const room = titleParts[2] ? titleParts[2].replace(/[()]/g, '') : '';
+          const subject = event.Tantargy || event.TantargyKategoria || titleParts[0] || 'Ismeretlen tantárgy';
           
-          let dateMatch = null;
-          let year, startMonth, startDay, endMonth, endDay;
-
-          dateMatch = weekText.match(/(\d{4})\. (\w+) (\d{1,2})\. - (\w+) (\d{1,2})\. \((\d+)\. hét\)/);
-          if (dateMatch) {
-            [, year, startMonth, startDay, endMonth, endDay] = dateMatch;
+          if (startTimeStr && subject) {
+            const lesson = {
+              startTime: startTimeStr,
+              endTime: endTimeStr,
+              subject: subject,
+              teacher: teacher,
+              originalTeacher: event.helyettesitoId ? teacher : '',
+              room: room,
+              day: dayIndex,
+              isSubstituted: !!event.helyettesitoId,
+              isCancelled: event.isElmaradt || false,
+              hasHomework: event.hasHaziFeladat || false,
+              testInfo: event.hasBejelentettSzamonkeres ? (event.Tema || LanguageManager.t('timetable.test_indicator')) : '',
+              homeworkDetails: '',
+              isSpecialDay: false,
+              color: event.color
+            };
+            lessons.push(lesson);
           } else {
-            dateMatch = weekText.match(/(\d{4})\.(\d{2})\.(\d{2})\. - (\d{4})\.(\d{2})\.(\d{2})\. \((\d+)\. hét\)/);
-            if (dateMatch) {
-              const [, startYear, startMonthNum, startDayNum, endYear, endMonthNum, endDayNum] = dateMatch;
-              year = startYear;
-              startMonth = parseInt(startMonthNum) - 1;
-              startDay = startDayNum;
-              endMonth = parseInt(endMonthNum) - 1;
-              endDay = endDayNum;
-            } else {
-              dateMatch = weekText.match(/(\d+)\. hét \((\d{4})\.(\d{2})\.(\d{2})\. - (\d{4})\.(\d{2})\.(\d{2})\.\)/);
-              if (dateMatch) {
-                const [, weekNum, startYear, startMonthNum, startDayNum, endYear, endMonthNum, endDayNum] = dateMatch;
-                year = startYear;
-                startMonth = parseInt(startMonthNum) - 1;
-                startDay = startDayNum;
-                endMonth = parseInt(endMonthNum) - 1;
-                endDay = endDayNum;
-              }
-            }
           }
-          
-          if (dateMatch) {
-            if (typeof startMonth === 'string') {
-              const monthNames = {
-                'január': 0, 'február': 1, 'március': 2, 'április': 3, 'május': 4, 'június': 5,
-                'július': 6, 'augusztus': 7, 'szeptember': 8, 'október': 9, 'november': 10, 'december': 11
-              };
-              
-              const startMonthNum = monthNames[startMonth.toLowerCase()];
-              const endMonthNum = monthNames[endMonth.toLowerCase()];
-              
-              if (startMonthNum !== undefined && endMonthNum !== undefined) {
-                startMonth = startMonthNum;
-                endMonth = endMonthNum;
-              } else {
-                continue;
-              }
-            }
-            
-            const weekStart = new Date(parseInt(year), startMonth, parseInt(startDay));
-            const weekEnd = new Date(parseInt(year), endMonth, parseInt(endDay));
-            
-            if (today >= weekStart && today <= weekEnd) {
-              foundWeekIndex = i;
-              console.log(`Megtalált jelenlegi hét: ${i}`);
-              break;
-            }
-          }
-        }
-        
-        if (foundWeekIndex !== -1) {
-          currentWeekIndex = foundWeekIndex;
         } else {
-          currentWeekIndex = Math.min(41, weekOptions.length - 1);
-          console.log(`Nem találtuk a jelenlegi hetet, fallback: ${currentWeekIndex}`);
         }
-        
-        kendoCombo.value(currentWeekIndex.toString());
-        kendoCombo.trigger('change');
+      } catch (error) {
+        console.error(`Hiba az API feldolgozása során (${index}):`, error, event);
       }
-      
-      console.log('Beállított currentWeekIndex:', currentWeekIndex);
-    }
-    const timetableData = {
-      schoolInfo: {
-        name: cookieManager.get('schoolName') || 'Iskola',
-        id: cookieManager.get('schoolCode') || ''
-      },
-      userData: {
-        name: cookieManager.get('userName') || 'Felhasználó',
-        time: document.querySelector('.usermenu_timer')?.textContent?.trim() || '45:00'
-      },
-      weekInfo: {
-        title: document.querySelector('.fc-center h2')?.textContent?.trim() || 'Hét',
-        options: Array.from(document.querySelectorAll('#Calendar_tanevHetek_listbox li'))
-          .map((li, i) => ({
-            text: li.textContent.trim(),
-            value: i.toString(),
-            selected: i === currentWeekIndex
-          }))
-      },
-      weekDates: dates,
-      lessons: []
-    };
-
-    for (const event of document.querySelectorAll('.fc-event')) {
-      const timeEl = event.querySelector('.fc-time');
-      const titleEl = event.querySelector('.fc-title');
-      
-      if (timeEl && titleEl) {
-        const [startTime, endTime] = (timeEl.getAttribute('data-full') || timeEl.textContent || '').split(' - ');
-        const [fullSubject, teacher, room] = titleEl.innerHTML.split('<br>').map(str => str.trim());
-        const subject = fullSubject.split('-')[0].trim();
-        
-        let originalTeacher = '';
-        if (teacher.startsWith('Helyettesítő:')) {
-          event.click();
-          originalTeacher = await helper.waitForElement("#OraAdatokDetailTabStrip-1 > div > div:nth-child(3) > div:nth-child(2)");
-          originalTeacher = originalTeacher.innerText;
-          document.querySelector("body > div.k-widget.k-window > div.k-window-titlebar.k-header > div > a:nth-child(2)").click();
-        }
-
-        timetableData.lessons.push({
-          startTime,
-          endTime,
-          subject: subject || '',
-          teacher: teacher || '',
-          originalTeacher: originalTeacher || '',
-          room: (room || '').replace(/[()]/g, ''),
-          day: event.closest('td').cellIndex - 1,
-          isSubstituted: event.querySelector('.fc-bg2') !== null,
-          isCancelled: event.classList.contains('fc-textline-through'),
-          hasHomework: titleEl.querySelector('.hasCalendarIcon') !== null,
-          testInfo: event.getAttribute('data-tooltiptext') || '',
-          homeworkDetails: event.getAttribute('data-homework') || ''
-        });
-      }
-    }
-    return timetableData;
+    });
+    return lessons;
   }
 
   function generateTimeGrid(lessons, weekDates) {
@@ -290,7 +124,13 @@
       const timeB = helper.convertTimeToMinutes(b);
       return timeA - timeB;
     });
-    const days = ['Hétfő', 'Kedd', 'Szerda', 'Csütörtök', 'Péntek'];
+    const days = [
+      LanguageManager.t('timetable.monday'), 
+      LanguageManager.t('timetable.tuesday'), 
+      LanguageManager.t('timetable.wednesday'), 
+      LanguageManager.t('timetable.thursday'), 
+      LanguageManager.t('timetable.friday')
+    ];
     
     return `
       <div class="grid-header"></div>
@@ -324,17 +164,17 @@
                   <div class="lesson-teacher">${lesson.teacher}</div>
                   <div class="lesson-bottom">
                     <div class="lesson-room">${lesson.room}</div>
-                    <div class="lesson-time">${lesson.isCancelled ? 'Elmarad' : lesson.startTime}</div>
+                    <div class="lesson-time">${lesson.isCancelled ? LanguageManager.t('timetable.cancelled') : lesson.startTime}</div>
                   </div>
                   ${lesson.hasHomework || lesson.testInfo ? `
                     <div class="lesson-indicators">
                       ${lesson.hasHomework ? `
-                        <span class="lesson-indicator homework-indicator" title="Házi feladat">
+                        <span class="lesson-indicator homework-indicator" title="${LanguageManager.t('timetable.homework_indicator')}">
                           <span class="material-icons-round">assignment</span>
                         </span>
                       ` : ''}
                       ${lesson.testInfo ? `
-                        <span class="lesson-indicator test-indicator" title="Számonkérés">
+                        <span class="lesson-indicator test-indicator" title="${LanguageManager.t('timetable.test_indicator')}">
                           <span class="material-icons-round">quiz</span>
                         </span>
                       ` : ''}
@@ -362,31 +202,31 @@
         <div class="modal-body">
           <div class="lesson-details">
             <div class="detail-item">
-              <span class="detail-label">Tanár:</span>
+              <span class="detail-label">${LanguageManager.t('timetable.teacher_label')}</span>
               <span class="detail-value ${(lesson.originalTeacher != '' ? 'line-through' : '')}">${lesson.originalTeacher != '' ? lesson.originalTeacher : lesson.teacher}</span>
             </div>
             <div class="detail-item ${(lesson.originalTeacher != '' ? '' : 'hidden')}">
-              <span class="detail-label">Helyettesítő tanár:</span>
+              <span class="detail-label">${LanguageManager.t('timetable.substitute_teacher_label')}</span>
               <span class="detail-value">${lesson.teacher.replace('Helyettesítő:', '')}</span>
             </div>
             <div class="detail-item">
-              <span class="detail-label">Terem:</span>
+              <span class="detail-label">${LanguageManager.t('timetable.classroom_label')}</span>
               <span class="detail-value">${lesson.room}</span>
             </div>
             <div class="detail-item">
-              <span class="detail-label">Időpont:</span>
+              <span class="detail-label">${LanguageManager.t('timetable.time_label')}</span>
               <span class="detail-value">${lesson.startTime} - ${lesson.endTime}</span>
             </div>
             ${lesson.isSubstituted ? `
             <div class="detail-item">
-              <span class="detail-label">Állapot:</span>
-              <span class="detail-value"><span class="material-icons-round">sync_alt</span> Helyettesítés</span>
+              <span class="detail-label">${LanguageManager.t('timetable.status_label')}</span>
+              <span class="detail-value"><span class="material-icons-round">sync_alt</span> ${LanguageManager.t('timetable.substitution')}</span>
             </div>
             ` : ''}
             ${lesson.isCancelled ? `
             <div class="detail-item">
-              <span class="detail-label">Állapot:</span>
-              <span class="detail-value"><span class="material-icons-round">cancel</span> Elmarad</span>
+              <span class="detail-label">${LanguageManager.t('timetable.status_label')}</span>
+              <span class="detail-value"><span class="material-icons-round">cancel</span> ${LanguageManager.t('timetable.cancelled')}</span>
             </div>
             ` : ''}
           </div>
@@ -395,12 +235,12 @@
             <div class="modal-section homework-section">
               <h4>
                 <span class="material-icons-round">assignment</span>
-                Házi feladat
+                ${LanguageManager.t('timetable.homework_indicator')}
               </h4>
               <div class="homework-content">
-                ${lesson.homeworkDetails ? `<p>${lesson.homeworkDetails}</p>` : '<p>Van házi feladat</p>'}
+                ${lesson.homeworkDetails ? `<p>${lesson.homeworkDetails}</p>` : `<p>${LanguageManager.t('timetable.has_homework')}</p>`}
                 <a href='https://${window.location.hostname}/Tanulo/TanuloHaziFeladat' class="more-link">
-                  Házi feladat megnyitása
+                  ${LanguageManager.t('timetable.open_homework')}
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="17" viewBox="0 0 16 17" fill="none">
                     <path d="M11.2997 5.19947L5.64282 5.19947M11.2997 5.19947L11.2997 10.8563M11.2997 5.19947L4.70001 11.7991" stroke="var(--accent-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
                   </svg>
@@ -412,7 +252,7 @@
             <div class="modal-section test-section">
               <h4>
                 <span class="material-icons-round">quiz</span>
-                Számonkérés
+                ${LanguageManager.t('timetable.test_indicator')}
               </h4>
               <div class="test-content">
                 <p>${lesson.testInfo}</p>
@@ -451,29 +291,33 @@
   async function loadAndDisplayWeek(weekOption) {
     try {
       loadingScreen.show();
-      const weekText = weekOption.text;
-      const dateMatch = weekText.match(/(\d{4})\.(\d{2})\.(\d{2})/);
-      
-      if (!dateMatch) {
-        console.error('Nem sikerült kinyerni a dátumot:', weekText);
-        return;
+      let startDate, endDate;
+      if (weekOption.startDate && weekOption.endDate) {
+        startDate = weekOption.startDate;
+        endDate = weekOption.endDate;
+      } else {
+        const weekText = weekOption.text;
+        const dateMatch = weekText.match(/(\d{4})\.(\d{2})\.(\d{2})/);
+        
+        if (!dateMatch) {
+          console.error(LanguageManager.t('timetable.date_extract_error'), weekText);
+          return;
+        }
+        const [, year, month, day] = dateMatch;
+        startDate = `${year}-${month}-${day}`;
+        const start = new Date(startDate);
+        const end = new Date(start);
+        end.setDate(start.getDate() + 6);
+        endDate = end.toISOString().split('T')[0];
       }
-      const [, year, month, day] = dateMatch;
-      const startDate = `${year}-${month}-${day}`;
-      const start = new Date(startDate);
-      const end = new Date(start);
-      end.setDate(start.getDate() + 6);
-      const endDate = end.toISOString().split('T')[0];
       const apiData = await loadWeekDataFromAPI(startDate, endDate);
       const weekDates = generateWeekDates(startDate);
       const kendoCombo = document.querySelector('#Calendar_tanevHetek')?.__kendoWidget;
       if (kendoCombo) {
         kendoCombo.value(weekOption.value);
         kendoCombo.trigger('change');
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        await helper.waitForElement('.fc-event', 2000).catch(() => {
-          console.log('Nincsenek órák ezen a héten vagy időtúllépés történt');
-        });
+
+        await new Promise(resolve => setTimeout(resolve, 2000));
       }
 
       const apiLessons = convertAPIDataToLessons(apiData, weekDates);
@@ -492,68 +336,13 @@
       setupDayNavigation(weekDates);
       
     } catch (error) {
-      console.error('Hiba a hét betöltése során:', error);
+      console.error(LanguageManager.t('timetable.week_load_error'), error);
     } finally {
       loadingScreen.hide();
     }
   }
 
-  async function collectDOMLessons() {
-    const lessons = [];
-    const events = document.querySelectorAll('.fc-event');
-    console.log(`Talált órák száma: ${events.length}`);
-    
-    for (const event of events) {
-      const timeEl = event.querySelector('.fc-time');
-      const titleEl = event.querySelector('.fc-title');
-      
-      if (timeEl && titleEl) {
-        const timeText = timeEl.getAttribute('data-full') || timeEl.textContent || '';
-        const [startTime, endTime] = timeText.split(' - ');
-        const titleHTML = titleEl.innerHTML;
-        const titleParts = titleHTML.split('<br>').map(str => str.trim());
-        const fullSubject = titleParts[0] || '';
-        const teacher = titleParts[1] || '';
-        const room = titleParts[2] || '';
-        
-        const subject = fullSubject.split('-')[0].trim();
-        
-        let originalTeacher = '';
-        if (teacher && teacher.startsWith('Helyettesítő:')) {
-          try {
-            event.click();
-            const originalTeacherEl = await helper.waitForElement("#OraAdatokDetailTabStrip-1 > div > div:nth-child(3) > div:nth-child(2)", 3000);
-            originalTeacher = originalTeacherEl.innerText;
-            const closeBtn = document.querySelector("body > div.k-widget.k-window > div.k-window-titlebar.k-header > div > a:nth-child(2)");
-            if (closeBtn) closeBtn.click();
-          } catch (error) {
-            console.log('Nem sikerült lekérni az eredeti tanár adatait:', error);
-          }
-        }
 
-        const dayCell = event.closest('td');
-        const dayIndex = dayCell ? dayCell.cellIndex - 1 : 0;
-
-        lessons.push({
-          startTime: startTime || '',
-          endTime: endTime || '',
-          subject: subject || '',
-          teacher: teacher || '',
-          originalTeacher: originalTeacher || '',
-          room: (room || '').replace(/[()]/g, ''),
-          day: Math.max(0, dayIndex),
-          isSubstituted: event.querySelector('.fc-bg2') !== null,
-          isCancelled: event.classList.contains('fc-textline-through'),
-          hasHomework: titleEl.querySelector('.hasCalendarIcon') !== null,
-          testInfo: event.getAttribute('data-tooltiptext') || '',
-          homeworkDetails: event.getAttribute('data-homework') || ''
-        });
-      }
-    }
-    
-    console.log(`Feldolgozott órák száma: ${lessons.length}`);
-    return lessons;
-  }
 
   function setupLessonCardListeners() {
     document.querySelectorAll('.lesson-card').forEach(card => {
@@ -566,39 +355,81 @@
 
   function setupEventListeners(data) {
     setupLessonCardListeners();
-
-    const prevBtn = document.querySelector('.prev-week');
-    const nextBtn = document.querySelector('.next-week');
-    const weekSelect = document.querySelector('.week-select');
-
-    prevBtn?.addEventListener('click', async () => {
-      const currentIndex = parseInt(weekSelect.value);
-      const prevIndex = Math.max(0, currentIndex - 1);
-      const prevOption = data.weekInfo.options[prevIndex];
-      
-      if (prevOption) {
-        await loadAndDisplayWeek(prevOption);
-      }
-    });
-
-    nextBtn?.addEventListener('click', async () => {
-      const currentIndex = parseInt(weekSelect.value);
-      const nextIndex = Math.min(data.weekInfo.options.length - 1, currentIndex + 1);
-      const nextOption = data.weekInfo.options[nextIndex];
-      
-      if (nextOption) {
-        await loadAndDisplayWeek(nextOption);
-      }
-    });
-
-    weekSelect?.addEventListener('change', async function() {
-      const selectedOption = data.weekInfo.options[parseInt(this.value)];
-      if (selectedOption) {
-        await loadAndDisplayWeek(selectedOption);
-      }
-    });
-
     setupDayNavigation(data.weekDates);
+
+    const weekGrid = document.getElementById('week-grid');
+    const weekTooltip = document.getElementById('week-tooltip');
+    
+    if (weekGrid && weekTooltip) {
+      weekGrid.addEventListener('click', async (e) => {
+        if (e.target.classList.contains('week-cell')) {
+          const weekValue = e.target.dataset.week;
+          const weekOption = data.weekInfo.options.find(opt => opt.value === weekValue);
+          
+          if (weekOption) {
+            document.querySelectorAll('.week-cell.selected').forEach(cell => {
+              cell.classList.remove('selected');
+            });
+
+            e.target.classList.add('selected');
+
+            await loadAndDisplayWeek(weekOption);
+          }
+        }
+      });
+
+      weekGrid.addEventListener('mouseover', (e) => {
+        if (e.target.classList.contains('week-cell')) {
+          const startDate = e.target.dataset.start;
+          const endDate = e.target.dataset.end;
+          const weekNum = e.target.dataset.week;
+          
+          if (startDate && endDate) {
+            const startFormatted = formatDateHU(new Date(startDate));
+            const endFormatted = formatDateHU(new Date(endDate));
+            weekTooltip.textContent = `${weekNum}. hét: ${startFormatted} - ${endFormatted}`;
+            const rect = e.target.getBoundingClientRect();
+            const containerRect = weekGrid.getBoundingClientRect();
+            
+            weekTooltip.style.left = `${rect.left - containerRect.left + rect.width / 2}px`;
+            weekTooltip.style.top = `${rect.top - containerRect.top - 40}px`;
+            weekTooltip.style.transform = 'translateX(-50%)';
+            weekTooltip.classList.add('show');
+          }
+        }
+      });
+      
+      weekGrid.addEventListener('mouseout', (e) => {
+        if (e.target.classList.contains('week-cell')) {
+          weekTooltip.classList.remove('show');
+        }
+      });
+    }
+
+    const expandBtn = document.getElementById('expandWeekView');
+    const modal = document.getElementById('weekModal');
+    const closeBtn = document.getElementById('closeWeekModal');
+    const modalGrid = document.getElementById('weekModalGrid');
+    
+    if (expandBtn && modal && closeBtn && modalGrid) {
+      expandBtn.addEventListener('click', () => {
+        generateFullYearWeeks(modalGrid, data);
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+      });
+
+      closeBtn.addEventListener('click', () => {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+      });
+
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          modal.style.display = 'none';
+          document.body.style.overflow = 'auto';
+        }
+      });
+    }
   }
 
   let dayNavigationState = {
@@ -607,15 +438,32 @@
   };
 
   function setupDayNavigation(weekDates) {
-    const days = ['Hétfő', 'Kedd', 'Szerda', 'Csütörtök', 'Péntek'];
+    const days = [
+      LanguageManager.t('timetable.monday'), 
+      LanguageManager.t('timetable.tuesday'), 
+      LanguageManager.t('timetable.wednesday'), 
+      LanguageManager.t('timetable.thursday'), 
+      LanguageManager.t('timetable.friday')
+    ];
     
     const prevBtn = document.getElementById('prevDay');
     const nextBtn = document.getElementById('nextDay');
     const currentDayName = document.getElementById('currentDayName');
     const currentDayDate = document.getElementById('currentDayDate');
-    const preservedDayIndex = dayNavigationState.isInitialized ? dayNavigationState.currentDayIndex : 0;
 
-    if (dayNavigationState.isInitialized) {
+    if (!dayNavigationState.isInitialized) {
+      const today = new Date();
+      const dayOfWeek = today.getDay();
+      let currentDayIndex = 0;
+      if (dayOfWeek >= 1 && dayOfWeek <= 5) {
+        currentDayIndex = dayOfWeek - 1;
+      } else {
+        currentDayIndex = 0;
+      }
+      
+      dayNavigationState.currentDayIndex = currentDayIndex;
+    } else {
+      const preservedDayIndex = dayNavigationState.currentDayIndex;
       dayNavigationState.currentDayIndex = preservedDayIndex;
       updateDayDisplay();
       return;
@@ -625,11 +473,6 @@
       if (currentDayName && currentDayDate) {
         currentDayName.textContent = days[dayNavigationState.currentDayIndex];
         currentDayDate.textContent = weekDates[dayNavigationState.currentDayIndex]?.formattedDate || '';
-      }
-
-      if (prevBtn && nextBtn) {
-        prevBtn.disabled = dayNavigationState.currentDayIndex === 0;
-        nextBtn.disabled = dayNavigationState.currentDayIndex === days.length - 1;
       }
 
       const gridHeaders = document.querySelectorAll('.grid-header:not(:first-child)');
@@ -672,13 +515,236 @@
     updateDayDisplay();
   }
 
+  function getWeekNumber(date) {
+    const currentDate = new Date(date);
+    const currentYear = currentDate.getFullYear();
+    const currentMonth = currentDate.getMonth();
+    let schoolYearStart;
+    if (currentMonth >= 8) {
+      schoolYearStart = new Date(currentYear, 8, 1);
+    } else {
+      schoolYearStart = new Date(currentYear - 1, 8, 1);
+    }
+    const timeDiff = currentDate.getTime() - schoolYearStart.getTime();
+    const daysDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+    const weekNumber = Math.floor(daysDiff / 7) + 1;
+    return Math.max(1, Math.min(52, weekNumber));
+  }
+
+  function getDateOfWeek(year, week, dayOfWeek) {
+    const jan4 = new Date(year, 0, 4);
+    const jan4DayOfWeek = jan4.getDay() || 7;
+    const daysToAdd = (week - 1) * 7 + (dayOfWeek - jan4DayOfWeek);
+    const result = new Date(jan4);
+    result.setDate(jan4.getDate() + daysToAdd);
+    return result;
+  }
+
+  function formatDateHU(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}.${month}.${day}.`;
+  }
+
+  function generateWeekOptions() {
+    const options = [];
+    const today = new Date();
+
+    for (let offset = -2; offset <= 2; offset++) {
+      const targetDate = new Date(today);
+      targetDate.setDate(today.getDate() + (offset * 7));
+      const dayOfWeek = targetDate.getDay();
+      const daysToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+      const weekStart = new Date(targetDate);
+      weekStart.setDate(targetDate.getDate() + daysToMonday);
+      
+      const weekEnd = new Date(weekStart);
+      weekEnd.setDate(weekStart.getDate() + 6);
+      
+      const weekNumber = getWeekNumber(weekStart);
+      
+      const startDateFormatted = formatDateHU(weekStart);
+      const endDateFormatted = formatDateHU(weekEnd);
+      
+      const startDate = weekStart.toISOString().split('T')[0];
+      const endDate = weekEnd.toISOString().split('T')[0];
+      
+      options.push({
+        text: `${weekNumber}. hét (${startDateFormatted} - ${endDateFormatted})`,
+        value: weekNumber.toString(),
+        selected: offset === 0,
+        startDate: startDate,
+        endDate: endDate
+      });
+    }
+    
+    return options;
+  }
+  
+  function generateFullYearWeeks(modalGrid, data) {
+    const today = new Date();
+    const currentYear = today.getFullYear();
+    const currentMonth = today.getMonth();
+
+    let schoolYearStart;
+    if (currentMonth >= 8) {
+      schoolYearStart = new Date(currentYear, 8, 1);
+    } else {
+      schoolYearStart = new Date(currentYear - 1, 8, 1);
+    }
+    
+    const currentWeekNumber = getWeekNumber(today);
+    const allWeeks = [];
+
+    for (let weekNum = 1; weekNum <= 52; weekNum++) {
+      const weekStart = new Date(schoolYearStart);
+      const sept1DayOfWeek = schoolYearStart.getDay();
+      const daysToMonday = sept1DayOfWeek === 0 ? 1 : (8 - sept1DayOfWeek) % 7;
+      if (weekNum === 1) {
+        weekStart.setDate(schoolYearStart.getDate() - daysToMonday);
+      } else {
+        weekStart.setDate(schoolYearStart.getDate() - daysToMonday + (weekNum - 1) * 7);
+      }
+      
+      const weekEnd = new Date(weekStart);
+      weekEnd.setDate(weekStart.getDate() + 6);
+      
+      const startDateFormatted = formatDateHU(weekStart);
+      const endDateFormatted = formatDateHU(weekEnd);
+      
+      const startDate = weekStart.toISOString().split('T')[0];
+      const endDate = weekEnd.toISOString().split('T')[0];
+      
+      allWeeks.push({
+        text: `${weekNum}. hét (${startDateFormatted} - ${endDateFormatted})`,
+        value: weekNum.toString(),
+        selected: weekNum === currentWeekNumber,
+        startDate: startDate,
+        endDate: endDate
+      });
+    }
+
+    modalGrid.innerHTML = allWeeks.map(week => `
+      <div class="week-cell ${week.selected ? 'selected' : ''}" 
+           data-week="${week.value}" 
+           data-start="${week.startDate}" 
+           data-end="${week.endDate}"
+           title="${week.text}">
+        ${week.value}
+      </div>
+    `).join('');
+    modalGrid.addEventListener('click', async (e) => {
+      if (e.target.classList.contains('week-cell')) {
+        const weekValue = e.target.dataset.week;
+        const weekOption = allWeeks.find(opt => opt.value === weekValue);
+        
+        if (weekOption) {
+          document.getElementById('weekModal').style.display = 'none';
+          document.body.style.overflow = 'auto';
+
+          document.querySelectorAll('#week-grid .week-cell.selected').forEach(cell => {
+            cell.classList.remove('selected');
+          });
+
+          await loadAndDisplayWeek(weekOption);
+
+          const newWeekOptions = generateWeekOptionsAroundWeek(parseInt(weekValue));
+          updateMainWeekGrid(newWeekOptions);
+        }
+      }
+    });
+  }
+  
+  function generateWeekOptionsAroundWeek(targetWeekNumber) {
+    const options = [];
+    const today = new Date();
+    const currentYear = today.getFullYear();
+    const currentMonth = today.getMonth();
+
+    let schoolYearStart;
+    if (currentMonth >= 8) {
+      schoolYearStart = new Date(currentYear, 8, 1);
+    } else {
+      schoolYearStart = new Date(currentYear - 1, 8, 1);
+    }
+    for (let offset = -2; offset <= 2; offset++) {
+      const weekNum = Math.max(1, Math.min(52, targetWeekNumber + offset));
+      const weekStart = new Date(schoolYearStart);
+      const sept1DayOfWeek = schoolYearStart.getDay();
+      const daysToMonday = sept1DayOfWeek === 0 ? 1 : (8 - sept1DayOfWeek) % 7;
+      if (weekNum === 1) {
+        weekStart.setDate(schoolYearStart.getDate() - daysToMonday);
+      } else {
+        weekStart.setDate(schoolYearStart.getDate() - daysToMonday + (weekNum - 1) * 7);
+      }
+      
+      const weekEnd = new Date(weekStart);
+      weekEnd.setDate(weekStart.getDate() + 6);
+      
+      const startDateFormatted = formatDateHU(weekStart);
+      const endDateFormatted = formatDateHU(weekEnd);
+      
+      const startDate = weekStart.toISOString().split('T')[0];
+      const endDate = weekEnd.toISOString().split('T')[0];
+      
+      options.push({
+        text: `${weekNum}. hét (${startDateFormatted} - ${endDateFormatted})`,
+        value: weekNum.toString(),
+        selected: weekNum === targetWeekNumber,
+        startDate: startDate,
+        endDate: endDate
+      });
+    }
+    
+    return options;
+  }
+  
+  function updateMainWeekGrid(newWeekOptions) {
+    const weekGrid = document.getElementById('week-grid');
+    if (weekGrid) {
+      weekGrid.innerHTML = newWeekOptions.map(opt => `
+        <div class="week-cell ${opt.selected ? 'selected' : ''}" 
+             data-week="${opt.value}" 
+             data-start="${opt.startDate}" 
+             data-end="${opt.endDate}"
+             title="${opt.text}">
+          ${opt.value}
+        </div>
+      `).join('');
+    }
+  }
+
   async function transformTimetablePage() {
     try {
-      const data = await collectTimetableData();
-      if (!data) {
-        loadingScreen.hide();
-        return;
-      }
+      const weekOptions = generateWeekOptions();
+      const currentWeekOption = weekOptions.find(opt => opt.selected);
+      const today = new Date();
+      const startOfWeek = new Date(today);
+      startOfWeek.setDate(today.getDate() - today.getDay() + 1);
+      const endOfWeek = new Date(startOfWeek);
+      endOfWeek.setDate(startOfWeek.getDate() + 6);
+      const startDate = startOfWeek.toISOString().split('T')[0];
+      const endDate = endOfWeek.toISOString().split('T')[0];
+      const apiData = await loadWeekDataFromAPI(startDate, endDate);
+      const weekDates = generateWeekDates(startDate);
+      const lessons = convertAPIDataToLessons(apiData, weekDates);
+      const data = {
+        schoolInfo: {
+          name: cookieManager.get('schoolName') || 'Iskola',
+          id: cookieManager.get('schoolCode') || ''
+        },
+        userData: {
+          name: cookieManager.get('userName') || 'Felhasználó',
+          time: '45:00'
+        },
+        weekInfo: {
+          title: LanguageManager.t('timetable.week'),
+          options: weekOptions
+        },
+        weekDates: weekDates,
+        lessons: lessons
+      };
 
       document.body.innerHTML = `
         <div class="kreta-container">
@@ -686,19 +752,38 @@
 
           <main class="kreta-main">
             <div class="week-controls">
-              <button class="week-nav-btn prev-week">
-                <span class="material-icons-round">chevron_left</span>
-              </button>
-              <select class="week-select" id="week-selector">
-                ${data.weekInfo.options.map(opt => `
-                  <option value="${opt.value}" ${opt.selected ? 'selected' : ''}>
-                    ${opt.text}
-                  </option>
-                `).join('')}
-              </select>
-              <button class="week-nav-btn next-week">
-                <span class="material-icons-round">chevron_right</span>
-              </button>
+              <div class="week-selector-container">
+                <div class="week-selector" id="week-selector">
+                  <button class="week-nav-btn" id="prevWeekBtn" title="Előző hét">
+                    <span class="material-icons-round">chevron_left</span>
+                  </button>
+                  <div class="week-display" id="week-display">
+                    <!-- Will be populated with 5 weeks -->
+                  </div>
+                  <button class="week-nav-btn" id="nextWeekBtn" title="Következő hét">
+                    <span class="material-icons-round">chevron_right</span>
+                  </button>
+                  <button class="expand-week-view-btn" id="expandWeekView" title="Teljes nézet">
+                    <span class="material-icons-round">open_in_full</span>
+                  </button>
+                </div>
+                <div class="week-tooltip" id="week-tooltip"></div>
+              </div>
+            </div>
+
+            <!-- Modal for expanded week view -->
+            <div class="week-modal" id="weekModal" style="display: none;">
+              <div class="week-modal-content">
+                <div class="week-modal-header">
+                  <h3>Hét választó - Teljes nézet</h3>
+                  <button class="week-modal-close" id="closeWeekModal">
+                    <span class="material-icons-round">close</span>
+                  </button>
+                </div>
+                <div class="week-modal-grid" id="weekModalGrid">
+                  <!-- Will be populated with all 52 weeks -->
+                </div>
+              </div>
             </div>
 
             <div class="day-navigation">
@@ -725,91 +810,203 @@
       setupUserDropdown();
       setupMobileNavigation();
       setupEventListeners(data);
-      setCurrentWeekInSelector(data.weekInfo.options);
+      initializeWeekSelector(data.weekInfo.options);
       
       loadingScreen.hide();
 
     } catch (error) {
-      console.error('Hiba az oldal átalakítása során:', error);
+      console.error(LanguageManager.t('timetable.page_transform_error'), error);
       loadingScreen.hide();
     }
   }
 
-  function setCurrentWeekInSelector(weekOptions) {
+  let currentWeekIndex = 0;
+  let allWeekOptions = [];
+  
+  function initializeWeekSelector(weekOptions) {
+    allWeekOptions = weekOptions;
     const today = new Date();
-    let foundWeekIndex = -1;
-
-    for (let i = 0; i < weekOptions.length; i++) {
-      const weekText = weekOptions[i].text;
+    const currentWeekNumber = getWeekNumber(today);
+    currentWeekIndex = allWeekOptions.findIndex(opt => parseInt(opt.value) === currentWeekNumber);
+    if (currentWeekIndex === -1) {
+      currentWeekIndex = Math.floor(allWeekOptions.length / 2);
+    }
+    
+    updateWeekDisplay();
+    setupWeekNavigation();
+  }
+  
+  function updateWeekDisplay() {
+    const weekDisplay = document.getElementById('week-display');
+    if (!weekDisplay) return;
+    let startIndex = currentWeekIndex - 2;
+    if (startIndex < 0) {
+      startIndex = 0;
+    }
+    else if (startIndex + 5 > allWeekOptions.length) {
+      startIndex = Math.max(0, allWeekOptions.length - 5);
+    }
+    
+    const endIndex = Math.min(allWeekOptions.length, startIndex + 5);
+    const visibleWeeks = allWeekOptions.slice(startIndex, startIndex + 5);
+    
+    const today = new Date();
+    const currentWeekNumber = getWeekNumber(today);
+    
+    weekDisplay.innerHTML = visibleWeeks.map((opt, index) => {
+      const weekNumber = parseInt(opt.value);
+      const isSelected = startIndex + index === currentWeekIndex;
+      const isCurrent = weekNumber === currentWeekNumber;
       
-      let dateMatch = null;
-      let year, startMonth, startDay, endMonth, endDay;
-
-      dateMatch = weekText.match(/(\d{4})\. (\w+) (\d{1,2})\. - (\w+) (\d{1,2})\. \((\d+)\. hét\)/);
-      if (dateMatch) {
-        [, year, startMonth, startDay, endMonth, endDay] = dateMatch;
-      } else {
-        dateMatch = weekText.match(/(\d{4})\.(\d{2})\.(\d{2})\. - (\d{4})\.(\d{2})\.(\d{2})\. \((\d+)\. hét\)/);
-        if (dateMatch) {
-          const [, startYear, startMonthNum, startDayNum, endYear, endMonthNum, endDayNum] = dateMatch;
-          year = startYear;
-          startMonth = parseInt(startMonthNum) - 1;
-          startDay = startDayNum;
-          endMonth = parseInt(endMonthNum) - 1;
-          endDay = endDayNum;
-        } else {
-          dateMatch = weekText.match(/(\d+)\. hét \((\d{4})\.(\d{2})\.(\d{2})\. - (\d{4})\.(\d{2})\.(\d{2})\.\)/);
-          if (dateMatch) {
-            const [, weekNum, startYear, startMonthNum, startDayNum, endYear, endMonthNum, endDayNum] = dateMatch;
-            year = startYear;
-            startMonth = parseInt(startMonthNum) - 1;
-            startDay = startDayNum;
-            endMonth = parseInt(endMonthNum) - 1;
-            endDay = endDayNum;
-          }
+      return `
+        <div class="week-cell ${isSelected ? 'selected' : ''} ${isCurrent ? 'current-week' : ''}" 
+             data-week="${opt.value}" 
+             data-start="${opt.startDate}" 
+             data-end="${opt.endDate}"
+             data-index="${startIndex + index}"
+             title="${opt.text}${isCurrent ? ' (Jelenlegi hét)' : ''}">
+          <span class="week-number">${opt.value}</span>
+          ${isCurrent ? '<span class="current-indicator">●</span>' : ''}
+        </div>
+      `;
+    }).join('');
+  }
+  
+  function setupWeekNavigation() {
+    const prevBtn = document.getElementById('prevWeekBtn');
+    const nextBtn = document.getElementById('nextWeekBtn');
+    const expandBtn = document.getElementById('expandWeekView');
+    
+    if (prevBtn) {
+      prevBtn.addEventListener('click', () => {
+        if (currentWeekIndex > 0) {
+          currentWeekIndex--;
+          updateWeekDisplay();
+          loadAndDisplayWeek(allWeekOptions[currentWeekIndex]);
+        }
+      });
+    }
+    
+    if (nextBtn) {
+      nextBtn.addEventListener('click', () => {
+        if (currentWeekIndex < allWeekOptions.length - 1) {
+          currentWeekIndex++;
+          updateWeekDisplay();
+          loadAndDisplayWeek(allWeekOptions[currentWeekIndex]);
+        }
+      });
+    }
+    
+    if (expandBtn) {
+      expandBtn.addEventListener('click', () => {
+        openWeekModal();
+      });
+    }
+    document.addEventListener('click', (e) => {
+      if (e.target.closest('.week-cell')) {
+        const weekCell = e.target.closest('.week-cell');
+        const weekIndex = parseInt(weekCell.dataset.index);
+        if (!isNaN(weekIndex)) {
+          currentWeekIndex = weekIndex;
+          updateWeekDisplay();
+          loadAndDisplayWeek(allWeekOptions[currentWeekIndex]);
         }
       }
-      
-      if (dateMatch) {
-        if (typeof startMonth === 'string') {
-          const monthNames = {
-            'január': 0, 'február': 1, 'március': 2, 'április': 3, 'május': 4, 'június': 5,
-            'július': 6, 'augusztus': 7, 'szeptember': 8, 'október': 9, 'november': 10, 'december': 11
-          };
-          
-          const startMonthNum = monthNames[startMonth.toLowerCase()];
-          const endMonthNum = monthNames[endMonth.toLowerCase()];
-          
-          if (startMonthNum !== undefined && endMonthNum !== undefined) {
-            startMonth = startMonthNum;
-            endMonth = endMonthNum;
-          } else {
-            continue;
-          }
-        }
-        
-        const weekStart = new Date(parseInt(year), startMonth, parseInt(startDay));
-        const weekEnd = new Date(parseInt(year), endMonth, parseInt(endDay));
-
-        if (today >= weekStart && today <= weekEnd) {
-          foundWeekIndex = i;
-          break;
-        }
+    });
+    
+    setupWeekModal();
+  }
+  
+  function openWeekModal() {
+    const modal = document.getElementById('weekModal');
+    const modalGrid = document.getElementById('weekModalGrid');
+    
+    if (!modal || !modalGrid) return;
+    const today = new Date();
+    const currentYear = today.getFullYear();
+    const currentWeekNumber = getWeekNumber(today);
+    const allWeeks = [];
+    for (let week = 1; week <= 52; week++) {
+      const existingWeek = allWeekOptions.find(opt => parseInt(opt.value) === week);
+      if (existingWeek) {
+        allWeeks.push({ ...existingWeek, weekIndex: allWeekOptions.indexOf(existingWeek) });
+      } else {
+        const startOfWeek = getDateOfWeek(currentYear, week, 1);
+        const endOfWeek = getDateOfWeek(currentYear, week, 5);
+        allWeeks.push({
+          value: week.toString(),
+          text: `${week}. hét`,
+          startDate: startOfWeek.toISOString().split('T')[0],
+          endDate: endOfWeek.toISOString().split('T')[0],
+          weekIndex: week - 1
+        });
       }
     }
-
-    const weekSelector = document.getElementById('week-selector');
-    if (weekSelector) {
-      if (foundWeekIndex !== -1) {
-        weekSelector.value = foundWeekIndex.toString();
-      } else {
-        const fallbackIndex = Math.min(41, weekOptions.length - 1);
-        weekSelector.value = fallbackIndex.toString();
-        console.log(`Nem találtuk a jelenlegi hetet, fallback: ${fallbackIndex}`);
-      }
-
-      weekSelector.dispatchEvent(new Event('change'));
+    
+    modalGrid.innerHTML = allWeeks.map((week) => {
+      const weekNumber = parseInt(week.value);
+      const isSelected = week.weekIndex === currentWeekIndex;
+      const isCurrent = weekNumber === currentWeekNumber;
+      
+      return `
+        <div class="week-cell modal-week-cell ${isSelected ? 'selected' : ''} ${isCurrent ? 'current-week' : ''}" 
+             data-week="${week.value}" 
+             data-start="${week.startDate || ''}" 
+             data-end="${week.endDate || ''}"
+             data-index="${allWeeks.indexOf(week)}"
+             title="${week.text}${isCurrent ? ' (Jelenlegi hét)' : ''}">
+          <span class="week-number">${week.value}</span>
+          ${isCurrent ? '<span class="current-indicator">●</span>' : ''}
+        </div>
+      `;
+    }).join('');
+    
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+  
+  function closeWeekModal() {
+    const modal = document.getElementById('weekModal');
+    if (modal) {
+      modal.style.display = 'none';
+      document.body.style.overflow = '';
     }
+  }
+  
+  function setupWeekModal() {
+    const modal = document.getElementById('weekModal');
+    const closeBtn = document.querySelector('.close-modal');
+    
+    if (closeBtn) {
+      closeBtn.addEventListener('click', closeWeekModal);
+    }
+    
+    if (modal) {
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          closeWeekModal();
+        }
+      });
+    }
+    
+    document.addEventListener('click', (e) => {
+      if (e.target.closest('.modal-week-cell')) {
+        const weekCell = e.target.closest('.modal-week-cell');
+        const weekIndex = parseInt(weekCell.dataset.index);
+        if (!isNaN(weekIndex) && weekIndex >= 0) {
+          currentWeekIndex = weekIndex;
+          updateWeekDisplay();
+          loadAndDisplayWeek(allWeekOptions[currentWeekIndex]);
+          closeWeekModal();
+        }
+      }
+    });
+    
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && modal && modal.style.display === 'flex') {
+        closeWeekModal();
+      }
+    });
   }
 
   if (window.location.href.includes('/Orarend/')) {

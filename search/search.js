@@ -64,7 +64,7 @@ function applyFirkaStyling() {
       redirectButton.addEventListener('click', function(event) {
         if (!instituteCodeInput.value) {
           event.preventDefault();
-          alert('Kérjük, válasszon egy intézményt a folytatáshoz!');
+          alert(LanguageManager.t('search.select_institution'));
         }
       });
     }

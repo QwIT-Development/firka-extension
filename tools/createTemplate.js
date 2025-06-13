@@ -28,7 +28,7 @@ const createTemplate = {
                 </div>
             </div>
             
-            <button class="nav-toggle" aria-label="Navigáció megnyitása">
+            <button class="nav-toggle" aria-label="${LanguageManager.t('navigation.nav_toggle')}">
                 <svg viewBox="0 0 24 24">
                     <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
                 </svg>
@@ -37,24 +37,24 @@ const createTemplate = {
             <nav class="kreta-nav">
             <div class="nav-links">
                 <a href="/Intezmeny/Faliujsag" data-page="dashboard" class="nav-item ${( location.pathname == '/Intezmeny/Faliujsag' ? 'active' : '')}">
-                <img src="${chrome.runtime.getURL('icons/dashboard-' + ( location.pathname == '/Intezmeny/Faliujsag' ? 'active' : 'inactive') + '.svg')}" alt="Kezdőlap">
-                Kezdőlap
+                <img src="${chrome.runtime.getURL('icons/dashboard-' + ( location.pathname == '/Intezmeny/Faliujsag' ? 'active' : 'inactive') + '.svg')}" alt="${LanguageManager.t('navigation.dashboard')}">
+                ${LanguageManager.t('navigation.dashboard')}
                 </a>
                 <a href="/TanuloErtekeles/Osztalyzatok" data-page="grades" class="nav-item ${( location.pathname == '/TanuloErtekeles/Osztalyzatok' ? 'active' : '')}">
-                <img src="${chrome.runtime.getURL('icons/grades-' + ( location.pathname == '/TanuloErtekeles/Osztalyzatok' ? 'active' : 'inactive') + '.svg')}" alt="Jegyek">
-                Jegyek
+                <img src="${chrome.runtime.getURL('icons/grades-' + ( location.pathname == '/TanuloErtekeles/Osztalyzatok' ? 'active' : 'inactive') + '.svg')}" alt="${LanguageManager.t('navigation.grades')}">
+                ${LanguageManager.t('navigation.grades')}
                 </a>
                 <a href="/Orarend/InformaciokOrarend" data-page="timetable" class="nav-item ${( location.pathname == '/Orarend/InformaciokOrarend' ? 'active' : '')}">
-                <img src="${chrome.runtime.getURL('icons/timetable-' + ( location.pathname == '/Orarend/InformaciokOrarend' ? 'active' : 'inactive') + '.svg')}" alt="Órarend">
-                Órarend
+                <img src="${chrome.runtime.getURL('icons/timetable-' + ( location.pathname == '/Orarend/InformaciokOrarend' ? 'active' : 'inactive') + '.svg')}" alt="${LanguageManager.t('navigation.timetable')}">
+                ${LanguageManager.t('navigation.timetable')}
                 </a>
                 <a href="/Hianyzas/Hianyzasok" data-page="absences" class="nav-item ${( location.pathname == '/Hianyzas/Hianyzasok' ? 'active' : '')}">
-                <img src="${chrome.runtime.getURL('icons/absences-' + ( location.pathname == '/Hianyzas/Hianyzasok' ? 'active' : 'inactive') + '.svg')}" alt="Mulasztások">
-                Mulasztások
+                <img src="${chrome.runtime.getURL('icons/absences-' + ( location.pathname == '/Hianyzas/Hianyzasok' ? 'active' : 'inactive') + '.svg')}" alt="${LanguageManager.t('navigation.absences')}">
+                ${LanguageManager.t('navigation.absences')}
                 </a>
                 <a href="/Tanulo/TanuloHaziFeladat" data-page="other" class="nav-item ${( location.pathname == '/Tanulo/TanuloHaziFeladat' ? 'active' : '')}">
-                <img src="${chrome.runtime.getURL('icons/others.svg')}" alt="Egyéb">
-                Egyéb
+                <img src="${chrome.runtime.getURL('icons/others.svg')}" alt="${LanguageManager.t('navigation.other')}">
+                ${LanguageManager.t('navigation.other')}
                 </a>
             </div>
             </nav>
@@ -68,16 +68,16 @@ const createTemplate = {
             </button>
             <div class="user-dropdown">
                 <a href="/Adminisztracio/Profil" data-page="profile" class="dropdown-item">
-                <img src="${chrome.runtime.getURL('icons/profile.svg')}" alt="Profil">
-                Profil
+                <img src="${chrome.runtime.getURL('icons/profile.svg')}" alt="${LanguageManager.t('navigation.profile')}">
+                ${LanguageManager.t('navigation.profile')}
                 </a>
                 <a href="#" class="dropdown-item" id="settingsBtn">
-                <img src="${chrome.runtime.getURL('icons/settings.svg')}" alt="Beállítások">
-                Beállítások
+                <img src="${chrome.runtime.getURL('icons/settings.svg')}" alt="${LanguageManager.t('navigation.settings')}">
+                ${LanguageManager.t('navigation.settings')}
                 </a>
                 <a href="/Home/Logout" data-page="logout" class="dropdown-item">
-                <img src="${chrome.runtime.getURL('icons/logout.svg')}" alt="Kijelentkezés">
-                Kijelentkezés
+                <img src="${chrome.runtime.getURL('icons/logout.svg')}" alt="${LanguageManager.t('navigation.logout')}">
+                ${LanguageManager.t('navigation.logout')}
                 </a>
             </div>
             </div>

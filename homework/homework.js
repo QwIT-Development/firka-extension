@@ -75,7 +75,15 @@ function formatApiDate(dateString) {
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
     
-    const dayNames = ['vasárnap', 'hétfő', 'kedd', 'szerda', 'csütörtök', 'péntek', 'szombat'];
+    const dayNames = [
+      LanguageManager.t('common.sunday'), 
+      LanguageManager.t('common.monday'), 
+      LanguageManager.t('common.tuesday'), 
+      LanguageManager.t('common.wednesday'), 
+      LanguageManager.t('common.thursday'), 
+      LanguageManager.t('common.friday'), 
+      LanguageManager.t('common.saturday')
+    ];
     const dayName = dayNames[date.getDay()];
     
     return `${month}.${day}. (${dayName})`;
@@ -120,16 +128,16 @@ async function transformHomeworkPage() {
       <main class="kreta-main">
         <div class="filter-card">
           <div class="filter-header">
-            <h2>Szűrés</h2>
+            <h2>${LanguageManager.t('homework.filter_title')}</h2>
           </div>
           <div class="filter-content">
             <div class="filter-group">
               <label>
                 <!--<span class="material-icons-round">subject</span>-->
-                Tantárgy
+                ${LanguageManager.t('homework.subject')}
               </label>
               <select id="subjectFilter">
-                <option value="">Összes tantárgy</option>
+                <option value="">${LanguageManager.t('homework.all_subjects')}</option>
                 ${[...new Set(homeworkItems.map(item => item.subject))]
                   .sort()
                   .map(subject => `<option value="${subject}">${subject}</option>`)
@@ -139,10 +147,10 @@ async function transformHomeworkPage() {
             <div class="filter-group">
               <label>
                 <!--<span class="material-icons-round">person</span>-->
-                Tanár
+                ${LanguageManager.t('homework.teacher')}
               </label>
               <select id="teacherFilter">
-                <option value="">Összes tanár</option>
+                <option value="">${LanguageManager.t('homework.all_teachers')}</option>
                 ${[...new Set(homeworkItems.map(item => item.teacher))]
                   .sort()
                   .map(teacher => `<option value="${teacher}">${teacher}</option>`)
@@ -152,13 +160,13 @@ async function transformHomeworkPage() {
             <div class="filter-group">
               <label>
                 <!--<span class="material-icons-round">date_range</span>-->
-                Határidő
+                ${LanguageManager.t('homework.due_date')}
               </label>
               <select id="deadlineFilter">
-                <option value="">Összes határidő</option>
-                <option value="tomorrow">Holnapi határidő</option>
-                <option value="thisWeek">Ezen a héten</option>
-                <option value="nextWeek">Jövő héten</option>
+                <option value="">${LanguageManager.t('homework.all_deadlines')}</option>
+                <option value="tomorrow">${LanguageManager.t('homework.tomorrow_deadline')}</option>
+                <option value="thisWeek">${LanguageManager.t('homework.this_week')}</option>
+                <option value="nextWeek">${LanguageManager.t('homework.next_week')}</option>
               </select>
             </div>
           </div>
@@ -202,7 +210,7 @@ function renderHomeworkList(groupedHomework) {
   if (sortedDates.length === 0) {
     return `
       <div class="empty-state">
-        <p>Nincs megjeleníthető házi feladat.</p>
+        <p>${LanguageManager.t('homework.no_homework')}</p>
       </div>
     `;
   }
@@ -255,12 +263,20 @@ function formatDateHeader(dateStr) {
   const date = new Date(currentYear, month, day);
   
   if (date.toDateString() === today.toDateString()) {
-    return 'Ma - ' + dateStr;
+    return LanguageManager.t('common.today') + ' - ' + dateStr;
   } else if (date.toDateString() === tomorrow.toDateString()) {
-    return 'Holnap - ' + dateStr;
+    return LanguageManager.t('common.tomorrow') + ' - ' + dateStr;
   }
   
-  const weekdays = ['Vasárnap', 'Hétfő', 'Kedd', 'Szerda', 'Csütörtök', 'Péntek', 'Szombat'];
+  const weekdays = [
+    LanguageManager.t('common.sunday'), 
+    LanguageManager.t('common.monday'), 
+    LanguageManager.t('common.tuesday'), 
+    LanguageManager.t('common.wednesday'), 
+    LanguageManager.t('common.thursday'), 
+    LanguageManager.t('common.friday'), 
+    LanguageManager.t('common.saturday')
+  ];
   return `${weekdays[date.getDay()]} - ${dateStr}`;
 }
 
@@ -376,7 +392,7 @@ function setupFilters(homeworkItems, groupedHomework) {
     if (!emptyState) {
       emptyState = document.createElement('div');
       emptyState.className = 'empty-state';
-      emptyState.innerHTML = '<p>Nincs a szűrési feltételeknek megfelelő házi feladat.</p>';
+      emptyState.innerHTML = `<p>${LanguageManager.t('homework.no_matching_homework')}</p>`;
       homeworkList.appendChild(emptyState);
     }
     

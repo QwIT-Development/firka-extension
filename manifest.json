@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Firxa",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "KRÉTA webes verziójának újraírása",
   "icons": {
     "128": "images/firka_logo_128.png"
@@ -15,10 +15,13 @@
   "web_accessible_resources": [{
     "resources": [
       "settings/*",
+      "global/language.js",
       "images/*",
       "fonts/*.woff2",
       "icons/*.svg",
-      "grades/chart.js"
+      "grades/chart.js",
+      "i18n/*.json",
+      "tools/cookieManager.js"
     ],
     "matches": ["https://*.e-kreta.hu/*", "https://idp.e-kreta.hu/*"]
   }],
@@ -28,7 +31,7 @@
         "https://*.e-kreta.hu/*"
       ],
       "js": ["tools/cookieManager.js", "tools/helper.js", "tools/loadingScreen.js", "tools/createTemplate.js",
-              "global/maintenance.js", "global/theme.js", "global/navigation.js"],
+              "global/language.js", "global/maintenance.js", "global/theme.js", "global/navigation.js"],
       "css": ["tools/loadingScreen.css", "global/theme.css", "global/navigation.css"],
       "run_at": "document_start"
     },

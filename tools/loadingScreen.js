@@ -9,8 +9,8 @@ const loadingScreen = {
         loadingScreen.innerHTML = `
     <div class="loading-content">
         <img src="${chrome.runtime.getURL('images/loading.gif')}" alt="Firka" class="loading-logo">
-        <div class="loading-text">Betöltés alatt...</div>
-        <div class="loading-text2">Kis türelmet!</div>
+        <div class="loading-text" data-i18n="loading.text">Betöltés alatt...</div>
+        <div class="loading-text2" data-i18n="loading.subtext">Kis türelmet!</div>
     </div>
     `;
         document.body.appendChild(loadingScreen);
@@ -22,9 +22,15 @@ const loadingScreen = {
         const loadingScreen = document.querySelector('.loading-screen');
         if (loadingScreen) {
             loadingScreen.style.opacity = '0';
-            loadingScreen.addEventListener('transitionend', () => {
-                loadingScreen.remove();
-            });
+
+            const removeLoadingScreen = () => {
+                if (loadingScreen && loadingScreen.parentNode) {
+                    loadingScreen.remove();
+                }
+            };
+            
+            loadingScreen.addEventListener('transitionend', removeLoadingScreen, { once: true });
+            setTimeout(removeLoadingScreen, 500);
         }
     }
 }

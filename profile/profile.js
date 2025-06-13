@@ -174,17 +174,17 @@
         const phone = phoneInput.value.trim();
   
         if (!email) {
-          alert('Az e-mail cím megadása kötelező!');
+          alert(LanguageManager.t('profile.email_required'));
           return;
         }
   
         if (email && !isValidEmail(email)) {
-          alert('Kérjük, adjon meg egy érvényes e-mail címet!');
+          alert(LanguageManager.t('profile.invalid_email'));
           return;
         }
   
         if (phone && !isValidPhone(phone)) {
-          alert('Kérjük, adjon meg egy érvényes telefonszámot!');
+          alert(LanguageManager.t('profile.invalid_phone'));
           return;
         }
   
@@ -199,13 +199,13 @@
           });
   
           if (response.ok) {
-            alert('Elérhetőségek sikeresen mentve!');
+            alert(LanguageManager.t('profile.contacts_saved'));
           } else {
-            throw new Error('Hiba történt a mentés során.');
+            throw new Error(LanguageManager.t('profile.contacts_save_error'));
           }
         } catch (error) {
           console.error('Error saving contacts:', error);
-          alert('Hiba történt a mentés során. Kérjük, próbálja újra később.');
+          alert(LanguageManager.t('profile.save_error'));
         }
       });
     }
@@ -259,13 +259,13 @@
           });
   
           if (response.ok) {
-            alert('Beállítások sikeresen mentve! A változtatások érvényesítéséhez jelentkezzen be újra.');
+            alert(LanguageManager.t('profile.settings_saved'));
           } else {
-            throw new Error('Hiba történt a mentés során.');
+            throw new Error(LanguageManager.t('profile.settings_save_error'));
           }
         } catch (error) {
           console.error('Error saving settings:', error);
-          alert('Hiba történt a mentés során. Kérjük, próbálja újra később.');
+          alert(LanguageManager.t('profile.save_error'));
         }
       });
   
@@ -276,17 +276,17 @@
         const confirmPassword = document.getElementById('confirmPassword').value;
   
         if (!currentPassword || !newPassword || !confirmPassword) {
-          alert('Kérjük, töltse ki az összes mezőt!');
+          alert(LanguageManager.t('profile.fill_all_fields'));
           return;
         }
   
         if (newPassword !== confirmPassword) {
-          alert('Az új jelszavak nem egyeznek!');
+          alert(LanguageManager.t('profile.passwords_not_match'));
           return;
         }
   
         if (newPassword.length < 8) {
-          alert('Az új jelszónak legalább 8 karakter hosszúnak kell lennie!');
+          alert(LanguageManager.t('profile.password_min_length'));
           return;
         }
   
@@ -305,16 +305,16 @@
           });
   
           if (response.ok) {
-            alert('Jelszó sikeresen módosítva!');
+            alert(LanguageManager.t('profile.password_changed'));
             document.getElementById('currentPassword').value = '';
             document.getElementById('newPassword').value = '';
             document.getElementById('confirmPassword').value = '';
           } else {
-            throw new Error('Hiba történt a jelszó módosítása során.');
+            throw new Error(LanguageManager.t('profile.password_change_error'));
           }
         } catch (error) {
           console.error('Error changing password:', error);
-          alert('Hiba történt a jelszó módosítása során. Kérjük, próbálja újra később.');
+          alert(LanguageManager.t('profile.password_change_error'));
         }
       });
   

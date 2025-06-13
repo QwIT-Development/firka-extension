@@ -54,23 +54,23 @@ async function transformAbsencesPage() {
       <main class="kreta-main">
         <div class="filter-card">
           <div class="filter-header">
-            <h2>Szűrés</h2>
+            <h2>${LanguageManager.t('absences.filter_title')}</h2>
           </div>
           <div class="filter-content">
             <div class="filter-group">
               <label>
                 <span class="material-icons-round">date_range</span>
-                Dátum
+                ${LanguageManager.t('absences.date')}
               </label>
               <input type="date" id="dateFilter" class="filter-input" disabled>
             </div>
             <div class="filter-group">
               <label>
                 <span class="material-icons-round">school</span>
-                Tantárgy
+                ${LanguageManager.t('absences.subject')}
               </label>
               <select id="subjectFilter" class="filter-input">
-                <option value="">Minden tantárgy</option>
+                <option value="">${LanguageManager.t('absences.all_subjects')}</option>
                 ${[...new Set(absences.map(a => a.subject))].sort().map(subject =>
                   `<option value="${subject}">${subject}</option>`
                 ).join('')}
@@ -79,13 +79,13 @@ async function transformAbsencesPage() {
             <div class="filter-group">
               <label>
                 <span class="material-icons-round">check_circle</span>
-                Igazolás
+                ${LanguageManager.t('absences.justification')}
               </label>
               <select id="justificationFilter" class="filter-input">
-                <option value="">Mindegy</option>
-                <option value="justified">Igazolt</option>
-                <option value="unjustified">Igazolatlan</option>
-                <option value="pending">Igazolásra vár</option>
+                <option value="">${LanguageManager.t('absences.all_types')}</option>
+                <option value="justified">${LanguageManager.t('absences.justified')}</option>
+                <option value="unjustified">${LanguageManager.t('absences.unjustified')}</option>
+                <option value="pending">${LanguageManager.t('absences.pending')}</option>
               </select>
             </div>
           </div>
@@ -97,7 +97,7 @@ async function transformAbsencesPage() {
               <div class="absence-date">
                 <span class="material-icons-round">event</span>
                 ${date}
-                <span class="absence-count">${dayAbsences.length} óra</span>
+                <span class="absence-count">${dayAbsences.length} ${LanguageManager.t('absences.hours')}</span>
               </div>
               <div class="absence-list">
                 ${dayAbsences.map(absence => `
@@ -106,7 +106,7 @@ async function transformAbsencesPage() {
                        data-justified="${absence.justified}">
                     <div class="absence-time">
                       <span class="material-icons-round">schedule</span>
-                      ${absence.lesson}. óra
+                      ${absence.lesson}. ${LanguageManager.t('absences.lesson').toLowerCase()}
                     </div>
                     <div class="absence-details">
                       <div class="absence-subject">${absence.subject}</div>
@@ -114,10 +114,10 @@ async function transformAbsencesPage() {
                     </div>
                     <div class="absence-status ${absence.justificationStatus}">
                       ${absence.justificationStatus === 'justified' ? 
-                        `Igazolt <span class="material-icons-round">check_circle</span>` : 
+                        `${LanguageManager.t('absences.justified')} <span class="material-icons-round">check_circle</span>` : 
                         absence.justificationStatus === 'unjustified' ?
-                        `Igazolatlan <span class="material-icons-round">cancel</span>` :
-                        `Igazolásra vár <span class="material-icons-round">pending</span>`}
+                        `${LanguageManager.t('absences.unjustified')} <span class="material-icons-round">cancel</span>` :
+                        `${LanguageManager.t('absences.pending')} <span class="material-icons-round">pending</span>`}
                     </div>
                   </div>
                 `).join('')}
@@ -252,6 +252,6 @@ function setupFilters() {
 
 if (window.location.href.includes('/Hianyzas/Hianyzasok')) {
   transformAbsencesPage().catch(error => {
-    console.error('Hiba történt az oldal átalakítása során:', error);
+    console.error(LanguageManager.t('absences.page_transform_error'), error);
   });
 }

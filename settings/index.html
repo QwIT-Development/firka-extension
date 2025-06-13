@@ -23,12 +23,12 @@
     </header>
 
     <div class="settings-card">
-      <h2>Beállítások</h2>
+      <h2 data-i18n="settings.title">Beállítások</h2>
       <div class="settings-group">
         <div class="setting-section">
           <div class="setting-header">
             <span class="material-icons-round">palette</span>
-            Téma
+            <span data-i18n="settings.theme">Téma</span>
           </div>
           <div class="theme-grid">
             <button class="theme-option" data-theme="default">
@@ -38,7 +38,7 @@
                   <div class="preview-card"></div>
                 </div>
               </div>
-              <span class="theme-name">Világos Kék</span>
+              <span class="theme-name" data-i18n="settings.themes.light_blue">Világos Kék</span>
             </button>
             <button class="theme-option" data-theme="light-green">
               <div class="theme-preview light-green">
@@ -47,7 +47,7 @@
                   <div class="preview-card"></div>
                 </div>
               </div>
-              <span class="theme-name">Világos Zöld</span>
+              <span class="theme-name" data-i18n="settings.themes.light_green">Világos Zöld</span>
             </button>
             <button class="theme-option" data-theme="dark-blue">
               <div class="theme-preview dark-blue">
@@ -56,7 +56,7 @@
                   <div class="preview-card"></div>
                 </div>
               </div>
-              <span class="theme-name">Sötét Kék</span>
+              <span class="theme-name" data-i18n="settings.themes.dark_blue">Sötét Kék</span>
             </button>
             <button class="theme-option" data-theme="dark-green">
               <div class="theme-preview dark-green">
@@ -65,7 +65,22 @@
                   <div class="preview-card"></div>
                 </div>
               </div>
-              <span class="theme-name">Sötét Zöld</span>
+              <span class="theme-name" data-i18n="settings.themes.dark_green">Sötét Zöld</span>
+            </button>
+          </div>
+        </div>
+        
+        <div class="setting-section">
+          <div class="setting-header">
+            <span class="material-icons-round">language</span>
+            <span data-i18n="settings.language">Nyelv</span>
+          </div>
+          <div class="language-grid">
+            <button class="language-option" data-language="hu">
+              <span class="language-name" data-i18n="settings.languages.hu">Magyar</span>
+            </button>
+            <button class="language-option" data-language="en">
+              <span class="language-name" data-i18n="settings.languages.en">English</span>
             </button>
           </div>
         </div>
@@ -73,24 +88,24 @@
     </div>
 
     <div class="about-card">
-      <h2>Névjegy</h2>
+      <h2 data-i18n="settings.about.title">Névjegy</h2>
       <div class="about-content">
-        <p>A Firka egy nyílt forráskódú projekt, amely a KRÉTA rendszerhez készít saját felhasználói felületet.</p>
+        <p data-i18n="settings.about.description">A Firka egy nyílt forráskódú projekt, amely a KRÉTA rendszerhez készít saját felhasználói felületet.</p>
         <a href="https://github.com/QwIT-Development/" target="_blank" class="github-link">
           <span class="material-icons-round">code</span>
-          GitHub
+          <span data-i18n="settings.about.github">GitHub</span>
         </a>
       </div>
     </div>
 
     <div class="support-card">
-      <h2>Támogatás</h2>
+      <h2 data-i18n="settings.support.title">Támogatás</h2>
       <div class="support-content">
-        <p>Ha tetszik a munkánk és szeretnéd támogatni a fejlesztést, az alábbi módon teheted meg:</p>
+        <p data-i18n="settings.support.description">Ha tetszik a munkánk és szeretnéd támogatni a fejlesztést, az alábbi módon teheted meg:</p>
         <div class="support-buttons">
           <a href="https://ko-fi.com/zan1456" target="_blank" class="support-button">
             <span class="material-icons-round">coffee</span>
-            Ko-Fi
+            <span data-i18n="settings.support.kofi">Ko-Fi</span>
           </a>
         </div>
       </div>
@@ -100,6 +115,8 @@
       <div class="version-info" id="version">v1.1.0</div>
     </footer>
   </div>
-  <script src="index.js"></script>
+  <script src="../tools/cookieManager.js"></script>
+    <script src="../global/language.js"></script>
+    <script src="index.js"></script>
 </body>
 </html>

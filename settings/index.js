@@ -1,4 +1,7 @@
 document.addEventListener('DOMContentLoaded', async () => {
+  while (typeof window.LanguageManager === 'undefined') {
+    await new Promise(resolve => setTimeout(resolve, 10));
+  }
   
   function isThemeDisabled(theme) {
       const blueThemesUnlocked = localStorage.getItem('blueThemesUnlocked') === 'true';
@@ -59,6 +62,35 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
       updateThemeAvailability();
   }
+
+  function getCurrentLanguage() {
+      return localStorage.getItem('languagePreference') || 
+             getCookie('languagePreference') || 
+             'hu';
+  }
+  
+  function updateLanguageButtons(currentLanguage) {
+      document.querySelectorAll('.language-option').forEach(button => {
+          const language = button.dataset.language;
+          button.classList.toggle('active', language === currentLanguage);
+      });
+  }
+  
+  async function applyLanguage(language) {
+      setCookie('languagePreference', language);
+      localStorage.setItem('languagePreference', language);
+
+      updateLanguageButtons(language);
+
+      const tabs = await chrome.tabs.query({});
+      tabs.forEach(tab => {
+          chrome.tabs.sendMessage(tab.id, {
+              action: 'changeLanguage',
+              language: language
+          }).catch(() => {
+          });
+      });
+  }
   
   async function applyTheme(theme) {
       setCookie('themePreference', theme);
@@ -77,8 +109,6 @@ document.addEventListener('DOMContentLoaded', async () => {
               action: 'changeTheme',
               theme: theme
           }).catch(() => {
-              
-              console.log('Tab not ready for theme change:', tab.id);
           });
       });
   }
@@ -91,11 +121,19 @@ document.addEventListener('DOMContentLoaded', async () => {
           
           
           if (button.hasAttribute('disabled')) {
-              alert('Ez a téma jelenleg nem elérhető.');
+              alert(window.LanguageManager.t('common.warning') + ': ' + window.LanguageManager.t('settings.theme_not_available'));
               return;
           }
           
           applyTheme(theme);
+      });
+  });
+  
+  const languageButtons = document.querySelectorAll('.language-option');
+  languageButtons.forEach(button => {
+      button.addEventListener('click', () => {
+          const language = button.dataset.language;
+          applyLanguage(language);
       });
   });
   
@@ -110,6 +148,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   
   updateThemeAvailability();
   await applyTheme(initialTheme);
+  
+  const initialLanguage = getCurrentLanguage();
+  updateLanguageButtons(initialLanguage);
   
   
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
@@ -148,7 +189,7 @@ document.addEventListener('DOMContentLoaded', async () => {
               box-shadow: 0 4px 12px rgba(0,0,0,0.15);
               animation: slideIn 0.3s ease-out;
           `;
-          notification.textContent = 'Kék témák feloldva! 🎉';
+          notification.textContent = window.LanguageManager.t('common.success') + ': ' + window.LanguageManager.t('settings.blue_themes_unlocked');
           
           
           const style = document.createElement('style');
@@ -183,5 +224,19 @@ document.addEventListener('DOMContentLoaded', async () => {
       button.addEventListener('mouseout', () => {
           button.style.transform = 'translateY(0)';
       });
+  });
+  
+  languageButtons.forEach(button => {
+      button.addEventListener('mouseover', () => {
+          button.style.transform = 'translateY(-2px)';
+      });
+      
+      button.addEventListener('mouseout', () => {
+          button.style.transform = 'translateY(0)';
+      });
+  });
+  
+  window.addEventListener('languageChanged', (event) => {
+      updateLanguageButtons(event.detail.language);
   });
 });

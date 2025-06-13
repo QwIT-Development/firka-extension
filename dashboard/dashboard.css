@@ -14,6 +14,10 @@ body {
   font-size: 16px;
 }
 
+h2 {
+  background-color: #00000000 !important;
+}
+
 .kreta-container {
   min-height: 100vh;
   display: flex;
@@ -35,42 +39,191 @@ body {
   gap: 20px;
 }
 
-
-.card {
+.widget-card {
   background: var(--card-card);
-  padding: 20px;
-  padding-top: 5px !important;
   border-radius: 24px;
   overflow: hidden;
   animation: fadeIn 0.5s ease forwards;
-  box-shadow: 0px 1px var(--shadow-blur) 0px var(--accent-shadow);
+  box-shadow: 0px 1px var(--shadow-blur, 2px) 0px var(--accent-shadow);
   display: flex;
   flex-direction: column;
   height: 100%;
+  border: none;
+  min-height: 400px;
+}
+
+.widget-header {
+  padding: 20px 20px 0 20px;
+  background: var(--card-card) !important;
+}
+
+.widget-card-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+  padding-bottom: 16px;
+}
+
+.widget-content {
+  flex: 1;
+  padding: 0 20px;
+  background: var(--card-card);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.widget-footer {
+  padding: 0px 20px 20px 20px;
+  background: var(--card-card);
+}
+
+.widget-link {
+  margin: 0;
+  padding: 0;
 }
 
 .card h2 {
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 600;
   color: var(--text-primary);
-  background-color: var(--card-card);
+  margin: 0;
+  padding: 20px 0 16px 0;
 }
 
 .card:last-child {
   grid-column: 1 / -1;
 }
 
-
-.grade-item, .absence-item, .note-item, .exam-item, .news-item {
-  border-radius: 6px;
+.widget-item {
+  border-radius: 12px;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
-  border: 1px solid var(--card-card);
+  border: none;
+  background: var(--card-card);
+  box-shadow: 0px 1px var(--shadow-blur, 2px) 0px var(--accent-shadow);
   display: flex;
   flex-direction: column;
-  margin-bottom: 12px;
-  padding: 12px;
+  padding: 8px;
+  position: relative;
+  min-height: 80px;
 }
 
+.widget-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0px 2px calc(var(--shadow-blur, 2px) * 2) 0px var(--accent-shadow);
+}
+
+.widget-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  width: 100%;
+  gap: 12px;
+  min-height: 40px;
+}
+
+.widget-row.grade-row {
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.widget-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.widget-details.grade-details {
+  flex: 1;
+  margin-right: auto;
+}
+
+.widget-title {
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.widget-subtitle {
+  color: var(--text-secondary);
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 1.2;
+}
+
+.widget-content {
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.4;
+  margin-top: 4px;
+}
+
+.widget-date {
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  text-align: right;
+  align-self: center;
+}
+
+.grade-type-with-date {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  gap: 8px;
+}
+
+.grade-type-with-date .grade-type {
+  flex: 1;
+  min-width: 0;
+}
+
+.note-author {
+  color: var(--text-tertiary);
+  font-size: 12px;
+  font-weight: 400;
+  margin-top: 4px;
+}
+
+.grade-date {
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 400;
+  white-space: nowrap;
+  text-align: right;
+}
+
+
+
+.widget-author {
+  color: var(--text-tertiary);
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.widget-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  text-align: right;
+}
+
+.widget-empty {
+  color: var(--text-secondary);
+  font-style: italic;
+  text-align: center;
+  padding: 20px;
+}
 
 .grade {
   width: 32px;
@@ -84,15 +237,25 @@ body {
   color: var(--text-primary);
   font-size: 22px;
 }
-.subject-name, .absence-type, .note-title, .exam-subject {
-  color: var(--text-primary);
-  font-weight: 600;
+
+.news-title {
   font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 8px;
 }
-.grade-type, .absence-date, .note-date, .exam-date {
-  color: var(--text-secondary);
-  font-weight: 500;
+
+.news-content {
   font-size: 14px;
+  line-height: 1.4;
+  color: var(--text-secondary);
+}
+
+.exam-type {
+  color: var(--accent-accent);
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 .more-link {
   margin-top: auto;
@@ -180,15 +343,25 @@ body {
   width: 20px;
   height: 20px;
 }
-.subject-name, .absence-type, .note-title, .exam-subject {
-  color: var(--text-primary);
-  font-weight: 600;
+
+.news-title {
   font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 8px;
 }
-.grade-type, .absence-date, .note-date, .exam-date {
-  color: var(--text-secondary);
-  font-weight: 500;
+
+.news-content {
   font-size: 14px;
+  line-height: 1.4;
+  color: var(--text-secondary);
+}
+
+.exam-type {
+  color: var(--accent-accent);
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 .more-link {
   margin-top: auto;
@@ -212,22 +385,12 @@ body {
   font-size: 0.875rem;
 }
 
-.grade-row {
+.exam-info {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-}
-
-.grade-details {
-  flex: 1;
-  margin-right: 10px;
-}
-
-.grade-date, .exam-date {
+  gap: 8px;
+  margin-top: 4px;
   color: var(--text-secondary);
   font-size: 14px;
-  white-space: nowrap;
 }
 
 .exam-info {

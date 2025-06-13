@@ -29,7 +29,7 @@ async function transformTwoFactorPage() {
               <img src=${chrome.runtime.getURL('images/firka_logo.png')} alt="Firka" class="logo">
               Firka
             </p>
-            <h1 class="twofactor-title">Kétfaktoros azonosítás</h1>
+            <h1 class="twofactor-title">${LanguageManager.t('twofactor.title')}</h1>
           </div>
 
           <form class="twofactor-form" action="${formData.action}" method="post" id="twoFactorForm">
@@ -41,30 +41,30 @@ async function transformTwoFactorPage() {
 
             <div class="form-group password-group">
               <input class="form-control" type="password" id="VerificationCode" name="VerificationCode" 
-                     placeholder="Egyszeri jelszó" maxlength="256" autocomplete="off" required autofocus>
-              <button type="button" class="show-password" aria-label="Jelszó mutatása">
+                     placeholder="${LanguageManager.t('twofactor.code_placeholder')}" maxlength="256" autocomplete="off" required autofocus>
+              <button type="button" class="show-password" aria-label="${LanguageManager.t('twofactor.show_code')}">
                 <img src="${chrome.runtime.getURL('icons/eye-off.svg')}" alt="Show password" class="icon-eye">
               </button>
-              <div class="error-message">Kérjük, add meg az egyszeri jelszót.</div>
+              <div class="error-message">${LanguageManager.t('twofactor.code_required')}</div>
             </div>
 
             <div class="form-check">
               <input class="form-check-input" type="checkbox" id="trustDevice" name="TrustDevice" value="true">
               <label class="form-check-label" for="trustDevice">
-                Eszköz megjelölése biztonságosként
+                ${LanguageManager.t('twofactor.trust_device')}
               </label>
               <input name="TrustDevice" type="hidden" value="false">
             </div>
 
             <div class="d-flex justify-content-center mb-3 mt-4">
-              <button type="submit" class="btn-kreta">Kód ellenőrzése</button>
+              <button type="submit" class="btn-kreta">${LanguageManager.t('twofactor.verify_button')}</button>
             </div>
 
             <div class="d-flex justify-content-center mt-3">
               <span class="subtext">
-                Nem fér hozzá eszközéhez? Lépjen be 
+                ${LanguageManager.t('twofactor.no_access')} 
                 <button type="submit" class="btn-link" formaction="/account/loginwithrecoverycode">
-                  helyreállító kóddal.
+                  ${LanguageManager.t('twofactor.recovery_code')}
                 </button>
               </span>
             </div>
@@ -73,7 +73,7 @@ async function transformTwoFactorPage() {
 
         <footer class="login-footer">
           <a href="https://tudasbazis.ekreta.hu/pages/viewpage.action?pageId=4064926" 
-             target="_blank" class="privacy-link">Adatkezelési tájékoztató</a>
+             target="_blank" class="privacy-link">${LanguageManager.t('login.privacy_policy')}</a>
         </footer>
       </div>
     `;
@@ -162,7 +162,7 @@ function handleSubmit(event) {
     const submitButton = form.querySelector('.btn-kreta');
     if (submitButton) {
       submitButton.disabled = true;
-      submitButton.innerHTML = '<span class="spinner"></span><span class="btn-text">Ellenőrzés...</span>';
+      submitButton.innerHTML = `<span class="spinner"></span><span class="btn-text">${LanguageManager.t('twofactor.verifying')}</span>`;
     }
     
     form.submit();

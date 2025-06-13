@@ -25,31 +25,31 @@
           </header>
   
           <div class="forgot-card">
-            <h1 class="forgot-title">Elfelejtett jelszó</h1>
+            <h1 class="forgot-title">${LanguageManager.t('forgotpassword.title')}</h1>
             
             <form id="forgotForm" novalidate>
               <div class="form-group">
-                <label class="form-label" for="username">OM azonosítód</label>
+                <label class="form-label" for="username">${LanguageManager.t('forgotpassword.om_id_label')}</label>
                 <input type="text" id="username" name="username" class="form-control" 
-                       placeholder="Add meg az OM azonosítód" required>
-                <div class="error-message">Kérjük, add meg az OM azonosítód.</div>
+                       placeholder="${LanguageManager.t('forgotpassword.om_id_placeholder')}" required>
+                <div class="error-message">${LanguageManager.t('forgotpassword.om_id_required')}</div>
               </div>
   
               <div class="form-group">
-                <label class="form-label" for="email">E-mail cím</label>
+                <label class="form-label" for="email">${LanguageManager.t('forgotpassword.email_label')}</label>
                 <input type="email" id="email" name="email" class="form-control" 
-                       placeholder="Add meg az e-mail címed" required>
-                <div class="error-message">Kérjük, add meg az e-mail címed.</div>
+                       placeholder="${LanguageManager.t('forgotpassword.email_placeholder')}" required>
+                <div class="error-message">${LanguageManager.t('forgotpassword.email_required')}</div>
               </div>
   
               <div class="g-recaptcha" data-sitekey="6LcmPB8dAAAAACJPQBj7WfpBoBsEfyibZeIG5Vbl"></div>
   
               <div class="form-actions">
                 <a href="/Adminisztracio/Login" class="help-link">
-                  Vissza a bejelentkezéshez
+                  ${LanguageManager.t('forgotpassword.back_to_login')}
                 </a>
                 <button type="submit" class="btn-submit">
-                  Jelszó visszaállítása
+                  ${LanguageManager.t('forgotpassword.reset_button')}
                 </button>
               </div>
             </form>
@@ -130,7 +130,7 @@
           window.location.href = '/Adminisztracio/Login';
         } else {
           
-          alert(result.Message || 'Hiba történt a jelszó visszaállítása során. (Kérlek használd az eredeti kréta oldalt erre)');
+          alert(result.Message || LanguageManager.t('forgotpassword.error_message'));
           grecaptcha.reset();
         }
       } catch (error) {

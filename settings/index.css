@@ -88,12 +88,14 @@ h2 {
 }
 
 
-.theme-grid {
+.theme-grid,
+.language-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 12px;
 }
-.theme-option {
+.theme-option,
+.language-option {
   background: none;
   border: none;
   padding: 0;
@@ -104,10 +106,15 @@ h2 {
   gap: 8px;
   transition: transform 0.2s ease;
 }
-.theme-option:hover {
+.theme-option:hover,
+.language-option:hover {
   transform: translateY(-2px);
 }
 .theme-option.active .theme-preview {
+  outline: 2px solid var(--accent-accent);
+  outline-offset: 2px;
+}
+.language-option.active .language-preview {
   outline: 2px solid var(--accent-accent);
   outline-offset: 2px;
 }
@@ -133,6 +140,30 @@ h2 {
   height: 100%;
   background-color: rgba(0, 0, 0, 0.1);
   border-radius: 8px;
+}
+
+.language-option {
+  background: var(--card-card);
+  border: 1px solid var(--border-border);
+  border-radius: 8px;
+  padding: 12px;
+  transition: all 0.2s ease;
+}
+
+.language-option:hover {
+  background: var(--card-hover);
+  border-color: var(--accent-accent);
+}
+
+.language-option.active {
+  background: var(--accent-accent);
+  border-color: var(--accent-accent);
+  color: white;
+}
+
+.language-name {
+  font-weight: 500;
+  font-size: 14px;
 }
 
 

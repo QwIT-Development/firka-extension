@@ -27,7 +27,7 @@ async function transformLoginPage() {
     if (spanElement) {
       const lines = spanElement.textContent?.split('\n').map(line => line.trim()) || [];
       schoolInfo.kretaId = lines[0] || '';
-      schoolInfo.omCode = (lines[1] || '').replace('KRÉTA azonosító: ', '');
+      schoolInfo.omCode = (lines[1] || '').replace(`${LanguageManager.t('login.kreta_id')}: `, '');
     }
     
     const rawSystemMessage = document.querySelector('.alert-primary')?.textContent?.trim() || '';
@@ -44,7 +44,7 @@ async function transformLoginPage() {
             <h1 class="school-name">${schoolInfo.name}</h1>
             <div class="school-details">
               ${schoolInfo.kretaId ? `<div>${schoolInfo.kretaId}</div>` : ''}
-              ${schoolInfo.omCode ? `<div>KRÉTA azonosító: ${schoolInfo.omCode}</div>` : ''}
+              ${schoolInfo.omCode ? `<div>${LanguageManager.t('login.kreta_id')}: ${schoolInfo.omCode}</div>` : ''}
             </div>
           </div>
 
@@ -57,27 +57,27 @@ async function transformLoginPage() {
 
             <div class="form-group">
               <input class="form-control" type="text" id="UserName" name="UserName" 
-                     placeholder="Felhasználónév" maxlength="256" autocomplete="username" required value="${formData.userName}">
-              <div class="error-message">Kérjük, add meg a felhasználóneved.</div>
+                     placeholder="${LanguageManager.t('login.username_placeholder')}" maxlength="256" autocomplete="username" required value="${formData.userName}">
+              <div class="error-message">${LanguageManager.t('login.username_required')}</div>
             </div>
 
             <div class="form-group password-group">
               <input class="form-control" type="password" id="Password" name="Password" 
-                     placeholder="Jelszó" maxlength="256" autocomplete="current-password" required value="${formData.password}">
-              <button type="button" class="show-password" aria-label="Jelszó mutatása">
+                     placeholder="${LanguageManager.t('login.password_placeholder')}" maxlength="256" autocomplete="current-password" required value="${formData.password}">
+              <button type="button" class="show-password" aria-label="${LanguageManager.t('login.show_password')}">
                 <img src="${chrome.runtime.getURL('icons/eye-off.svg')}" alt="Show password" class="icon-eye">
               </button>
-              <div class="error-message">Kérjük, add meg a jelszavad.</div>
+              <div class="error-message">${LanguageManager.t('login.password_required')}</div>
             </div>
 
             <div class="form-actions">
               <button type="submit" class="btn-login">
                 <span class="spinner"></span>
-                <span class="btn-text">Bejelentkezés</span>
+                <span class="btn-text">${LanguageManager.t('login.login_button')}</span>
               </button>
               <div class="help-links">
-                <a href="https://${schoolInfo.omCode ? `${schoolInfo.omCode}` : ''}.e-kreta.hu/Adminisztracio/ElfelejtettJelszo" class="help-link">Elfelejtettem a jelszavam</a>
-                <a href="https://tudasbazis.ekreta.hu/pages/viewpage.action?pageId=2425086" target="_blank" class="help-link">Nem tudsz bejelentkezni?</a>
+                <a href="https://${schoolInfo.omCode ? `${schoolInfo.omCode}` : ''}.e-kreta.hu/Adminisztracio/ElfelejtettJelszo" class="help-link">${LanguageManager.t('login.forgot_password')}</a>
+                <a href="https://tudasbazis.ekreta.hu/pages/viewpage.action?pageId=2425086" target="_blank" class="help-link">${LanguageManager.t('login.help_link')}</a>
               </div>
             </div>
           </form>
@@ -85,14 +85,14 @@ async function transformLoginPage() {
 
         ${systemMessage ? `
           <div class="system-message">
-            <h4>Rendszerértesítés</h4>
+            <h4>${LanguageManager.t('login.system_message')}</h4>
             <p>${systemMessage}</p>
           </div>
         ` : ''}
 
         <footer class="login-footer">
           <a href="https://tudasbazis.ekreta.hu/pages/viewpage.action?pageId=4064926" 
-             target="_blank" class="privacy-link">Adatkezelési tájékoztató</a>
+             target="_blank" class="privacy-link">${LanguageManager.t('login.privacy_policy')}</a>
         </footer>
       </div>
     `;

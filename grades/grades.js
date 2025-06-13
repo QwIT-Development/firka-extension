@@ -27,7 +27,6 @@
             loadingScreen.hide();
 
         } catch (error) {
-            console.error('Error transforming grades page:', error);
             loadingScreen.hide();
         }
     }
@@ -42,7 +41,20 @@
                 const subjectName = cells[2].textContent.trim();
                 if (subjectName && subjectName !== 'Magatartás/Szorgalom') {
                     const grades = [];
-                    const months = ['Szeptember', 'Oktober', 'November', 'December', 'JanuarI', 'JanuarII', 'Februar', 'Marcius', 'Aprilis', 'Majus', 'JuniusI', 'JuniusII'];
+                    const months = [
+                        LanguageManager.t('grades.september'), 
+                        LanguageManager.t('grades.october'), 
+                        LanguageManager.t('grades.november'), 
+                        LanguageManager.t('grades.december'), 
+                        LanguageManager.t('grades.january_1'), 
+                        LanguageManager.t('grades.january_2'), 
+                        LanguageManager.t('grades.february'), 
+                        LanguageManager.t('grades.march'), 
+                        LanguageManager.t('grades.april'), 
+                        LanguageManager.t('grades.may'), 
+                        LanguageManager.t('grades.june_1'), 
+                        LanguageManager.t('grades.june_2')
+                    ];
 
                     months.forEach((month, index) => {
                         const gradeElements = cells[index + 3].querySelectorAll('span[data-tanuloertekelesid]');
@@ -136,7 +148,20 @@
     function generateGradeItem(grade) {
         const semesterClass = grade.isSemesterGrade ? 'semester-grade' : '';
         const dateObj = new Date(grade.date);
-        const monthNames = ['Január', 'Február', 'Március', 'Április', 'Május', 'Június', 'Július', 'Augusztus', 'Szeptember', 'Október', 'November', 'December'];
+        const monthNames = [
+            LanguageManager.t('months.january'), 
+            LanguageManager.t('months.february'), 
+            LanguageManager.t('months.march'), 
+            LanguageManager.t('months.april'), 
+            LanguageManager.t('months.may'), 
+            LanguageManager.t('months.june'), 
+            LanguageManager.t('months.july'), 
+            LanguageManager.t('months.august'), 
+            LanguageManager.t('months.september'), 
+            LanguageManager.t('months.october'), 
+            LanguageManager.t('months.november'), 
+            LanguageManager.t('months.december')
+        ];
         const formattedDate = `${monthNames[dateObj.getMonth()]} ${dateObj.getDate()}`;
         const shortenedTheme = shortenEvaluationName(grade.theme);
         return `
@@ -183,7 +208,7 @@
           <div class="grades-overview">
             <div class="overall-averages card">
               <div class="chart-header">
-                <div class="chart-title">Jegyek (${totalGrades}db)</div>
+                <div class="chart-title">${LanguageManager.t('grades.chart_title')} (${totalGrades}db)</div>
                 <div class="chart-averages">
                   <div class="average-circle my-average" data-grade="${studentGradeLevel}">
                     <span class="average-value ${studentAverage < 2 && studentAverage > 0 ? 'warning' : ''}">${studentAverage > 0 ? studentAverage.toFixed(2) : '-'}</span>
@@ -210,7 +235,7 @@
             </div>
             ${semesterGrades.length > 0 ? `
                 <div class="semester-grades card">
-                    <h3>Félévi értékelések</h3>
+                    <h3>${LanguageManager.t('grades.semester_evaluations')}</h3>
                     <div class="semester-grades-list">
                         ${semesterGrades.map(grade => `
                             <div class="semester-grade-item grade-${grade.value}">
