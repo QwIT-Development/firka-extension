@@ -12,6 +12,12 @@
       "128": "images/firka_logo_128.png"
     }
   },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "firxa@zan1456.hu",
+      "strict_min_version": "58.0"
+    }
+  },
   "web_accessible_resources": [{
     "resources": [
       "settings/*",
@@ -23,7 +29,7 @@
       "i18n/*.json",
       "tools/cookieManager.js"
     ],
-    "matches": ["https://*.e-kreta.hu/*", "https://idp.e-kreta.hu/*"]
+    "matches": ["<all_urls>"]
   }],
   "content_scripts": [
     {
