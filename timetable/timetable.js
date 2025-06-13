@@ -27,6 +27,14 @@
     const start = new Date(startDate);
     const dates = [];
     const dayNames = [LanguageManager.t('common.monday'), LanguageManager.t('common.tuesday'), LanguageManager.t('common.wednesday'), LanguageManager.t('common.thursday'), LanguageManager.t('common.friday')];
+
+    const startDay = start.getDay();
+    let dayOffset = 0;
+
+    if (startDay !== 1) {
+      dayOffset = startDay === 0 ? 1 : 1 - startDay;
+      start.setDate(start.getDate() + dayOffset);
+    }
     
     for (let i = 0; i < 5; i++) {
       const date = new Date(start);
@@ -519,25 +527,41 @@
     const currentDate = new Date(date);
     const currentYear = currentDate.getFullYear();
     const currentMonth = currentDate.getMonth();
-    let schoolYearStart;
+    
+    let schoolYear;
     if (currentMonth >= 8) {
-      schoolYearStart = new Date(currentYear, 8, 1);
+      schoolYear = currentYear;
     } else {
-      schoolYearStart = new Date(currentYear - 1, 8, 1);
+      schoolYear = currentYear - 1;
     }
-    const timeDiff = currentDate.getTime() - schoolYearStart.getTime();
+    
+    const schoolYearStart = new Date(schoolYear, 8, 1); // szeptember 1
+    const startDayOfWeek = schoolYearStart.getDay();
+    const daysToFirstMonday = startDayOfWeek === 1 ? 0 : (8 - startDayOfWeek) % 7;
+    
+    const firstMonday = new Date(schoolYearStart);
+    firstMonday.setDate(schoolYearStart.getDate() + daysToFirstMonday);
+    
+    const timeDiff = currentDate.getTime() - firstMonday.getTime();
     const daysDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
     const weekNumber = Math.floor(daysDiff / 7) + 1;
+    
     return Math.max(1, Math.min(52, weekNumber));
   }
 
   function getDateOfWeek(year, week, dayOfWeek) {
-    const jan4 = new Date(year, 0, 4);
-    const jan4DayOfWeek = jan4.getDay() || 7;
-    const daysToAdd = (week - 1) * 7 + (dayOfWeek - jan4DayOfWeek);
-    const result = new Date(jan4);
-    result.setDate(jan4.getDate() + daysToAdd);
-    return result;
+    // Tanév alapú hét számítás: szeptember 1-től kezdődik
+    const schoolYearStart = new Date(year, 8, 1); // szeptember 1
+    const startDayOfWeek = schoolYearStart.getDay();
+    const daysToFirstMonday = startDayOfWeek === 1 ? 0 : (8 - startDayOfWeek) % 7;
+    
+    const firstMonday = new Date(schoolYearStart);
+    firstMonday.setDate(schoolYearStart.getDate() + daysToFirstMonday);
+    
+    const targetDate = new Date(firstMonday);
+    targetDate.setDate(firstMonday.getDate() + (week - 1) * 7 + (dayOfWeek - 1));
+    
+    return targetDate;
   }
 
   function formatDateHU(date) {
@@ -758,7 +782,6 @@
                     <span class="material-icons-round">chevron_left</span>
                   </button>
                   <div class="week-display" id="week-display">
-                    <!-- Will be populated with 5 weeks -->
                   </div>
                   <button class="week-nav-btn" id="nextWeekBtn" title="Következő hét">
                     <span class="material-icons-round">chevron_right</span>
@@ -775,13 +798,12 @@
             <div class="week-modal" id="weekModal" style="display: none;">
               <div class="week-modal-content">
                 <div class="week-modal-header">
-                  <h3>Hét választó - Teljes nézet</h3>
+                  <h3></h3>
                   <button class="week-modal-close" id="closeWeekModal">
                     <span class="material-icons-round">close</span>
                   </button>
                 </div>
                 <div class="week-modal-grid" id="weekModalGrid">
-                  <!-- Will be populated with all 52 weeks -->
                 </div>
               </div>
             </div>
@@ -810,7 +832,7 @@
       setupUserDropdown();
       setupMobileNavigation();
       setupEventListeners(data);
-      initializeWeekSelector(data.weekInfo.options);
+      initializeWeekSelector();
       
       loadingScreen.hide();
 
@@ -820,17 +842,13 @@
     }
   }
 
-  let currentWeekIndex = 0;
-  let allWeekOptions = [];
+  let selectedWeekNumber = 1;
+  let currentWeekNumber = 1;
   
-  function initializeWeekSelector(weekOptions) {
-    allWeekOptions = weekOptions;
+  function initializeWeekSelector() {
     const today = new Date();
-    const currentWeekNumber = getWeekNumber(today);
-    currentWeekIndex = allWeekOptions.findIndex(opt => parseInt(opt.value) === currentWeekNumber);
-    if (currentWeekIndex === -1) {
-      currentWeekIndex = Math.floor(allWeekOptions.length / 2);
-    }
+    currentWeekNumber = getWeekNumber(today);
+    selectedWeekNumber = currentWeekNumber;
     
     updateWeekDisplay();
     setupWeekNavigation();
@@ -839,33 +857,25 @@
   function updateWeekDisplay() {
     const weekDisplay = document.getElementById('week-display');
     if (!weekDisplay) return;
-    let startIndex = currentWeekIndex - 2;
-    if (startIndex < 0) {
-      startIndex = 0;
+    
+    // Mindig 5 hetet mutatunk, a kiválasztott hét középen
+    const visibleWeeks = [];
+    for (let i = -2; i <= 2; i++) {
+      let weekNum = selectedWeekNumber + i;
+      if (weekNum < 1) weekNum = 52 + weekNum;
+      if (weekNum > 52) weekNum = weekNum - 52;
+      visibleWeeks.push(weekNum);
     }
-    else if (startIndex + 5 > allWeekOptions.length) {
-      startIndex = Math.max(0, allWeekOptions.length - 5);
-    }
     
-    const endIndex = Math.min(allWeekOptions.length, startIndex + 5);
-    const visibleWeeks = allWeekOptions.slice(startIndex, startIndex + 5);
-    
-    const today = new Date();
-    const currentWeekNumber = getWeekNumber(today);
-    
-    weekDisplay.innerHTML = visibleWeeks.map((opt, index) => {
-      const weekNumber = parseInt(opt.value);
-      const isSelected = startIndex + index === currentWeekIndex;
-      const isCurrent = weekNumber === currentWeekNumber;
+    weekDisplay.innerHTML = visibleWeeks.map((weekNum, index) => {
+      const isSelected = index === 2; // A középső elem mindig a kiválasztott
+      const isCurrent = weekNum === currentWeekNumber;
       
       return `
         <div class="week-cell ${isSelected ? 'selected' : ''} ${isCurrent ? 'current-week' : ''}" 
-             data-week="${opt.value}" 
-             data-start="${opt.startDate}" 
-             data-end="${opt.endDate}"
-             data-index="${startIndex + index}"
-             title="${opt.text}${isCurrent ? ' (Jelenlegi hét)' : ''}">
-          <span class="week-number">${opt.value}</span>
+             data-week="${weekNum}"
+             title="${weekNum}. hét${isCurrent ? ' (Jelenlegi hét)' : ''}">
+          <span class="week-number">${weekNum}</span>
           ${isCurrent ? '<span class="current-indicator">●</span>' : ''}
         </div>
       `;
@@ -879,21 +889,19 @@
     
     if (prevBtn) {
       prevBtn.addEventListener('click', () => {
-        if (currentWeekIndex > 0) {
-          currentWeekIndex--;
-          updateWeekDisplay();
-          loadAndDisplayWeek(allWeekOptions[currentWeekIndex]);
-        }
+        selectedWeekNumber--;
+        if (selectedWeekNumber < 1) selectedWeekNumber = 52;
+        updateWeekDisplay();
+        loadWeekData(selectedWeekNumber);
       });
     }
     
     if (nextBtn) {
       nextBtn.addEventListener('click', () => {
-        if (currentWeekIndex < allWeekOptions.length - 1) {
-          currentWeekIndex++;
-          updateWeekDisplay();
-          loadAndDisplayWeek(allWeekOptions[currentWeekIndex]);
-        }
+        selectedWeekNumber++;
+        if (selectedWeekNumber > 52) selectedWeekNumber = 1;
+        updateWeekDisplay();
+        loadWeekData(selectedWeekNumber);
       });
     }
     
@@ -902,19 +910,51 @@
         openWeekModal();
       });
     }
-    document.addEventListener('click', (e) => {
-      if (e.target.closest('.week-cell')) {
-        const weekCell = e.target.closest('.week-cell');
-        const weekIndex = parseInt(weekCell.dataset.index);
-        if (!isNaN(weekIndex)) {
-          currentWeekIndex = weekIndex;
+    
+    const weekClickHandler = (e) => {
+      const weekCell = e.target.closest('.week-cell');
+      if (weekCell) {
+        const weekNumber = parseInt(weekCell.dataset.week);
+        if (!isNaN(weekNumber)) {
+          selectedWeekNumber = weekNumber;
           updateWeekDisplay();
-          loadAndDisplayWeek(allWeekOptions[currentWeekIndex]);
+          loadWeekData(selectedWeekNumber);
         }
       }
-    });
+    };
+
+    document.getElementById('week-display').addEventListener('click', weekClickHandler);
     
     setupWeekModal();
+  }
+  
+  function loadWeekData(weekNumber) {
+    // Hét adatainak betöltése
+    const today = new Date();
+    let currentYear = today.getFullYear();
+    
+    // Ha szeptember előtt vagyunk, akkor az előző tanévet használjuk
+    if (today.getMonth() < 8) {
+      currentYear--;
+    }
+    
+    const startOfWeek = getDateOfWeek(currentYear, weekNumber, 1);
+    const endOfWeek = getDateOfWeek(currentYear, weekNumber, 7);
+    const startDate = startOfWeek.toISOString().split('T')[0];
+    const endDate = endOfWeek.toISOString().split('T')[0];
+    
+    loadWeekDataFromAPI(startDate, endDate).then(apiData => {
+      const weekDates = generateWeekDates(startDate);
+      const lessons = convertAPIDataToLessons(apiData, weekDates);
+      
+      const timetableContainer = document.querySelector('.timetable-grid');
+      if (timetableContainer) {
+        timetableContainer.innerHTML = generateTimeGrid(lessons, weekDates);
+        setupLessonCardListeners();
+      }
+    }).catch(error => {
+      console.error('Hét adatainak betöltése sikertelen:', error);
+    });
   }
   
   function openWeekModal() {
@@ -922,40 +962,21 @@
     const modalGrid = document.getElementById('weekModalGrid');
     
     if (!modal || !modalGrid) return;
-    const today = new Date();
-    const currentYear = today.getFullYear();
-    const currentWeekNumber = getWeekNumber(today);
+    
     const allWeeks = [];
     for (let week = 1; week <= 52; week++) {
-      const existingWeek = allWeekOptions.find(opt => parseInt(opt.value) === week);
-      if (existingWeek) {
-        allWeeks.push({ ...existingWeek, weekIndex: allWeekOptions.indexOf(existingWeek) });
-      } else {
-        const startOfWeek = getDateOfWeek(currentYear, week, 1);
-        const endOfWeek = getDateOfWeek(currentYear, week, 5);
-        allWeeks.push({
-          value: week.toString(),
-          text: `${week}. hét`,
-          startDate: startOfWeek.toISOString().split('T')[0],
-          endDate: endOfWeek.toISOString().split('T')[0],
-          weekIndex: week - 1
-        });
-      }
+      allWeeks.push(week);
     }
     
-    modalGrid.innerHTML = allWeeks.map((week) => {
-      const weekNumber = parseInt(week.value);
-      const isSelected = week.weekIndex === currentWeekIndex;
+    modalGrid.innerHTML = allWeeks.map((weekNumber) => {
+      const isSelected = weekNumber === selectedWeekNumber;
       const isCurrent = weekNumber === currentWeekNumber;
       
       return `
         <div class="week-cell modal-week-cell ${isSelected ? 'selected' : ''} ${isCurrent ? 'current-week' : ''}" 
-             data-week="${week.value}" 
-             data-start="${week.startDate || ''}" 
-             data-end="${week.endDate || ''}"
-             data-index="${allWeeks.indexOf(week)}"
-             title="${week.text}${isCurrent ? ' (Jelenlegi hét)' : ''}">
-          <span class="week-number">${week.value}</span>
+             data-week="${weekNumber}"
+             title="${weekNumber}. hét${isCurrent ? ' (Jelenlegi hét)' : ''}">
+          <span class="week-number">${weekNumber}</span>
           ${isCurrent ? '<span class="current-indicator">●</span>' : ''}
         </div>
       `;
@@ -989,18 +1010,20 @@
       });
     }
     
-    document.addEventListener('click', (e) => {
-      if (e.target.closest('.modal-week-cell')) {
-        const weekCell = e.target.closest('.modal-week-cell');
-        const weekIndex = parseInt(weekCell.dataset.index);
-        if (!isNaN(weekIndex) && weekIndex >= 0) {
-          currentWeekIndex = weekIndex;
+    const modalWeekClickHandler = (e) => {
+      const weekCell = e.target.closest('.modal-week-cell');
+      if (weekCell) {
+        const weekNumber = parseInt(weekCell.dataset.week);
+        if (!isNaN(weekNumber)) {
+          selectedWeekNumber = weekNumber;
           updateWeekDisplay();
-          loadAndDisplayWeek(allWeekOptions[currentWeekIndex]);
+          loadWeekData(selectedWeekNumber);
           closeWeekModal();
         }
       }
-    });
+    };
+
+    document.getElementById('weekModalGrid').addEventListener('click', modalWeekClickHandler);
     
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && modal && modal.style.display === 'flex') {

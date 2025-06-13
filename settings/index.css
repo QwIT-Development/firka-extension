@@ -162,8 +162,9 @@ h2 {
 }
 
 .language-name {
+  color: var(--text-primary);
+  font-size: 12px;
   font-weight: 500;
-  font-size: 14px;
 }
 
 
