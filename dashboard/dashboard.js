@@ -375,6 +375,7 @@ class DashboardRenderer {
       </div>
     `;
     setupUserDropdown();
+    setupMobileNavigation();
   }
 }
 

@@ -67,6 +67,10 @@ const createTemplate = {
                 </div>
             </button>
             <div class="user-dropdown">
+                <a href="https://bmszc-puskas.e-kreta.hu/Home/Uzenetek" data-page="messages" class="dropdown-item">
+                <img src="${chrome.runtime.getURL('icons/messages.svg')}" alt="${LanguageManager.t('navigation.messages')}">
+                ${LanguageManager.t('navigation.messages')}
+                </a>
                 <a href="/Adminisztracio/Profil" data-page="profile" class="dropdown-item">
                 <img src="${chrome.runtime.getURL('icons/profile.svg')}" alt="${LanguageManager.t('navigation.profile')}">
                 ${LanguageManager.t('navigation.profile')}

@@ -1,10 +1,10 @@
 (() => {
     async function transformGradesPage() {
         try {
-            await helper.waitForElement('#Osztalyzatok_7895TanuloErtekelesByTanuloGrid');
-            await new Promise(resolve => setTimeout(resolve, 1000));
-
-            const gradesData = extractGradesData();
+            const tanuloIdElement = document.querySelector('#TanuloId');
+            const tanuloId = tanuloIdElement ? tanuloIdElement.value : '772481';
+            
+            const gradesData = await fetchGradesFromAPI(tanuloId);
             const studentAverage = calculateOverallAverage(gradesData.subjects);
             const classAverage = calculateOverallClassAverage(gradesData.subjects);
 
@@ -27,11 +27,137 @@
             loadingScreen.hide();
 
         } catch (error) {
+            console.error('Error loading grades:', error);
             loadingScreen.hide();
         }
     }
 
-    function extractGradesData() {
+    async function fetchGradesFromAPI(tanuloId) {
+        try {
+            const currentDomain = window.location.origin;
+            const apiUrl = `${currentDomain}/api/TanuloErtekelesByTanuloApi/GetTanuloErtekelesByTanuloGridTanuloView?sort=&group=&filter=&data=%7B%22tanuloId%22%3A%22${tanuloId}%22%2C%22oktatasiNevelesiFeladatId%22%3A%227895%22%2C%22isOsztalyAtlagMegjelenik%22%3A%22True%22%7D&_=${Date.now()}`;
+            
+            const response = await fetch(apiUrl, {
+                method: 'GET',
+                credentials: 'include',
+                headers: {
+                    'Accept': 'application/json, text/javascript, */*; q=0.01',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            return processAPIGradesData(data);
+        } catch (error) {
+            console.error('Error fetching grades from API:', error);
+            return extractGradesDataFromDOM();
+        }
+    }
+
+    function processAPIGradesData(apiData) {
+        const subjects = [];
+        
+        if (!apiData.Data || !Array.isArray(apiData.Data)) {
+            return {
+                schoolInfo: {
+                    id: cookieManager.get('schoolCode') || '',
+                    name: cookieManager.get('schoolName') || 'Iskola'
+                },
+                userData: {
+                    name: cookieManager.get('userName') || 'Felhasználó',
+                    time: document.querySelector('.usermenu_timer')?.textContent?.trim() || '45:00'
+                },
+                subjects: []
+            };
+        }
+
+        apiData.Data.forEach(subject => {
+            if (subject.TantargyNev && subject.TantargyNev !== 'Magatartás/Szorgalom') {
+                const grades = [];
+                const monthFields = [
+                    'Szeptember', 'Oktober', 'November', 'December', 
+                    'JanuarI', 'JanuarII', 'Februar', 'Marcius', 
+                    'Aprilis', 'Majus', 'Junius', 'Julius', 'Augusztus'
+                ];
+
+                monthFields.forEach(month => {
+                    const monthData = subject[month];
+                    if (monthData && monthData.trim() !== '') {
+                        const gradeMatches = monthData.match(/<span[^>]*data-tanuloertekelesid[^>]*>([^<]+)<\/span>/g);
+                        if (gradeMatches) {
+                            gradeMatches.forEach(gradeHtml => {
+                                const gradeValue = gradeHtml.match(/>([^<]+)<\/span>/)?.[1]?.trim();
+                                if (gradeValue && gradeValue !== '-' && !gradeValue.includes('%')) {
+                                    const dateMatch = gradeHtml.match(/data-datum='([^']*)'/);
+                                    const typeMatch = gradeHtml.match(/data-tipusmod='([^']*)'/);
+                                    const themeMatch = gradeHtml.match(/data-ertekelestema='([^']*)'/);
+                                    const weightMatch = gradeHtml.match(/data-suly='([^']*)'/);
+                                    const teacherMatch = gradeHtml.match(/data-ertekelonyomtatasinev='([^']*)'/);
+
+                                    const theme = themeMatch ? themeMatch[1].replace('Téma: ', '').replace(/&#\d+;/g, (match) => {
+                                        const code = match.match(/\d+/)[0];
+                                        return String.fromCharCode(code);
+                                    }) : '';
+
+                                    const teacher = teacherMatch ? teacherMatch[1].replace(/&#\d+;/g, (match) => {
+                                        const code = match.match(/\d+/)[0];
+                                        return String.fromCharCode(code);
+                                    }) : '';
+
+                                    const type = typeMatch ? typeMatch[1].replace(/&#\d+;/g, (match) => {
+                                        const code = match.match(/\d+/)[0];
+                                        return String.fromCharCode(code);
+                                    }) : '';
+
+                                    grades.push({
+                                        value: gradeValue,
+                                        date: dateMatch ? dateMatch[1] : '',
+                                        type: type,
+                                        theme: theme,
+                                        weight: weightMatch ? weightMatch[1] : '',
+                                        teacher: teacher,
+                                        isSemesterGrade: type.toLowerCase().includes('félévi') ||
+                                            theme.toLowerCase().includes('félévi'),
+                                        isYearEndGrade: type.toLowerCase().includes('évvégi') ||
+                                            theme.toLowerCase().includes('évvégi') ||
+                                            type.toLowerCase().includes('év végi') ||
+                                            theme.toLowerCase().includes('év végi')
+                                    });
+                                }
+                            });
+                        }
+                    }
+                });
+
+                if (grades.length > 0) {
+                    subjects.push({
+                        name: subject.TantargyNev,
+                        grades: grades,
+                        average: subject.Atlag || 0,
+                        classAverage: subject.OsztalyAtlag || 0
+                    });
+                }
+            }
+        });
+
+        return {
+            schoolInfo: {
+                id: cookieManager.get('schoolCode') || '',
+                name: cookieManager.get('schoolName') || 'Iskola'
+            },
+            userData: {
+                name: cookieManager.get('userName') || 'Felhasználó',
+                time: document.querySelector('.usermenu_timer')?.textContent?.trim() || '45:00'
+            },
+            subjects: subjects
+        };
+    }
+
+    function extractGradesDataFromDOM() {
         const subjects = [];
         const rows = document.querySelectorAll('#Osztalyzatok_7895TanuloErtekelesByTanuloGrid tbody tr');
 
@@ -60,22 +186,31 @@
                         const gradeElements = cells[index + 3].querySelectorAll('span[data-tanuloertekelesid]');
                         gradeElements.forEach(element => {
                             const gradeText = element.textContent.trim();
-                            if (gradeText && gradeText !== '-') {
+                            if (gradeText && gradeText !== '-' && !gradeText.includes('%')) {
+                                const type = element.getAttribute('data-tipusmod') || '';
+                                const theme = element.getAttribute('data-ertekelestema') || '';
+                                const dataType = element.getAttribute('data-tipus') || '';
+                                
                                 grades.push({
                                     value: gradeText,
                                     date: element.getAttribute('data-datum'),
-                                    type: element.getAttribute('data-tipusmod'),
-                                    theme: element.getAttribute('data-ertekelestema').replace('Téma: ', ''),
+                                    type: type,
+                                    theme: theme.replace('Téma: ', ''),
                                     weight: element.getAttribute('data-suly'),
                                     teacher: element.getAttribute('data-ertekelonyomtatasinev'),
-                                    isSemesterGrade: (element.getAttribute('data-tipusmod') || '').toLowerCase().includes('félévi') ||
-                                        (element.getAttribute('data-ertekelestema') || '').toLowerCase().includes('félévi') ||
-                                        (element.getAttribute('data-tipus') || '').toLowerCase().includes('félévi')
+                                    isSemesterGrade: type.toLowerCase().includes('félévi') ||
+                                        theme.toLowerCase().includes('félévi') ||
+                                        dataType.toLowerCase().includes('félévi'),
+                                    isYearEndGrade: type.toLowerCase().includes('évvégi') ||
+                                        theme.toLowerCase().includes('évvégi') ||
+                                        type.toLowerCase().includes('év végi') ||
+                                        theme.toLowerCase().includes('év végi') ||
+                                        dataType.toLowerCase().includes('évvégi') ||
+                                        dataType.toLowerCase().includes('év végi')
                                 });
                             }
                         });
                     });
-
 
                     const avgText = cells[16].textContent.trim();
                     const classAvgText = cells[17].textContent.trim();
@@ -84,7 +219,6 @@
                     const classAvg = classAvgText !== '-' ? parseFloat(classAvgText.replace(',', '.')) : 0;
 
                     if (grades.length > 0) {
-
                         subjects.push({
                             name: subjectName,
                             grades: grades,
@@ -113,24 +247,7 @@
         const validSubjects = subjects.filter(s => s.average > 0);
         if (validSubjects.length === 0) return 0;
 
-
-        const weightedSum = validSubjects.reduce((sum, subject) => {
-            const validGrades = subject.grades.filter(grade => !isNaN(parseInt(grade.value)));
-            const subjectWeightedSum = validGrades.reduce((gradeSum, grade) => {
-                const value = parseInt(grade.value);
-                const weight = parseInt(grade.weight?.match(/\d+/)?.[0] || '100') / 100;
-                return gradeSum + (value * weight);
-            }, 0);
-
-            const totalWeight = validGrades.reduce((weightSum, grade) => {
-                const weight = parseInt(grade.weight?.match(/\d+/)?.[0] || '100') / 100;
-                return weightSum + weight;
-            }, 0);
-
-            return sum + (subjectWeightedSum / totalWeight);
-        }, 0);
-
-        return weightedSum / validSubjects.length;
+        return validSubjects.reduce((sum, s) => sum + s.average, 0) / validSubjects.length;
     }
 
     function calculateOverallClassAverage(subjects) {
@@ -147,6 +264,7 @@
 
     function generateGradeItem(grade) {
         const semesterClass = grade.isSemesterGrade ? 'semester-grade' : '';
+        const yearEndClass = grade.isYearEndGrade ? 'year-end-grade' : '';
         const dateObj = new Date(grade.date);
         const monthNames = [
             LanguageManager.t('months.january'), 
@@ -165,7 +283,7 @@
         const formattedDate = `${monthNames[dateObj.getMonth()]} ${dateObj.getDate()}`;
         const shortenedTheme = shortenEvaluationName(grade.theme);
         return `
-      <div class="grade-item grade-${grade.value} ${semesterClass}">
+      <div class="grade-item grade-${grade.value} ${semesterClass} ${yearEndClass}">
         <div class="grade-value">${grade.value}</div>
         <div class="grade-details">
           <div class="grade-theme" title="${grade.theme}">${shortenedTheme}</div>
@@ -181,7 +299,7 @@
         subjects.forEach(subject => {
             subject.grades.forEach(grade => {
                 const value = parseInt(grade.value);
-                if (value >= 1 && value <= 5) {
+                if (value >= 1 && value <= 5 && !grade.value.includes('%')) {
                     distribution[value]++;
                 }
             });
@@ -193,6 +311,7 @@
         const totalGrades = data.subjects.reduce((sum, subject) => sum + subject.grades.length, 0);
         const gradeDistribution = calculateGradeDistribution(data.subjects);
         const semesterGrades = extractSemesterGrades(data.subjects);
+        const yearEndGrades = extractYearEndGrades(data.subjects);
 
         const studentGradeLevel = Math.floor(studentAverage) || 0;
         const classGradeLevel = Math.floor(classAverage) || 0;
@@ -246,6 +365,19 @@
                     </div>
                 </div>
             ` : ''}
+            ${yearEndGrades.length > 0 ? `
+                <div class="year-end-grades card">
+                    <h3>Évvégi értékelések</h3>
+                    <div class="year-end-grades-list">
+                        ${yearEndGrades.map(grade => `
+                            <div class="year-end-grade-item grade-${grade.value}">
+                                <div class="year-end-grade-value">${grade.value}</div>
+                                <div class="year-end-grade-subject">${grade.subject}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            ` : ''}
           </div>
           <div class="grades-grid">
             ${generateSubjectCards(data.subjects)}
@@ -270,6 +402,21 @@
         return semesterGrades;
     }
 
+    function extractYearEndGrades(subjects) {
+        const yearEndGrades = [];
+        subjects.forEach(subject => {
+            const yearEndGrade = subject.grades.find(grade => grade.isYearEndGrade);
+            if (yearEndGrade) {
+                yearEndGrades.push({
+                    subject: subject.name,
+                    value: yearEndGrade.value,
+                    date: yearEndGrade.date
+                });
+            }
+        });
+        return yearEndGrades;
+    }
+
     function calculateGradePoints(subjects) {
         const allGrades = [];
 
@@ -278,7 +425,7 @@
                 const date = new Date(grade.date);
                 const value = parseInt(grade.value);
                 const weight = parseInt(grade.weight?.match(/\d+/)?.[0] || '100') / 100;
-                if (date && value && weight) {
+                if (date && value && weight && !grade.value.includes('%')) {
                     allGrades.push({
                         date,
                         value,

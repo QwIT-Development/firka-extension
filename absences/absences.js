@@ -1,7 +1,4 @@
 async function collectAbsencesData() {
-  await helper.waitForElement('#HianyzasGrid');
-  await new Promise(resolve => setTimeout(resolve, 1000));
-
   const basicData = {
     schoolInfo: {
       name: cookieManager.get('schoolName') || 'Iskola',
@@ -13,35 +10,63 @@ async function collectAbsencesData() {
     }
   };
 
-  const absences = [];
-  const rows = document.querySelectorAll('#HianyzasGrid .k-grid-content tr');
-  rows.forEach(row => {
-    const cells = row.querySelectorAll('td');
-    if (cells.length >= 9) {
-      absences.push({
-        date: cells[1]?.textContent?.trim() || '',
-        lesson: cells[2]?.textContent?.trim() || '',
-        subject: cells[3]?.textContent?.trim() || '',
-        topic: cells[4]?.textContent?.trim() || '',
-        type: cells[5]?.textContent?.trim() || '',
-        justified: cells[6]?.textContent?.trim() === 'Igen',
-        justificationStatus: cells[6]?.textContent?.trim() === 'Igen' ? 'justified' : 
-                            cells[6]?.textContent?.trim() === 'Nem' ? 'unjustified' : 'pending',
-        purposeful: cells[7]?.textContent?.trim() || '',
-        justificationType: cells[8]?.textContent?.trim() || ''
+  try {
+    const currentDomain = window.location.hostname;
+    const response = await fetch(`https://${currentDomain}/api/HianyzasokApi/GetHianyzasGrid?sort=MulasztasDatum-desc&page=1&pageSize=100&group=&filter=&data=%7B%7D&_=${Date.now()}`, {
+      method: 'GET',
+      credentials: 'include',
+      headers: {
+        'Accept': 'application/json, text/javascript, */*; q=0.01',
+        'X-Requested-With': 'XMLHttpRequest'
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const apiData = await response.json();
+    const absences = [];
+
+    if (apiData.Data && Array.isArray(apiData.Data)) {
+      apiData.Data.forEach(item => {
+        const date = new Date(item.MulasztasDatum);
+        const formattedDate = `${date.getFullYear()}.${(date.getMonth() + 1).toString().padStart(2, '0')}.${date.getDate().toString().padStart(2, '0')}.`;
+
+        let justificationStatus = 'pending';
+        if (item.Igazolt_BOOL === true) {
+          justificationStatus = 'justified';
+        } else if (item.Igazolt_BOOL === false && item.IgazolasTipus !== null) {
+          justificationStatus = 'unjustified';
+        }
+
+        absences.push({
+          date: formattedDate,
+          lesson: item.Oraszam?.toString() || '',
+          subject: item.Targy || '',
+          topic: item.Tema || '',
+          type: item.MulasztasTipus_DNAME || '',
+          justified: item.Igazolt_BOOL === true,
+          justificationStatus: justificationStatus,
+          purposeful: item.TanoraiCeluMulasztas_BNAME || '',
+          justificationType: item.IgazolasTipus_DNAME || ''
+        });
       });
     }
-  });
 
-  const groupedAbsences = {};
-  absences.forEach(absence => {
-    if (!groupedAbsences[absence.date]) {
-      groupedAbsences[absence.date] = [];
-    }
-    groupedAbsences[absence.date].push(absence);
-  });
+    const groupedAbsences = {};
+    absences.forEach(absence => {
+      if (!groupedAbsences[absence.date]) {
+        groupedAbsences[absence.date] = [];
+      }
+      groupedAbsences[absence.date].push(absence);
+    });
 
-  return { basicData, absences, groupedAbsences };
+    return { basicData, absences, groupedAbsences };
+  } catch (error) {
+    console.error('Hiba az API hívás során:', error);
+    return { basicData, absences: [], groupedAbsences: {} };
+  }
 }
 
 async function transformAbsencesPage() {
@@ -62,7 +87,7 @@ async function transformAbsencesPage() {
                 <span class="material-icons-round">date_range</span>
                 ${LanguageManager.t('absences.date')}
               </label>
-              <input type="date" id="dateFilter" class="filter-input" disabled>
+              <input type="date" id="dateFilter" class="filter-input">
             </div>
             <div class="filter-group">
               <label>
@@ -156,46 +181,42 @@ function setupFilters() {
       return;
     }
 
-    
-    if (filters.dateFilter) {
-      filters.dateFilter.disabled = true;
-    }
-
     const filterAbsences = () => {
       try {
-        
         const dateFilterValue = filters.dateFilter.value;
         const subject = filters.subject.value;
         const justified = filters.justified.value;
-        
-        
         const selectedDate = dateFilterValue ? new Date(dateFilterValue) : null;
 
         document.querySelectorAll('.absence-group').forEach(group => {
           const dateStr = group.dataset.date;
           const dateParts = dateStr.split('.');
           
-          
           if (dateParts.length < 3) {
             console.error(`Invalid date format: ${dateStr}`);
             return;
           }
           
-          
-          const parsedDay = parseInt(dateParts[0].trim(), 10);
+          const parsedYear = parseInt(dateParts[0].trim(), 10);
           const parsedMonth = parseInt(dateParts[1].trim(), 10) - 1;
-          const parsedYear = parseInt(dateParts[2].trim(), 10);
-          
+          const parsedDay = parseInt(dateParts[2].trim(), 10);
           
           if (isNaN(parsedDay) || isNaN(parsedMonth) || isNaN(parsedYear)) {
             console.error(`Invalid date components: ${dateStr}`);
             return;
           }
           
-          
           const groupDate = new Date(parsedYear, parsedMonth, parsedDay);
           
           let showGroup = true;
+
+          if (selectedDate) {
+            if (groupDate.getFullYear() !== selectedDate.getFullYear() ||
+                groupDate.getMonth() !== selectedDate.getMonth() ||
+                groupDate.getDate() !== selectedDate.getDate()) {
+              showGroup = false;
+            }
+          }
 
           const absenceItems = group.querySelectorAll('.absence-item');
           let visibleItems = 0;
@@ -225,7 +246,7 @@ function setupFilters() {
     
     Object.values(filters).forEach(filter => {
       try {
-        if (filter && filter !== filters.dateFilter) {
+        if (filter) {
           filter.addEventListener('change', filterAbsences);
         }
       } catch (err) {

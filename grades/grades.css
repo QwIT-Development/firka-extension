@@ -618,6 +618,109 @@ body {
     color: var(--grades-5); 
 }
 
+.year-end-grades {
+    width: 300px;
+    height: 400px;
+    padding: 1.5rem;
+    background: var(--card-card);
+    border-radius: 24px;
+    box-shadow: 0px 1px var(--shadow-blur) 0px var(--accent-shadow);
+    display: flex;
+    flex-direction: column;
+}
+.year-end-grades h3 {
+    padding: 1rem;
+    margin-bottom: 0px !important;
+    margin-top: 0px !important;
+    color: var(--text-primary);
+    font-family: Montserrat;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
+}
+.year-end-grade-item {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 1rem;
+    padding: 1rem;
+    border-radius: 12px;
+    align-items: center;
+}
+.year-end-grade-item:hover {
+    background: var(--button-secondaryFill);
+}
+.year-end-grades-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+    flex: 1;
+    margin: -0.5rem 0;
+}
+.year-end-grade-subject {
+    overflow: hidden;
+    color: var(--text-primary);
+    text-overflow: ellipsis;
+    font-family: Figtree;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 130%;
+}
+.year-end-grade-value {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 16px;
+    font-weight: 700;
+    font-size: 22px;
+}
+.year-end-grade-item.grade-1 .year-end-grade-value { 
+    background-color: var(--grades-background-1);
+    color: var(--grades-1); 
+}
+.year-end-grade-item.grade-2 .year-end-grade-value { 
+    background-color: var(--grades-background-2);
+    color: var(--grades-2); 
+}
+.year-end-grade-item.grade-3 .year-end-grade-value { 
+    background-color: var(--grades-background-3);
+    color: var(--grades-3); 
+}
+.year-end-grade-item.grade-4 .year-end-grade-value { 
+    background-color: var(--grades-background-4);
+    color: var(--grades-4); 
+}
+.year-end-grade-item.grade-5 .year-end-grade-value { 
+    background-color: var(--grades-background-5);
+    color: var(--grades-5); 
+}
+
+.year-end-grade {
+    border: 2px solid var(--accent-primary) !important;
+    box-shadow: 0 0 0 2px rgba(var(--accent-primary-rgb), 0.2) !important;
+}
+.year-end-grade::before {
+    content: "É";
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: var(--accent-primary);
+    color: white;
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    font-size: 10px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 @media (max-width: 1200px) {
     .chart-header {
         flex-direction: column;
@@ -646,6 +749,12 @@ body {
     }
     
     .semester-grades {
+        width: 100%;
+        height: auto;
+        max-height: 400px;
+    }
+    
+    .year-end-grades {
         width: 100%;
         height: auto;
         max-height: 400px;
@@ -727,6 +836,32 @@ body {
         font-size: 14px;
     }
     
+    .year-end-grades {
+        padding: 1rem;
+        width: 100%;
+        min-width: 0;
+    }
+    
+    .year-end-grades h3 {
+        padding: 0.5rem;
+        font-size: 14px;
+    }
+    
+    .year-end-grade-item {
+        padding: 0.75rem;
+        gap: 0.75rem;
+    }
+    
+    .year-end-grade-value {
+        width: 28px;
+        height: 28px;
+        font-size: 18px;
+    }
+    
+    .year-end-grade-subject {
+        font-size: 14px;
+    }
+    
     .overall-averages {
          padding: 1rem;
          overflow-x: auto;
@@ -766,6 +901,10 @@ body {
     }
     
     .semester-grades {
+        padding: 0.75rem;
+    }
+    
+    .year-end-grades {
         padding: 0.75rem;
     }
     
