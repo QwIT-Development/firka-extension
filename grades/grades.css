@@ -702,22 +702,6 @@ body {
     border: 2px solid var(--accent-primary) !important;
     box-shadow: 0 0 0 2px rgba(var(--accent-primary-rgb), 0.2) !important;
 }
-.year-end-grade::before {
-    content: "É";
-    position: absolute;
-    top: -8px;
-    right: -8px;
-    background: var(--accent-primary);
-    color: white;
-    border-radius: 50%;
-    width: 16px;
-    height: 16px;
-    font-size: 10px;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
 
 @media (max-width: 1200px) {
     .chart-header {

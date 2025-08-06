@@ -473,8 +473,6 @@
     } else {
       const preservedDayIndex = dayNavigationState.currentDayIndex;
       dayNavigationState.currentDayIndex = preservedDayIndex;
-      updateDayDisplay();
-      return;
     }
 
     function updateDayDisplay() {
