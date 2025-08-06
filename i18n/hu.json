@@ -43,6 +43,7 @@
     "homework": "Házi feladatok",
     "absences": "Mulasztások",
     "other": "Egyéb",
+    "messages": "Üzenetek",
     "profile": "Profil",
     "settings": "Beállítások",
     "logout": "Kijelentkezés",
@@ -130,7 +131,8 @@
     "no_homework": "Nincs megjeleníthető házi feladat.",
     "no_filtered_homework": "Nincs a szűrési feltételeknek megfelelő házi feladat.",
     "teacher": "Tanár",
-    "no_matching_homework": "Nincs a szűrési feltételeknek megfelelő házi feladat."
+    "no_matching_homework": "Nincs a szűrési feltételeknek megfelelő házi feladat.",
+    "items": "feladat"
   },
   "absences": {
     "title": "Hiányzások",
@@ -146,7 +148,13 @@
     "subject": "Tantárgy",
     "justification": "Igazolás",
     "hours": "óra",
-    "page_transform_error": "Hiba történt az oldal átalakítása során"
+    "page_transform_error": "Hiba történt az oldal átalakítása során",
+    "time_period": "Időszak",
+    "all_periods": "Összes időszak",
+    "current_month": "Aktuális hónap",
+    "last_month": "Előző hónap",
+    "current_semester": "Aktuális félév",
+    "last_30_days": "Utolsó 30 nap"
   },
   "profile": {
     "title": "Profil",
@@ -315,5 +323,21 @@
   "app": {
     "title": "Firka - KRÉTA",
     "settings_title": "Firxa - Beállítások"
+  },
+  "forgotpassword": {
+    "title": "Elfelejtett jelszó",
+    "om_id_label": "OM azonosító",
+    "om_id_placeholder": "Adja meg az OM azonosítóját",
+    "om_id_required": "Az OM azonosító megadása kötelező",
+    "email_label": "E-mail cím",
+    "email_placeholder": "Adja meg az e-mail címét",
+    "email_required": "Az e-mail cím megadása kötelező",
+    "back_to_login": "Vissza a bejelentkezéshez",
+    "reset_button": "Jelszó visszaállítása",
+    "error_message": "Hiba történt a jelszó visszaállítása során",
+    "success_message": "A jelszó visszaállítási link elküldve az e-mail címére",
+    "invalid_data": "Hibás adatok",
+    "invalid_email": "Érvénytelen e-mail cím formátum",
+    "recaptcha_required": "Kérjük, töltse ki a reCAPTCHA-t"
   }
 }

@@ -221,24 +221,24 @@ function renderHomeworkList(groupedHomework) {
       <div class="homework-date-group" data-date="${date}">
         <div class="date-header">
           <h3>${formatDateHeader(date)}</h3>
+          <span class="homework-count">${homeworkItems.length} ${LanguageManager.t('homework.items') || 'feladat'}</span>
         </div>
-        ${homeworkItems.map(homework => {
-          const isTomorrowClass = isTomorrow(homework.deadline) ? 'due-tomorrow' : '';
-          const urgentClass = isTomorrow(homework.deadline) ? 'urgent' : '';
-          
-          return `
-            <div class="homework-item ${isTomorrowClass}" data-subject="${homework.subject}" data-teacher="${homework.teacher}">
-              <div class="homework-header">
-                <div class="homework-subject">${homework.subject}</div>
-                <div class="homework-deadline ${urgentClass}">${homework.deadline}</div>
+        <div class="homework-list-items">
+          ${homeworkItems.map(homework => {
+            const isTomorrowClass = isTomorrow(homework.deadline) ? 'due-tomorrow' : '';
+            const urgentClass = isTomorrow(homework.deadline) ? 'urgent' : '';
+            
+            return `
+              <div class="homework-item ${isTomorrowClass}" data-subject="${homework.subject}" data-teacher="${homework.teacher}">
+                <div class="homework-details">
+                  <div class="homework-subject">${homework.subject}</div>
+                  <div class="homework-content">${homework.description}</div>
+                  <div class="homework-teacher">${homework.teacher}</div>
+                </div>
               </div>
-              <div class="homework-content">${formatHomeworkDescription(homework.description)}</div>
-              <div class="homework-footer">
-                <div class="homework-teacher">${homework.teacher}</div>
-              </div>
-            </div>
-          `;
-        }).join('')}
+            `;
+          }).join('')}
+        </div>
       </div>
     `;
   }).join('');
@@ -283,14 +283,6 @@ function formatDateHeader(dateStr) {
 function formatDate(dateStr) {
   if (!dateStr) return '';
   return dateStr;
-}
-
-function formatHomeworkDescription(description) {
-  if (!description) return '';
-  
-  description = description.replace(/\n/g, '<br>');
-  
-  return description;
 }
 
 function setupFilters(homeworkItems, groupedHomework) {

@@ -43,6 +43,7 @@
     "homework": "Homework",
     "absences": "Absences",
     "other": "Other",
+    "messages": "Messages",
     "profile": "Profile",
     "settings": "Settings",
     "logout": "Logout",
@@ -130,7 +131,8 @@
     "no_homework": "No homework to display.",
     "no_filtered_homework": "No homework matching the filter criteria.",
     "teacher": "Teacher",
-    "no_matching_homework": "No homework matching the filter criteria."
+    "no_matching_homework": "No homework matching the filter criteria.",
+    "items": "items"
   },
   "absences": {
     "title": "Absences",
@@ -146,7 +148,13 @@
     "subject": "Subject",
     "justification": "Justification",
     "hours": "hours",
-    "page_transform_error": "An error occurred while transforming the page"
+    "page_transform_error": "An error occurred while transforming the page",
+    "time_period": "Time period",
+    "all_periods": "All periods",
+    "current_month": "Current month",
+    "last_month": "Last month",
+    "current_semester": "Current semester",
+    "last_30_days": "Last 30 days"
   },
   "profile": {
     "title": "Profile",
@@ -315,5 +323,21 @@
   "app": {
     "title": "Firka - KRÉTA",
     "settings_title": "Firka - Settings"
+  },
+  "forgotpassword": {
+    "title": "Forgot Password",
+    "om_id_label": "OM ID",
+    "om_id_placeholder": "Enter your OM ID",
+    "om_id_required": "OM ID is required",
+    "email_label": "Email address",
+    "email_placeholder": "Enter your email address",
+    "email_required": "Email address is required",
+    "back_to_login": "Back to login",
+    "reset_button": "Reset password",
+    "error_message": "An error occurred during password reset",
+    "success_message": "Password reset link sent to your email address",
+    "invalid_data": "Invalid data",
+    "invalid_email": "Invalid email address format",
+    "recaptcha_required": "Please complete the reCAPTCHA"
   }
 }
