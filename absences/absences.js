@@ -116,39 +116,67 @@ async function transformAbsencesPage() {
           </div>
         </div>
 
+        <div class="stats-overview">
+          <div class="stat-card">
+            <div class="stat-number">${absences.length}</div>
+            <div class="stat-label">${LanguageManager.t('absences.total_absences')}</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">${absences.filter(a => a.justificationStatus === 'justified').length}</div>
+            <div class="stat-label">${LanguageManager.t('absences.justified')}</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">${absences.filter(a => a.justificationStatus === 'unjustified').length}</div>
+            <div class="stat-label">${LanguageManager.t('absences.unjustified')}</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">${absences.filter(a => a.justificationStatus === 'pending').length}</div>
+            <div class="stat-label">${LanguageManager.t('absences.pending')}</div>
+          </div>
+        </div>
+
         <div class="absences-container">
-          ${Object.entries(groupedAbsences).map(([date, dayAbsences]) => `
-            <div class="absence-group" data-date="${date}">
-              <div class="absence-date">
-                <span class="material-icons-round">event</span>
-                ${date}
-                <span class="absence-count">${dayAbsences.length} ${LanguageManager.t('absences.hours')}</span>
-              </div>
-              <div class="absence-list">
-                ${dayAbsences.map(absence => `
-                  <div class="absence-item" 
-                       data-subject="${absence.subject}"
-                       data-justified="${absence.justified}">
-                    <div class="absence-time">
-                      <span class="material-icons-round">schedule</span>
-                      ${absence.lesson}. ${LanguageManager.t('absences.lesson').toLowerCase()}
-                    </div>
-                    <div class="absence-details">
-                      <div class="absence-subject">${absence.subject}</div>
-                      <div class="absence-topic">${absence.topic}</div>
-                    </div>
-                    <div class="absence-status ${absence.justificationStatus}">
+          <table class="absences-table">
+            <thead class="table-header">
+              <tr>
+                <th>${LanguageManager.t('absences.date')}</th>
+                <th>${LanguageManager.t('absences.lesson')}</th>
+                <th>${LanguageManager.t('absences.subject')}</th>
+                <th>${LanguageManager.t('absences.topic')}</th>
+                <th>${LanguageManager.t('absences.status')}</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${absences.map(absence => `
+                <tr class="table-row" 
+                    data-subject="${absence.subject}"
+                    data-justified="${absence.justified}"
+                    data-date="${absence.date}">
+                  <td class="table-cell date-cell" data-label="${LanguageManager.t('absences.date')}">
+                    ${absence.date}
+                  </td>
+                  <td class="table-cell lesson-cell" data-label="${LanguageManager.t('absences.lesson')}">
+                    ${absence.lesson}.
+                  </td>
+                  <td class="table-cell subject-cell" data-label="${LanguageManager.t('absences.subject')}">
+                    ${absence.subject}
+                  </td>
+                  <td class="table-cell topic-cell" data-label="${LanguageManager.t('absences.topic')}" title="${absence.topic}">
+                    ${absence.topic}
+                  </td>
+                  <td class="table-cell status-cell" data-label="${LanguageManager.t('absences.status')}">
+                    <span class="status-badge ${absence.justificationStatus}">
                       ${absence.justificationStatus === 'justified' ? 
-                        `${LanguageManager.t('absences.justified')} <span class="material-icons-round">check_circle</span>` : 
+                        `<span class="material-icons-round">check_circle</span> ${LanguageManager.t('absences.justified')}` : 
                         absence.justificationStatus === 'unjustified' ?
-                        `${LanguageManager.t('absences.unjustified')} <span class="material-icons-round">cancel</span>` :
-                        `${LanguageManager.t('absences.pending')} <span class="material-icons-round">pending</span>`}
-                    </div>
-                  </div>
-                `).join('')}
-              </div>
-            </div>
-          `).join('')}
+                        `<span class="material-icons-round">cancel</span> ${LanguageManager.t('absences.unjustified')}` :
+                        `<span class="material-icons-round">pending</span> ${LanguageManager.t('absences.pending')}`}
+                    </span>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
         </div>
       </main>
     </div>
@@ -188,8 +216,8 @@ function setupFilters() {
         const justified = filters.justified.value;
         const selectedDate = dateFilterValue ? new Date(dateFilterValue) : null;
 
-        document.querySelectorAll('.absence-group').forEach(group => {
-          const dateStr = group.dataset.date;
+        document.querySelectorAll('.table-row').forEach(row => {
+          const dateStr = row.dataset.date;
           const dateParts = dateStr.split('.');
           
           if (dateParts.length < 3) {
@@ -206,37 +234,32 @@ function setupFilters() {
             return;
           }
           
-          const groupDate = new Date(parsedYear, parsedMonth, parsedDay);
+          const rowDate = new Date(parsedYear, parsedMonth, parsedDay);
           
-          let showGroup = true;
+          let showRow = true;
 
           if (selectedDate) {
-            if (groupDate.getFullYear() !== selectedDate.getFullYear() ||
-                groupDate.getMonth() !== selectedDate.getMonth() ||
-                groupDate.getDate() !== selectedDate.getDate()) {
-              showGroup = false;
+            if (rowDate.getFullYear() !== selectedDate.getFullYear() ||
+                rowDate.getMonth() !== selectedDate.getMonth() ||
+                rowDate.getDate() !== selectedDate.getDate()) {
+              showRow = false;
             }
           }
 
-          const absenceItems = group.querySelectorAll('.absence-item');
-          let visibleItems = 0;
+          if (subject && row.dataset.subject !== subject) {
+            showRow = false;
+          }
 
-          absenceItems.forEach(item => {
-            let showItem = true;
-            if (subject && item.dataset.subject !== subject) showItem = false;
-            
-            if (justified) {
-              const statusElement = item.querySelector('.absence-status');
-              const hasStatus = statusElement.classList.contains(justified);
-              if (!hasStatus) showItem = false;
-            }
+          if (justified) {
+            const statusElement = row.querySelector('.status-badge');
+            const hasStatus = statusElement.classList.contains(justified);
+            if (!hasStatus) showRow = false;
+          }
 
-            item.style.display = showItem ? '' : 'none';
-            if (showItem) visibleItems++;
-          });
-
-          group.style.display = (showGroup && visibleItems > 0) ? '' : 'none';
+          row.style.display = showRow ? '' : 'none';
         });
+
+        updateStatistics();
       } catch (err) {
         
         console.error('Error during filtering absences:', err);
@@ -267,6 +290,27 @@ function setupFilters() {
     } else {
       console.error('Error setting up filters:', err);
     }
+  }
+}
+
+function updateStatistics() {
+  try {
+    const visibleRows = document.querySelectorAll('.table-row:not([style*="display: none"])');
+    const totalVisible = visibleRows.length;
+    const justifiedVisible = Array.from(visibleRows).filter(row => 
+      row.querySelector('.status-badge.justified')).length;
+    const unjustifiedVisible = Array.from(visibleRows).filter(row => 
+      row.querySelector('.status-badge.unjustified')).length;
+    const pendingVisible = Array.from(visibleRows).filter(row => 
+      row.querySelector('.status-badge.pending')).length;
+
+    const statCards = document.querySelectorAll('.stat-card');
+    if (statCards[0]) statCards[0].querySelector('.stat-number').textContent = totalVisible;
+    if (statCards[1]) statCards[1].querySelector('.stat-number').textContent = justifiedVisible;
+    if (statCards[2]) statCards[2].querySelector('.stat-number').textContent = unjustifiedVisible;
+    if (statCards[3]) statCards[3].querySelector('.stat-number').textContent = pendingVisible;
+  } catch (err) {
+    console.error('Error updating statistics:', err);
   }
 }
 

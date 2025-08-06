@@ -155,7 +155,10 @@
     "current_month": "Current month",
     "last_month": "Last month",
     "current_semester": "Current semester",
-    "last_30_days": "Last 30 days"
+    "last_30_days": "Last 30 days",
+    "total_absences": "Total absences",
+    "topic": "Topic",
+    "status": "Status"
   },
   "profile": {
     "title": "Profile",

@@ -155,7 +155,10 @@
     "current_month": "Aktuális hónap",
     "last_month": "Előző hónap",
     "current_semester": "Aktuális félév",
-    "last_30_days": "Utolsó 30 nap"
+    "last_30_days": "Utolsó 30 nap",
+    "total_absences": "Összes hiányzás",
+    "topic": "Téma",
+    "status": "Állapot"
   },
   "profile": {
     "title": "Profil",

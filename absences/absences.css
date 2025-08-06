@@ -239,66 +239,200 @@ body {
 }
 
 
-.absences-container {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.absence-group {
-  background: var(--card-card);
-  border-radius: 24px;
-  overflow: hidden;
-  animation: fadeIn 0.3s ease;
-  box-shadow: 0px 1px var(--shadow-blur) 0px var(--accent-shadow);
-}
-
-.absence-date {
-  padding: 16px;
-  color: var(--text-primary);
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.absence-count {
-  margin-left: auto;
-  background: var(--accent-accent);
-  color: var(--button-secondaryFill);
-  padding: 4px 8px;
-  border-radius: 12px;
-  font-size: 14px;
-}
-
-.absence-list {
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.absence-item {
+.stats-overview {
   display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 16px;
-  padding: 12px;
-  background: var(--accent-15);
-  border-radius: 12px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  background: var(--card-card);
+  border-radius: 16px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0px 1px var(--shadow-blur) 0px var(--accent-shadow);
   transition: transform 0.2s ease;
 }
 
-.absence-item:hover {
-  transform: translateX(4px);
+.stat-card:hover {
+  transform: translateY(-2px);
 }
 
-.absence-time {
-  display: flex;
-  align-items: center;
-  gap: 4px;
+.stat-number {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--accent-accent);
+  margin-bottom: 8px;
+}
+
+.stat-label {
   color: var(--text-secondary);
   font-size: 14px;
+  font-weight: 500;
+}
+
+.absences-container {
+  background: var(--card-card);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0px 1px var(--shadow-blur) 0px var(--accent-shadow);
+}
+
+.absences-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table-header {
+  background: var(--accent-15);
+  border-bottom: 1px solid var(--accent-30);
+}
+
+.table-header th {
+  padding: 16px;
+  text-align: left;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.table-row {
+  border-bottom: 1px solid var(--accent-15);
+  transition: background-color 0.2s ease;
+}
+
+.table-row:hover {
+  background: var(--accent-10);
+}
+
+.table-row:last-child {
+  border-bottom: none;
+}
+
+.table-cell {
+  padding: 16px;
+  color: var(--text-primary);
+  vertical-align: middle;
+}
+
+.date-cell {
+  font-weight: 600;
+  color: var(--accent-accent);
+}
+
+.lesson-cell {
+  text-align: center;
+  font-weight: 500;
+}
+
+.subject-cell {
+  font-weight: 600;
+}
+
+.topic-cell {
+  color: var(--text-secondary);
+  font-size: 14px;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.status-cell {
+  text-align: center;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-badge.justified {
+  background: var(--grades-4-bg);
+  color: var(--grades-4);
+}
+
+.status-badge.unjustified {
+  background: var(--grades-1-bg);
+  color: var(--grades-1);
+}
+
+.status-badge.pending {
+  background: var(--grades-3-bg);
+  color: var(--grades-3);
+}
+
+@media (max-width: 768px) {
+  .absences-table {
+    font-size: 14px;
+  }
+  
+  .table-header th,
+  .table-cell {
+    padding: 12px 8px;
+  }
+  
+  .topic-cell {
+    max-width: 120px;
+  }
+  
+  .stats-overview {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .absences-table,
+  .table-header,
+  .table-row {
+    display: block;
+  }
+  
+  .table-header {
+    display: none;
+  }
+  
+  .table-row {
+    margin-bottom: 16px;
+    border: 1px solid var(--accent-15);
+    border-radius: 12px;
+    padding: 16px;
+    background: var(--card-card);
+  }
+  
+  .table-cell {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--accent-15);
+  }
+  
+  .table-cell:last-child {
+    border-bottom: none;
+  }
+  
+  .table-cell::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-size: 12px;
+    text-transform: uppercase;
+  }
+  
+  .stats-overview {
+    grid-template-columns: 1fr;
+  }
 }
 
 .absence-details {
