@@ -34,7 +34,7 @@
   "content_scripts": [
     {
       "matches": ["https://*.e-kreta.hu/*"],
-      "js": ["tools/loadingScreen.js, tools/cookieManager.js", "tools/helper.js", "tools/createTemplate.js",
+      "js": ["tools/loadingScreen.js", "tools/cookieManager.js", "tools/helper.js", "tools/createTemplate.js",
               "global/language.js", "global/maintenance.js", "global/theme.js", "global/navigation.js"],
       "css": ["tools/loadingScreen.css", "global/theme.css", "global/navigation.css", "global/maintenance.css"],
       "run_at": "document_start"
@@ -65,12 +65,6 @@
       "matches": ["https://*.e-kreta.hu/Adminisztracio/BelepesKezelo*"],
       "js": ["roleselect/roleselect.js"],
       "css": ["roleselect/roleselect.css"],
-      "run_at": "document_end"
-    },
-    {
-      "matches": ["https://*.e-kreta.hu/Adminisztracio/ElfelejtettJelszo*"],
-      "js": ["forgotpassword/forgotpassword.js"],
-      "css": ["forgotpassword/forgotpassword.css"],
       "run_at": "document_end"
     },
     {

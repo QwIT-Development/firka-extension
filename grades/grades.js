@@ -358,9 +358,6 @@
                 <div class="year-end-grades card">
                     <div class="grades-summary-header">
                         <h3>${LanguageManager.t('grades.year_end_evaluations')}</h3>
-                        <button class="view-details-btn" onclick="showGradesModal('yearEnd')">
-                            ${LanguageManager.t('grades.view_details')}
-                        </button>
                     </div>
                     <div class="year-end-grades-list">
                         ${yearEndGrades.map(grade => `
