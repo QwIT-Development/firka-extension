@@ -33,20 +33,11 @@
   }],
   "content_scripts": [
     {
-      "matches": [
-        "https://*.e-kreta.hu/*"
-      ],
-      "js": ["tools/cookieManager.js", "tools/helper.js", "tools/loadingScreen.js", "tools/createTemplate.js",
+      "matches": ["https://*.e-kreta.hu/*"],
+      "js": ["tools/loadingScreen.js, tools/cookieManager.js", "tools/helper.js", "tools/createTemplate.js",
               "global/language.js", "global/maintenance.js", "global/theme.js", "global/navigation.js"],
-      "css": ["tools/loadingScreen.css", "global/theme.css", "global/navigation.css"],
+      "css": ["tools/loadingScreen.css", "global/theme.css", "global/navigation.css", "global/maintenance.css"],
       "run_at": "document_start"
-    },
-    {
-      "matches": [
-        "https://*.e-kreta.hu/*"
-      ],
-      "css": ["global/maintenance.css"],
-      "run_at": "document_end"
     },
     {
       "matches": ["https://idp.e-kreta.hu/Account/Login*"],
@@ -59,48 +50,37 @@
       "css": ["login/twofactor.css"]
     },
     {
-      "matches": [
-        "https://*.e-kreta.hu/Hianyzas/Hianyzasok*"
-      ],
+      "matches": ["https://*.e-kreta.hu/Hianyzas/Hianyzasok*"],
       "js": ["absences/absences.js"],
       "css": ["absences/absences.css"],
       "run_at": "document_end"
     },
     {
-      "matches": [
-        "https://idp.e-kreta.hu/Account/Logout*"
-      ],
+      "matches": ["https://idp.e-kreta.hu/Account/Logout*"],
       "js": ["logout/logout.js"],
       "css": ["logout/logout.css"],
       "run_at": "document_end"
     },
     {
-      "matches": [
-        "https://*.e-kreta.hu/Adminisztracio/BelepesKezelo*"
-      ],
+      "matches": ["https://*.e-kreta.hu/Adminisztracio/BelepesKezelo*"],
       "js": ["roleselect/roleselect.js"],
       "css": ["roleselect/roleselect.css"],
       "run_at": "document_end"
     },
     {
-      "matches": [
-        "https://*.e-kreta.hu/Adminisztracio/ElfelejtettJelszo*"
-      ],
+      "matches": ["https://*.e-kreta.hu/Adminisztracio/ElfelejtettJelszo*"],
       "js": ["forgotpassword/forgotpassword.js"],
       "css": ["forgotpassword/forgotpassword.css"],
       "run_at": "document_end"
     },
     {
-      "matches": [
-        "https://*.e-kreta.hu/Intezmeny/Faliujsag*"
-      ],
+      "matches": ["https://*.e-kreta.hu/Intezmeny/Faliujsag*"],
       "js": ["dashboard/dashboard.js"],
       "css": ["dashboard/dashboard.css"],
       "run_at": "document_end"
     },
     {
-      "matches": [
-        "https://*.e-kreta.hu/TanuloErtekeles/Osztalyzatok*"
+      "matches": [ "https://*.e-kreta.hu/TanuloErtekeles/Osztalyzatok*"
       ],
       "js": ["grades/grades.js", "grades/chart.js"],
       "css": ["grades/grades.css"],

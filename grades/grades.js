@@ -8,6 +8,8 @@
             const studentAverage = calculateOverallAverage(gradesData.subjects);
             const classAverage = calculateOverallClassAverage(gradesData.subjects);
 
+            window.currentGradesData = gradesData;
+
             document.body.innerHTML = generatePageHTML(gradesData, studentAverage, classAverage);
 
             createTemplate.importFonts();
@@ -80,8 +82,8 @@
                 const grades = [];
                 const monthFields = [
                     'Szeptember', 'Oktober', 'November', 'December', 
-                    'JanuarI', 'JanuarII', 'Februar', 'Marcius', 
-                    'Aprilis', 'Majus', 'Junius', 'Julius', 'Augusztus'
+                    'JanuarI', 'I', 'JanuarII', 'Februar', 'Marcius', 
+                    'Aprilis', 'Majus', 'Junius', 'Julius', 'Augusztus', 'II'
                 ];
 
                 monthFields.forEach(month => {
@@ -352,22 +354,14 @@
                   `).join('')}
               </div>
             </div>
-            ${semesterGrades.length > 0 ? `
-                <div class="semester-grades card">
-                    <h3>${LanguageManager.t('grades.semester_evaluations')}</h3>
-                    <div class="semester-grades-list">
-                        ${semesterGrades.map(grade => `
-                            <div class="semester-grade-item grade-${grade.value}">
-                                <div class="semester-grade-value">${grade.value}</div>
-                                <div class="semester-grade-subject">${grade.subject}</div>
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>
-            ` : ''}
             ${yearEndGrades.length > 0 ? `
                 <div class="year-end-grades card">
-                    <h3>Évvégi értékelések</h3>
+                    <div class="grades-summary-header">
+                        <h3>${LanguageManager.t('grades.year_end_evaluations')}</h3>
+                        <button class="view-details-btn" onclick="showGradesModal('yearEnd')">
+                            ${LanguageManager.t('grades.view_details')}
+                        </button>
+                    </div>
                     <div class="year-end-grades-list">
                         ${yearEndGrades.map(grade => `
                             <div class="year-end-grade-item grade-${grade.value}">
@@ -634,7 +628,7 @@
             checkScrollable();
         });
     }
-
+    
     if (window.location.href.includes('/TanuloErtekeles/Osztalyzatok')) {
         transformGradesPage();
     }
