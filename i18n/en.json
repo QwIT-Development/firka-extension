@@ -115,7 +115,8 @@
     "wednesday": "Wednesday",
     "thursday": "Thursday",
     "friday": "Friday",
-    "found_current_week": "Found current week"
+    "found_current_week": "Found current week",
+    "open_homework": "Open homework"
   },
   "homework": {
     "title": "Homework",
@@ -133,7 +134,15 @@
     "no_filtered_homework": "No homework matching the filter criteria.",
     "teacher": "Teacher",
     "no_matching_homework": "No homework matching the filter criteria.",
-    "items": "items"
+    "items": "items",
+    "status": "Status",
+    "total_homework": "Total homework",
+    "urgent_homework": "Urgent homework",
+    "completed_homework": "Completed homework",
+    "pending_homework": "Pending homework",
+    "completed": "Completed",
+    "urgent": "Urgent",
+    "pending": "Pending"
   },
   "absences": {
     "title": "Absences",

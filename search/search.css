@@ -1,222 +1,195 @@
 /* Hide original elements */
-header, footer, .page-title, .card-kreta {
-  display: none !important;
+header,footer,.page-title,.card-kreta {
+  display:none !important;
 }
-
 * {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
 }
-
 body {
-  margin: 0;
-  padding: 0;
-  color: var(--text-primary);
-  background-color: var(--background) !important;
-  font-family: "Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
-  min-height: 100vh;
-  font-size: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  margin:0;
+  padding:0;
+  color:var(--text-primary);
+  background-color:var(--background) !important;
+  font-family:"Montserrat",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif !important;
+  min-height:100vh;
+  font-size:16px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
 }
-
 /* Firka search page styling */
 .firka-search-wrapper {
-  width: 90%;
-  max-width: 500px;
-  padding: 0;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  width:90%;
+  max-width:500px;
+  padding:0;
+  margin:0 auto;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
 }
-
 /* Firka header styling */
 .firka-header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  margin: 0;
-  background: var(--card-card) !important;
-  padding: 24px;
-  border-radius: 24px 24px 0 0;
-  width: 100%;
-  box-shadow: 0px 1px var(--shadow-blur) 0px var(--accent-shadow);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:8px;
+  margin:0;
+  background:var(--card-card) !important;
+  padding:24px;
+  border-radius:24px 24px 0 0;
+  width:100%;
+  box-shadow:0px 1px var(--shadow-blur) 0px var(--accent-shadow);
 }
-
 .logo-text {
-  color: var(--text-primary);
-  text-align: center;
-  font-family: Montserrat;
-  font-size: 20px;
-  font-style: normal;
-  font-weight: 700;
-  line-height: normal;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  color:var(--text-primary);
+  text-align:center;
+  font-family:Montserrat;
+  font-size:20px;
+  font-style:normal;
+  font-weight:700;
+  line-height:normal;
+  display:flex;
+  align-items:center;
+  gap:8px;
 }
-
 .logo {
-  width: 32px;
-  height: 32px;
+  width:32px;
+  height:32px;
 }
-
 .search-title {
-  color: var(--text-primary);
-  text-align: center;
-  font-family: Montserrat;
-  font-size: 24px;
-  font-style: normal;
-  font-weight: 600;
-  line-height: normal;
-  margin: 8px 0;
+  color:var(--text-primary);
+  text-align:center;
+  font-family:Montserrat;
+  font-size:24px;
+  font-style:normal;
+  font-weight:600;
+  line-height:normal;
+  margin:8px 0;
 }
-
 /* Form container styling */
 .firka-form-container {
-  background: var(--card-card);
-  padding: 0 24px 24px 24px;
-  border-radius: 0 0 24px 24px;
-  width: 100%;
-  box-shadow: 0px 1px var(--shadow-blur) 0px var(--accent-shadow);
+  background:var(--card-card);
+  padding:0 24px 24px 24px;
+  border-radius:0 0 24px 24px;
+  width:100%;
+  box-shadow:0px 1px var(--shadow-blur) 0px var(--accent-shadow);
 }
-
 /* Form styling */
 form {
-  width: 100%;
+  width:100%;
 }
-
 .form-control {
-  background-color: var(--button-secondaryFill) !important;
-  border: 1px solid var(--accent-15) !important;
-  border-radius: 12px !important;
-  color: var(--text-primary) !important;
-  padding: 12px 16px !important;
-  font-family: Montserrat !important;
-  font-size: 16px !important;
-  font-weight: 400 !important;
-  height: auto !important;
-  transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  background-color:var(--button-secondaryFill) !important;
+  border:1px solid var(--accent-15) !important;
+  border-radius:12px !important;
+  color:var(--text-primary) !important;
+  padding:12px 16px !important;
+  font-family:Montserrat !important;
+  font-size:16px !important;
+  font-weight:400 !important;
+  height:auto !important;
+  transition:border-color 0.2s ease-in-out,box-shadow 0.2s ease-in-out;
 }
-
 .form-control:focus {
-  border-color: var(--accent-accent) !important;
-  box-shadow: 0 0 0 2px var(--accent-15) !important;
-  outline: none !important;
+  border-color:var(--accent-accent) !important;
+  box-shadow:0 0 0 2px var(--accent-15) !important;
+  outline:none !important;
 }
-
 .form-control::placeholder {
-  color: var(--text-teritary) !important;
+  color:var(--text-teritary) !important;
 }
-
 /* Autocomplete dropdown styling */
 .dropdown-menu {
-  background-color: var(--card-card) !important;
-  border: 1px solid var(--accent-15) !important;
-  border-radius: 12px !important;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
-  padding: 8px !important;
-  max-height: 300px !important;
-  overflow-y: auto !important;
-  width: 100% !important;
+  background-color:var(--card-card) !important;
+  border:1px solid var(--accent-15) !important;
+  border-radius:12px !important;
+  box-shadow:0 4px 8px rgba(0,0,0,0.1) !important;
+  padding:8px !important;
+  max-height:300px !important;
+  overflow-y:auto !important;
+  width:100% !important;
 }
-
 .dropdown-item {
-  color: var(--text-primary) !important;
-  padding: 10px 16px !important;
-  border-radius: 8px !important;
-  margin-bottom: 4px !important;
-  font-family: Montserrat !important;
-  font-size: 14px !important;
-  transition: background-color 0.2s ease-in-out !important;
+  color:var(--text-primary) !important;
+  padding:10px 16px !important;
+  border-radius:8px !important;
+  margin-bottom:4px !important;
+  font-family:Montserrat !important;
+  font-size:14px !important;
+  transition:background-color 0.2s ease-in-out !important;
 }
-
-li.dropdown-item:hover, li.dropdown-item:focus {
-  background-color: var(--accent-15) !important;
-  color: var(--text-primary) !important;
+li.dropdown-item:hover,li.dropdown-item:focus {
+  background-color:var(--accent-15) !important;
+  color:var(--text-primary) !important;
 }
-
-a.dropdown-item:hover, a.dropdown-item:focus {
-  background-color: #00000000 !important;
+a.dropdown-item:hover,a.dropdown-item:focus {
+  background-color:#00000000 !important;
 }
-
 .dropdown-item.active {
-  background-color: var(--accent-accent) !important;
-  color: white !important;
+  background-color:var(--accent-accent) !important;
+  color:white !important;
 }
-
 /* Button styling */
 .btn-kreta {
-  background-color: var(--accent-accent) !important;
-  color: white !important;
-  border: none !important;
-  border-radius: 12px !important;
-  padding: 12px 24px !important;
-  font-family: Montserrat !important;
-  font-size: 16px !important;
-  font-weight: 600 !important;
-  cursor: pointer !important;
-  transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
+  background-color:var(--accent-accent) !important;
+  color:white !important;
+  border:none !important;
+  border-radius:12px !important;
+  padding:12px 24px !important;
+  font-family:Montserrat !important;
+  font-size:16px !important;
+  font-weight:600 !important;
+  cursor:pointer !important;
+  transition:background-color 0.2s ease-in-out,transform 0.1s ease-in-out !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
 }
-
 .btn-kreta:hover {
-  background-color: var(--accent-secondary) !important;
-  transform: translateY(-1px) !important;
+  background-color:var(--accent-secondary) !important;
+  transform:translateY(-1px) !important;
 }
-
 .btn-kreta:active {
-  transform: translateY(1px) !important;
+  transform:translateY(1px) !important;
 }
-
 .btn-kreta:disabled {
-  background-color: var(--text-teritary) !important;
-  cursor: not-allowed !important;
-  transform: none !important;
+  background-color:var(--text-teritary) !important;
+  cursor:not-allowed !important;
+  transform:none !important;
 }
-
 /* Footer styling */
 .firka-footer {
-  margin-top: 16px;
-  text-align: center;
-  width: 100%;
+  margin-top:16px;
+  text-align:center;
+  width:100%;
 }
-
 .privacy-link {
-  color: var(--text-secondary);
-  font-family: Montserrat;
-  font-size: 14px;
-  text-decoration: none;
-  transition: color 0.2s ease-in-out;
+  color:var(--text-secondary);
+  font-family:Montserrat;
+  font-size:14px;
+  text-decoration:none;
+  transition:color 0.2s ease-in-out;
 }
-
 .privacy-link:hover {
-  color: var(--accent-accent);
-  text-decoration: underline;
+  color:var(--accent-accent);
+  text-decoration:underline;
 }
-
 /* Responsive adjustments */
-@media (max-width: 576px) {
+@media (max-width:576px) {
   .firka-search-wrapper {
-    width: 95%;
-  }
-  
-  .search-title {
-    font-size: 20px;
-  }
-  
-  .btn-kreta {
-    padding: 10px 20px !important;
-    font-size: 14px !important;
-  }
+  width:95%;
+}
+.search-title {
+  font-size:20px;
+}
+.btn-kreta {
+  padding:10px 20px !important;
+  font-size:14px !important;
+}
 }

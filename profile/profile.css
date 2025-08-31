@@ -1,437 +1,362 @@
 * {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
 }
-
 body {
-  margin: 0;
-  padding: 0;
-  color: var(--text-primary);
-  background-color: var(--background) !important;
-  font-family: "Montserrat", serif !important;
-  min-height: 100vh;
-  font-size: 16px;
+  margin:0;
+  padding:0;
+  color:var(--text-primary);
+  background-color:var(--background) !important;
+  font-family:"Montserrat",serif !important;
+  min-height:100vh;
+  font-size:16px;
 }
-
 .kreta-container {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
 }
-
-
 .kreta-header {
-  padding: clamp(1rem, 3vw, 2rem);
-  display: grid;
-  grid-template-columns: minmax(300px, 400px) 1fr minmax(200px, 300px);
-  align-items: center;
-  gap: 1rem;
+  padding:clamp(1rem,3vw,2rem);
+  display:grid;
+  grid-template-columns:minmax(300px,400px) 1fr minmax(200px,300px);
+  align-items:center;
+  gap:1rem;
 }
-
 .school-info {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+  display:flex;
+  flex-direction:column;
+  gap:0.5rem;
 }
-
 .logo-text {
-  color: var(--text-primary);
-  font-size: 24px;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  margin: 0;
+  color:var(--text-primary);
+  font-size:24px;
+  font-weight:600;
+  display:flex;
+  align-items:center;
+  margin:0;
 }
-
 .logo {
-  width: 24px;
-  border-radius: 8px;
-  margin-right: 8px;
+  width:24px;
+  border-radius:8px;
+  margin-right:8px;
 }
-
 .school-details {
-  color: var(--text-secondary);
-  font-size: 14px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 300px;
+  color:var(--text-secondary);
+  font-size:14px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  max-width:300px;
 }
-
 .user-profile {
-  position: relative;
-  justify-self: flex-end;
+  position:relative;
+  justify-self:flex-end;
 }
-
 .user-dropdown-btn {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0.5rem;
-  border-radius: 8px;
-  transition: background-color 0.2s;
+  display:flex;
+  align-items:center;
+  gap:1rem;
+  background:none;
+  border:none;
+  cursor:pointer;
+  padding:0.5rem;
+  border-radius:8px;
+  transition:background-color 0.2s;
 }
-
 .user-dropdown-btn:hover {
-  background: var(--card-card);
+  background:var(--card-card);
 }
-
 .user-info {
-  text-align: right;
+  text-align:right;
 }
-
 .user-dropdown {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  margin-top: 0.5rem;
-  background: var(--card-card);
-  border-radius: 12px;
-  box-shadow: 0px 1px var(--shadow-blur) 0px var(--accent-shadow);
-  width: 200px;
-  display: none;
-  z-index: 1000;
+  position:absolute;
+  top:100%;
+  right:0;
+  margin-top:0.5rem;
+  background:var(--card-card);
+  border-radius:12px;
+  box-shadow:0px 1px var(--shadow-blur) 0px var(--accent-shadow);
+  width:200px;
+  display:none;
+  z-index:1000;
 }
-
 .user-dropdown.show {
-  display: block;
-  animation: dropdownShow 0.2s ease;
+  display:block;
+  animation:dropdownShow 0.2s ease;
 }
-
 .dropdown-item {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem 1rem;
-  color: var(--text-primary);
-  text-decoration: none;
-  transition: background-color 0.2s;
+  display:flex;
+  align-items:center;
+  gap:0.75rem;
+  padding:0.75rem 1rem;
+  color:var(--text-primary);
+  text-decoration:none;
+  transition:background-color 0.2s;
 }
-
 .dropdown-item:hover {
-  background: var(--button-secondaryFill);
+  background:var(--button-secondaryFill);
 }
-
-
 .kreta-main {
-  flex: 1;
-  padding: clamp(1rem, 3vw, 2rem);
-  max-width: 800px;
-  margin: 0 auto;
-  width: 100%;
+  flex:1;
+  padding:clamp(1rem,3vw,2rem);
+  max-width:800px;
+  margin:0 auto;
+  width:100%;
 }
-
 .card {
-  background: var(--card-card);
-  border-radius: 24px;
-  overflow: hidden;
-  box-shadow: 0px 1px var(--shadow-blur) 0px var(--accent-shadow);
+  background:var(--card-card);
+  border-radius:24px;
+  overflow:hidden;
+  box-shadow:0px 1px var(--shadow-blur) 0px var(--accent-shadow);
 }
-
 .card h2 {
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--text-primary);
-  padding: 1.5rem;
-  padding-bottom: 0.5rem;
-  background-color: var(--card-card);
+  font-size:18px;
+  font-weight:600;
+  color:var(--text-primary);
+  padding:1.5rem;
+  padding-bottom:0.5rem;
+  background-color:var(--card-card);
 }
-
-
 .profile-tabs {
-  padding: 1.5rem;
+  padding:1.5rem;
 }
-
 .tab-headers {
-  display: flex;
-  gap: 0.5rem;
-  margin-bottom: 1.5rem;
-  border-bottom: 1px solid var(--card-translucent);
-  overflow-x: auto;
-  scrollbar-width: none;
+  display:flex;
+  gap:0.5rem;
+  margin-bottom:1.5rem;
+  border-bottom:1px solid var(--card-translucent);
+  overflow-x:auto;
+  scrollbar-width:none;
 }
-
 .tab-headers::-webkit-scrollbar {
-  display: none;
+  display:none;
 }
-
 .tab-header {
-  padding: 0.75rem 1rem;
-  background: none;
-  border: none;
-  color: var(--text-secondary);
-  font-weight: 500;
-  cursor: pointer;
-  white-space: nowrap;
-  border-bottom: 2px solid transparent;
-  font-size: 14px;
+  padding:0.75rem 1rem;
+  background:none;
+  border:none;
+  color:var(--text-secondary);
+  font-weight:500;
+  cursor:pointer;
+  white-space:nowrap;
+  border-bottom:2px solid transparent;
+  font-size:14px;
 }
-
 .tab-header.active {
-  color: var(--accent-accent);
-  border-bottom-color: var(--accent-accent);
+  color:var(--accent-accent);
+  border-bottom-color:var(--accent-accent);
 }
-
 .tab-content {
-  display: none;
-  background: var(--button-secondaryFill);
-  border-radius: 8px;
-  padding: 1.5rem;
+  display:none;
+  background:var(--button-secondaryFill);
+  border-radius:8px;
+  padding:1.5rem;
 }
-
 .tab-content.active {
-  display: block;
+  display:block;
 }
-
-
 .form-group {
-  margin-bottom: 1rem;
+  margin-bottom:1rem;
 }
-
 .form-label {
-  display: block;
-  color: var(--text-secondary);
-  font-size: 14px;
-  margin-bottom: 0.5rem;
+  display:block;
+  color:var(--text-secondary);
+  font-size:14px;
+  margin-bottom:0.5rem;
 }
-
 .form-control {
-  width: 100%;
-  padding: 0.75rem;
-  border: 1px solid var(--accent-15);
-  border-radius: 8px;
-  background: var(--accent-15);
-  color: var(--text-primary);
-  font-size: 14px;
+  width:100%;
+  padding:0.75rem;
+  border:1px solid var(--accent-15);
+  border-radius:8px;
+  background:var(--accent-15);
+  color:var(--text-primary);
+  font-size:14px;
 }
-
 .form-control:focus {
-  outline: none;
-  border-color: var(--accent-accent);
+  outline:none;
+  border-color:var(--accent-accent);
 }
-
 .form-text {
-  font-size: 12px;
-  color: var(--text-secondary);
-  margin-top: 0.25rem;
+  font-size:12px;
+  color:var(--text-secondary);
+  margin-top:0.25rem;
 }
-
-
 .security-content {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+  display:flex;
+  flex-direction:column;
+  gap:1.5rem;
 }
-
 .step-card {
-  background: var(--button-secondaryFill);
-  border-radius: 12px;
-  padding: 1.5rem;
-  animation: fadeIn 0.3s ease;
+  background:var(--button-secondaryFill);
+  border-radius:12px;
+  padding:1.5rem;
+  animation:fadeIn 0.3s ease;
 }
-
 .step-card h3 {
-  color: var(--text-primary);
-  font-size: 16px;
-  font-weight: 600;
-  margin-bottom: 1rem;
+  color:var(--text-primary);
+  font-size:16px;
+  font-weight:600;
+  margin-bottom:1rem;
 }
-
 .step-card p {
-  color: var(--text-secondary);
-  font-size: 14px;
-  margin-bottom: 1rem;
-  line-height: 1.5;
+  color:var(--text-secondary);
+  font-size:14px;
+  margin-bottom:1rem;
+  line-height:1.5;
 }
-
 .app-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
-  margin-top: 1rem;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:1.5rem;
+  margin-top:1rem;
 }
-
 .app-section h4 {
-  color: var(--text-primary);
-  font-size: 14px;
-  font-weight: 600;
-  margin-bottom: 0.75rem;
+  color:var(--text-primary);
+  font-size:14px;
+  font-weight:600;
+  margin-bottom:0.75rem;
 }
-
 .app-links {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+  display:flex;
+  flex-direction:column;
+  gap:0.5rem;
 }
-
 .app-link {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem;
-  background: var(--card-card);
-  border-radius: 8px;
-  color: var(--text-primary);
-  text-decoration: none;
-  font-size: 14px;
-  transition: background-color 0.2s;
+  display:flex;
+  align-items:center;
+  gap:0.5rem;
+  padding:0.75rem;
+  background:var(--card-card);
+  border-radius:8px;
+  color:var(--text-primary);
+  text-decoration:none;
+  font-size:14px;
+  transition:background-color 0.2s;
 }
-
 .app-link:hover {
-  background: var(--button-secondaryFill);
+  background:var(--button-secondaryFill);
 }
-
 .qr-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-  margin: 1.5rem 0;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:1rem;
+  margin:1.5rem 0;
 }
-
 .qr-container img {
-  background: white;
-  padding: 1rem;
-  border-radius: 8px;
-  max-width: 200px;
+  background:white;
+  padding:1rem;
+  border-radius:8px;
+  max-width:200px;
 }
-
 .setup-key {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  width: 100%;
+  display:flex;
+  flex-direction:column;
+  gap:0.5rem;
+  width:100%;
 }
-
 .key-display {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: var(--card-card);
-  padding: 0.75rem;
-  border-radius: 8px;
+  display:flex;
+  align-items:center;
+  gap:0.5rem;
+  background:var(--card-card);
+  padding:0.75rem;
+  border-radius:8px;
 }
-
 .key-display code {
-  font-family: monospace;
-  color: var(--text-primary);
-  font-size: 14px;
-  flex-grow: 1;
-  text-align: center;
+  font-family:monospace;
+  color:var(--text-primary);
+  font-size:14px;
+  flex-grow:1;
+  text-align:center;
 }
-
 .btn-copy {
-  background: none;
-  border: none;
-  color: var(--text-secondary);
-  cursor: pointer;
-  padding: 0.25rem;
-  border-radius: 4px;
-  transition: all 0.2s;
+  background:none;
+  border:none;
+  color:var(--text-secondary);
+  cursor:pointer;
+  padding:0.25rem;
+  border-radius:4px;
+  transition:all 0.2s;
 }
-
 .btn-copy:hover {
-  color: var(--text-primary);
-  background: var(--button-secondaryFill);
+  color:var(--text-primary);
+  background:var(--button-secondaryFill);
 }
-
-
 .btn-save {
-  padding: 0.75rem 1.5rem;
-  background: var(--accent-accent);
-  color: var(--button-secondaryFill);
-  border: none;
-  border-radius: 8px;
-  font-weight: 500;
-  cursor: pointer;
-  font-size: 14px;
-  transition: background-color 0.2s;
+  padding:0.75rem 1.5rem;
+  background:var(--accent-accent);
+  color:var(--button-secondaryFill);
+  border:none;
+  border-radius:8px;
+  font-weight:500;
+  cursor:pointer;
+  font-size:14px;
+  transition:background-color 0.2s;
 }
-
 .btn-save:hover {
-  background: var(--accent-secondary);
+  background:var(--accent-secondary);
 }
-
-
 @keyframes fadeIn {
   from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  opacity:0;
+  transform:translateY(-10px);
 }
-
-@keyframes dropdownShow {
+to {
+  opacity:1;
+  transform:translateY(0);
+}
+}@keyframes dropdownShow {
   from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  opacity:0;
+  transform:translateY(-10px);
 }
-
-
-@media (max-width: 768px) {
+to {
+  opacity:1;
+  transform:translateY(0);
+}
+}@media (max-width:768px) {
   .kreta-header {
-    grid-template-columns: 1fr auto auto;
-    grid-template-areas: 
-      "school toggle user"
+  grid-template-columns:1fr auto auto;
+  grid-template-areas:"school toggle user"
       "nav nav nav";
-    padding: 1rem;
-    gap: 0.5rem;
-  }
-
-  .school-info {
-    grid-area: school;
-  }
-
-  .user-profile {
-    grid-area: user;
-  }
-
-  .app-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .profile-tabs {
-    padding: 1rem;
-  }
-
-  .tab-content {
-    padding: 1rem;
-  }
+  padding:1rem;
+  gap:0.5rem;
 }
-
-
-.material-icons-round {
-  font-size: 20px;
-  vertical-align: middle;
+.school-info {
+  grid-area:school;
 }
-
-
+.user-profile {
+  grid-area:user;
+}
+.app-grid {
+  grid-template-columns:1fr;
+}
+.profile-tabs {
+  padding:1rem;
+}
+.tab-content {
+  padding:1rem;
+}
+}.material-icons-round {
+  font-size:20px;
+  vertical-align:middle;
+}
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width:8px;
+  height:8px;
 }
-
 ::-webkit-scrollbar-track {
-  background: var(--background);
+  background:var(--background);
 }
-
 ::-webkit-scrollbar-thumb {
-  background: var(--text-secondary);
-  border-radius: 4px;
+  background:var(--text-secondary);
+  border-radius:4px;
 }
-
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--text-primary);
+  background:var(--text-primary);
 }

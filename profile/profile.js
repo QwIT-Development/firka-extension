@@ -1,6 +1,6 @@
-(() => {  
-    function createSecurityTab() {
-      return `
+(() => {
+  function createSecurityTab() {
+    return `
         <div class="security-content">
           <div class="setup-steps">
             <div class="step-card">
@@ -95,10 +95,10 @@
           </div>
         </div>
       `;
-    }
-  
+  }
+
   function createContactTab() {
-      return `
+    return `
         <div class="contact-form">
           <div class="form-group">
             <label class="form-label" for="email">E-mail cím</label>
@@ -115,10 +115,10 @@
           </div>
         </div>
       `;
-    }
-  
-    function createPasswordTab() {
-      return `
+  }
+
+  function createPasswordTab() {
+    return `
         <div class="password-form">
           <div class="form-group">
             <label class="form-label" for="currentPassword">Jelenlegi jelszó</label>
@@ -138,10 +138,10 @@
           </div>
         </div>
       `;
-    }
-  
-    function createSettingsTab() {
-      return `
+  }
+
+  function createSettingsTab() {
+    return `
         <div class="settings-form">
           <div class="form-group">
             <label class="form-label">
@@ -155,194 +155,215 @@
           </div>
         </div>
       `;
-    }
-  
-    function setupContactForm() {
-      const form = document.querySelector('.contact-form');
-      if (!form) return;
-  
-      const emailInput = form.querySelector('#email');
-      const phoneInput = form.querySelector('#phone');
-      const saveButton = form.querySelector('#saveContacts');
-  
-      
-      emailInput.value = cookieManager.get('userEmail') || '';
-      phoneInput.value = cookieManager.get('userPhone') || '';
-  
-      saveButton?.addEventListener('click', async () => {
-        const email = emailInput.value.trim();
-        const phone = phoneInput.value.trim();
-  
-        if (!email) {
-          alert(LanguageManager.t('profile.email_required'));
-          return;
-        }
-  
-        if (email && !isValidEmail(email)) {
-          alert(LanguageManager.t('profile.invalid_email'));
-          return;
-        }
-  
-        if (phone && !isValidPhone(phone)) {
-          alert(LanguageManager.t('profile.invalid_phone'));
-          return;
-        }
-  
-        try {
-          const response = await fetch('/Adminisztracio/Profil/SaveElerhetosegek', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
-            },
-            body: JSON.stringify({ email, phone })
-          });
-  
-          if (response.ok) {
-            alert(LanguageManager.t('profile.contacts_saved'));
-          } else {
-            throw new Error(LanguageManager.t('profile.contacts_save_error'));
-          }
-        } catch (error) {
-          console.error('Error saving contacts:', error);
-          alert(LanguageManager.t('profile.save_error'));
-        }
-      });
-    }
-  
-    function isValidEmail(email) {
-      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-    }
-  
-    function isValidPhone(phone) {
-      return /^\+?[0-9\s-]{9,}$/.test(phone);
-    }
-  
-    function setupEventListeners() {
-      
-      document.querySelectorAll('.tab-header').forEach(header => {
-        header.addEventListener('click', () => {
-          document.querySelectorAll('.tab-header').forEach(h => h.classList.remove('active'));
-          document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-          
-          header.classList.add('active');
-          const targetId = header.dataset.tab;
-          document.getElementById(`${targetId}-content`).classList.add('active');
-        });
-      });
-  
-      
-      const userBtn = document.querySelector('.user-dropdown-btn');
-      const userDropdown = document.querySelector('.user-dropdown');
-      
-      userBtn?.addEventListener('click', (e) => {
-        e.stopPropagation();
-        userDropdown?.classList.toggle('show');
-      });
-  
-      document.addEventListener('click', () => {
-        userDropdown?.classList.remove('show');
-      });
-  
-      
-      document.getElementById('saveSettings')?.addEventListener('click', async () => {
-        const hideTips = document.getElementById('hideTips').checked;
-        
-        try {
-          const response = await fetch('/Adminisztracio/Profil/SaveTippekBeallitasa', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
-            },
-            body: JSON.stringify({ hideTips })
-          });
-  
-          if (response.ok) {
-            alert(LanguageManager.t('profile.settings_saved'));
-          } else {
-            throw new Error(LanguageManager.t('profile.settings_save_error'));
-          }
-        } catch (error) {
-          console.error('Error saving settings:', error);
-          alert(LanguageManager.t('profile.save_error'));
-        }
-      });
-  
-      
-      document.getElementById('savePassword')?.addEventListener('click', async () => {
-        const currentPassword = document.getElementById('currentPassword').value;
-        const newPassword = document.getElementById('newPassword').value;
-        const confirmPassword = document.getElementById('confirmPassword').value;
-  
-        if (!currentPassword || !newPassword || !confirmPassword) {
-          alert(LanguageManager.t('profile.fill_all_fields'));
-          return;
-        }
-  
-        if (newPassword !== confirmPassword) {
-          alert(LanguageManager.t('profile.passwords_not_match'));
-          return;
-        }
-  
-        if (newPassword.length < 8) {
-          alert(LanguageManager.t('profile.password_min_length'));
-          return;
-        }
-  
-        try {
-          const response = await fetch('/Adminisztracio/Profil/SaveJelszoModositas', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
-            },
-            body: JSON.stringify({
-              currentPassword,
-              newPassword,
-              confirmPassword
-            })
-          });
-  
-          if (response.ok) {
-            alert(LanguageManager.t('profile.password_changed'));
-            document.getElementById('currentPassword').value = '';
-            document.getElementById('newPassword').value = '';
-            document.getElementById('confirmPassword').value = '';
-          } else {
-            throw new Error(LanguageManager.t('profile.password_change_error'));
-          }
-        } catch (error) {
-          console.error('Error changing password:', error);
-          alert(LanguageManager.t('profile.password_change_error'));
-        }
-      });
-  
-      
-      const timerEl = document.getElementById('logoutTimer');
-      if (timerEl) {
-        const startTime = parseInt(timerEl.textContent?.match(/\d+/)?.[0] || "45");
-        let timeLeft = startTime * 60;
-        
-        const updateTimer = () => {
-          const minutes = Math.floor(timeLeft / 60);
-          const seconds = timeLeft % 60;
-          timerEl.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-          
-          if (timeLeft <= 0) {
-            window.location.href = '/Home/Logout';
-          } else {
-            timeLeft--;
-          }
-        };
-  
-        updateTimer();
-        setInterval(updateTimer, 1000);
+  }
+
+  function setupContactForm() {
+    const form = document.querySelector(".contact-form");
+    if (!form) return;
+
+    const emailInput = form.querySelector("#email");
+    const phoneInput = form.querySelector("#phone");
+    const saveButton = form.querySelector("#saveContacts");
+
+    emailInput.value = cookieManager.get("userEmail") || "";
+    phoneInput.value = cookieManager.get("userPhone") || "";
+
+    saveButton?.addEventListener("click", async () => {
+      const email = emailInput.value.trim();
+      const phone = phoneInput.value.trim();
+
+      if (!email) {
+        alert(LanguageManager.t("profile.email_required"));
+        return;
       }
+
+      if (email && !isValidEmail(email)) {
+        alert(LanguageManager.t("profile.invalid_email"));
+        return;
+      }
+
+      if (phone && !isValidPhone(phone)) {
+        alert(LanguageManager.t("profile.invalid_phone"));
+        return;
+      }
+
+      try {
+        const response = await fetch(
+          "/Adminisztracio/Profil/SaveElerhetosegek",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              RequestVerificationToken: document.querySelector(
+                'input[name="__RequestVerificationToken"]',
+              ).value,
+            },
+            body: JSON.stringify({ email, phone }),
+          },
+        );
+
+        if (response.ok) {
+          alert(LanguageManager.t("profile.contacts_saved"));
+        } else {
+          throw new Error(LanguageManager.t("profile.contacts_save_error"));
+        }
+      } catch (error) {
+        console.error("Error saving contacts:", error);
+        alert(LanguageManager.t("profile.save_error"));
+      }
+    });
+  }
+
+  function isValidEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  }
+
+  function isValidPhone(phone) {
+    return /^\+?[0-9\s-]{9,}$/.test(phone);
+  }
+
+  function setupEventListeners() {
+    document.querySelectorAll(".tab-header").forEach((header) => {
+      header.addEventListener("click", () => {
+        document
+          .querySelectorAll(".tab-header")
+          .forEach((h) => h.classList.remove("active"));
+        document
+          .querySelectorAll(".tab-content")
+          .forEach((c) => c.classList.remove("active"));
+
+        header.classList.add("active");
+        const targetId = header.dataset.tab;
+        document.getElementById(`${targetId}-content`).classList.add("active");
+      });
+    });
+
+    const userBtn = document.querySelector(".user-dropdown-btn");
+    const userDropdown = document.querySelector(".user-dropdown");
+
+    userBtn?.addEventListener("click", (e) => {
+      e.stopPropagation();
+      userDropdown?.classList.toggle("show");
+    });
+
+    document.addEventListener("click", () => {
+      userDropdown?.classList.remove("show");
+    });
+
+    document
+      .getElementById("saveSettings")
+      ?.addEventListener("click", async () => {
+        const hideTips = document.getElementById("hideTips").checked;
+
+        try {
+          const response = await fetch(
+            "/Adminisztracio/Profil/SaveTippekBeallitasa",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                RequestVerificationToken: document.querySelector(
+                  'input[name="__RequestVerificationToken"]',
+                ).value,
+              },
+              body: JSON.stringify({ hideTips }),
+            },
+          );
+
+          if (response.ok) {
+            alert(LanguageManager.t("profile.settings_saved"));
+          } else {
+            throw new Error(LanguageManager.t("profile.settings_save_error"));
+          }
+        } catch (error) {
+          console.error("Error saving settings:", error);
+          alert(LanguageManager.t("profile.save_error"));
+        }
+      });
+
+    document
+      .getElementById("savePassword")
+      ?.addEventListener("click", async () => {
+        const currentPassword =
+          document.getElementById("currentPassword").value;
+        const newPassword = document.getElementById("newPassword").value;
+        const confirmPassword =
+          document.getElementById("confirmPassword").value;
+
+        if (!currentPassword || !newPassword || !confirmPassword) {
+          alert(LanguageManager.t("profile.fill_all_fields"));
+          return;
+        }
+
+        if (newPassword !== confirmPassword) {
+          alert(LanguageManager.t("profile.passwords_not_match"));
+          return;
+        }
+
+        if (newPassword.length < 8) {
+          alert(LanguageManager.t("profile.password_min_length"));
+          return;
+        }
+
+        try {
+          const response = await fetch(
+            "/Adminisztracio/Profil/SaveJelszoModositas",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                RequestVerificationToken: document.querySelector(
+                  'input[name="__RequestVerificationToken"]',
+                ).value,
+              },
+              body: JSON.stringify({
+                currentPassword,
+                newPassword,
+                confirmPassword,
+              }),
+            },
+          );
+
+          if (response.ok) {
+            alert(LanguageManager.t("profile.password_changed"));
+            document.getElementById("currentPassword").value = "";
+            document.getElementById("newPassword").value = "";
+            document.getElementById("confirmPassword").value = "";
+          } else {
+            throw new Error(LanguageManager.t("profile.password_change_error"));
+          }
+        } catch (error) {
+          console.error("Error changing password:", error);
+          alert(LanguageManager.t("profile.password_change_error"));
+        }
+      });
+
+    const timerEl = document.getElementById("logoutTimer");
+    if (timerEl) {
+      const startTime = parseInt(
+        timerEl.textContent?.match(/\d+/)?.[0] || "45",
+      );
+      let timeLeft = startTime * 60;
+
+      const updateTimer = () => {
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        timerEl.textContent = `${minutes}:${seconds.toString().padStart(2, "0")}`;
+
+        if (timeLeft <= 0) {
+          window.location.href = "/Home/Logout";
+        } else {
+          timeLeft--;
+        }
+      };
+
+      updateTimer();
+      setInterval(updateTimer, 1000);
     }
-  
-    function createProfileHTML() {
-      return `
+  }
+
+  function createProfileHTML() {
+    return `
         <div class="kreta-container">
           ${createTemplate.header()}
   
@@ -377,20 +398,19 @@
           </main>
         </div>
       `;
+  }
+
+  async function init() {
+    if (window.location.pathname.includes("/Adminisztracio/Profil")) {
+      
+
+      document.body.innerHTML = createProfileHTML();
+      setupUserDropdown();
+      setupMobileNavigation();
+      setupEventListeners();
+      setupContactForm();
     }
-  
-    async function init() {
-      if (window.location.pathname.includes('/Adminisztracio/Profil')) {
-        
-        createTemplate.importFonts();
-  
-        document.body.innerHTML = createProfileHTML();
-        setupUserDropdown();
-        setupMobileNavigation();
-        setupEventListeners();
-        setupContactForm();
-      }
-    }
-  
-    init();
+  }
+
+  init();
 })();

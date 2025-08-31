@@ -1,360 +1,313 @@
 :root {
-  --icon-invert: 0.1;
-  --icon-sepia: 0.1;
-  --icon-saturate: 0.1;
-  --icon-hue-rotate: 0deg;
-  --icon-brightness: 0.1;
+  --icon-invert:0.1;
+  --icon-sepia:0.1;
+  --icon-saturate:0.1;
+  --icon-hue-rotate:0deg;
+  --icon-brightness:0.1;
 }
-
-
 :root[data-theme="light-green"] {
-  --icon-invert: 0.1;
-  --icon-sepia: 0.1;
-  --icon-saturate: 0.1;
-  --icon-hue-rotate: 0deg;
-  --icon-brightness: 0.1;
+  --icon-invert:0.1;
+  --icon-sepia:0.1;
+  --icon-saturate:0.1;
+  --icon-hue-rotate:0deg;
+  --icon-brightness:0.1;
 }
-
-
 :root[data-theme="dark-blue"] {
-  --icon-invert: 0.9;
-  --icon-sepia: 0.1;
-  --icon-saturate: 0.1;
-  --icon-hue-rotate: 0deg;
-  --icon-brightness: 1;
+  --icon-invert:0.9;
+  --icon-sepia:0.1;
+  --icon-saturate:0.1;
+  --icon-hue-rotate:0deg;
+  --icon-brightness:1;
 }
-
-
 :root[data-theme="dark-green"] {
-  --icon-invert: 0.9;
-  --icon-sepia: 0.1;
-  --icon-saturate: 0.1;
-  --icon-hue-rotate: 0deg;
-  --icon-brightness: 1;
+  --icon-invert:0.9;
+  --icon-sepia:0.1;
+  --icon-saturate:0.1;
+  --icon-hue-rotate:0deg;
+  --icon-brightness:1;
 }
-
 * {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
 }
-
 body {
-  margin: 0;
-  padding: 0;
-  color: var(--text-primary);
-  background-color: var(--background) !important;
-  font-family: "Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
-  min-height: 100vh;
-  font-size: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  margin:0;
+  padding:0;
+  color:var(--text-primary);
+  background-color:var(--background) !important;
+  font-family:"Montserrat",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif !important;
+  min-height:100vh;
+  font-size:16px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
 }
-
 .login-container {
-  width: 90%;
-  max-width: 500px;
-  padding: 20px;
-  margin: 0 auto;
+  width:90%;
+  max-width:500px;
+  padding:20px;
+  margin:0 auto;
 }
-
 .login-card {
-  background: var(--card-card);
-  padding: 24px;
-  margin-bottom: 16px;
-  border-radius: 24px;
-  box-shadow: 0px 1px var(--shadow-blur) 0px var(--accent-shadow);
+  background:var(--card-card);
+  padding:24px;
+  margin-bottom:16px;
+  border-radius:24px;
+  box-shadow:0px 1px var(--shadow-blur) 0px var(--accent-shadow);
 }
-
 .card-header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  margin: 16px 0;
-  background: var(--card-card) !important;
-  border-bottom: 1px solid rgba(0, 0, 0, 0) !important;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:8px;
+  margin:16px 0;
+  background:var(--card-card) !important;
+  border-bottom:1px solid rgba(0,0,0,0) !important;
 }
-
 .logo-text {
-  color: var(--text-primary);
-  text-align: center;
-  font-family: Montserrat;
-  font-size: 20px;
-  font-style: normal;
-  font-weight: 700;
-  line-height: normal;
+  color:var(--text-primary);
+  text-align:center;
+  font-family:Montserrat;
+  font-size:20px;
+  font-style:normal;
+  font-weight:700;
+  line-height:normal;
 }
-
 .logo {
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
+  width:48px;
+  height:48px;
+  border-radius:12px;
 }
-
 .school-name {
-  color: var(--text-secondary);
-  text-align: center;
-  font-family: Figtree;
-  font-size: 16px;
-  font-style: normal;
-  font-weight: 500;
-  line-height: 130%;
+  color:var(--text-secondary);
+  text-align:center;
+  font-family:Figtree;
+  font-size:16px;
+  font-style:normal;
+  font-weight:500;
+  line-height:130%;
 }
-
 .school-details {
-  color: var(--text-secondary);
-  text-align: center;
-  font-family: Figtree;
-  font-size: 16px;
-  font-style: normal;
-  font-weight: 500;
-  line-height: 130%;
+  color:var(--text-secondary);
+  text-align:center;
+  font-family:Figtree;
+  font-size:16px;
+  font-style:normal;
+  font-weight:500;
+  line-height:130%;
 }
-
 .login-form {
-  width: 100%;
+  width:100%;
 }
-
 .form-group {
-  margin-bottom: 16px;
+  margin-bottom:16px;
 }
-
 .form-control {
-  display: flex;
-  height: 48px;
-  padding: 0px 14px;
-  align-items: center;
-  gap: 10px;
-  align-self: stretch;
-  border-radius: 12px;
-  background: var(--accent-15) !important;
-  border: 0px solid var(--accent-15) !important;
-  color: var(--text-primary) !important;
+  display:flex;
+  height:48px;
+  padding:0px 14px;
+  align-items:center;
+  gap:10px;
+  align-self:stretch;
+  border-radius:12px;
+  background:var(--accent-15) !important;
+  border:0px solid var(--accent-15) !important;
+  color:var(--text-primary) !important;
 }
-
 .form-control:focus {
-  outline: none;
-  border-color: var(--accent-accent) !important;
+  outline:none;
+  border-color:var(--accent-accent) !important;
 }
-
 .form-control::placeholder {
-  color: var(--text-secondary) !important;
+  color:var(--text-secondary) !important;
 }
-
 .password-group {
-  position: relative;
+  position:relative;
 }
-
 .show-password {
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: none;
-  border: none;
-  padding: 4px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  position:absolute;
+  right:12px;
+  top:50%;
+  transform:translateY(-50%);
+  background:none;
+  border:none;
+  padding:4px;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
 }
-
 .icon-eye {
-  width: 20px;
-  height: 20px;
-  opacity: 0.6;
-  transition: opacity 0.2s ease;
-  filter: invert(var(--icon-invert)) sepia(var(--icon-sepia)) saturate(var(--icon-saturate)) hue-rotate(var(--icon-hue-rotate)) brightness(var(--icon-brightness));
+  width:20px;
+  height:20px;
+  opacity:0.6;
+  transition:opacity 0.2s ease;
+  filter:invert(var(--icon-invert)) sepia(var(--icon-sepia)) saturate(var(--icon-saturate)) hue-rotate(var(--icon-hue-rotate)) brightness(var(--icon-brightness));
 }
-
 .show-password:hover .icon-eye {
-  opacity: 1;
+  opacity:1;
 }
-
 .form-actions {
-  margin-top: 24px;
+  margin-top:24px;
 }
-
 .help-links {
-  margin-top: 16px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
+  margin-top:16px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:8px;
 }
-
 .help-link {
-  color: var(--text-primary);
-  font-size: 14px;
-  font-weight: 500;
-  text-decoration: none;
-  transition: color 0.2s ease;
+  color:var(--text-primary);
+  font-size:14px;
+  font-weight:500;
+  text-decoration:none;
+  transition:color 0.2s ease;
 }
-
 .help-link:hover {
-  color: var(--text-teritary);
+  color:var(--text-teritary);
 }
-
 .btn-login {
-  width: 100%;
-  padding: 12px;
-  background: var(--accent-accent);
-  color: white;
-  border: none;
-  border-radius: 12px;
-  font-size: 16px;
-  font-weight: 600;
-  font-family: "Montserrat", serif;
-  cursor: pointer;
-  transition: background 0.2s ease;
-  position: relative;
+  width:100%;
+  padding:12px;
+  background:var(--accent-accent);
+  color:white;
+  border:none;
+  border-radius:12px;
+  font-size:16px;
+  font-weight:600;
+  font-family:"Montserrat",serif;
+  cursor:pointer;
+  transition:background 0.2s ease;
+  position:relative;
 }
-
 .btn-login:hover {
-  background: var(--text-teritary);
+  background:var(--text-teritary);
 }
-
 .btn-login:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
+  opacity:0.7;
+  cursor:not-allowed;
 }
-
 .btn-text {
-  color: var(--text-primary);
-  text-align: center;
-  font-family: Montserrat;
-  font-size: 18px;
-  font-style: normal;
-  font-weight: 700;
-  line-height: normal;
-  letter-spacing: -0.3px;
+  color:var(--text-primary);
+  text-align:center;
+  font-family:Montserrat;
+  font-size:18px;
+  font-style:normal;
+  font-weight:700;
+  line-height:normal;
+  letter-spacing:-0.3px;
 }
-
 .system-message {
-  display: flex;
-  padding: 20px;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-  align-self: stretch;
-  border-radius: 24px;
-  background: var(--card-card);
-  box-shadow: 0px 1px var(--shadow-blur) 0px var(--accent-shadow);
+  display:flex;
+  padding:20px;
+  flex-direction:column;
+  align-items:center;
+  gap:12px;
+  align-self:stretch;
+  border-radius:24px;
+  background:var(--card-card);
+  box-shadow:0px 1px var(--shadow-blur) 0px var(--accent-shadow);
 }
-
 .system-message h4 {
-  color: var(--text-primary);
-  text-align: center;
-  font-family: Montserrat;
-  font-size: 20px;
-  font-style: normal;
-  font-weight: 700;
-  line-height: normal;
+  color:var(--text-primary);
+  text-align:center;
+  font-family:Montserrat;
+  font-size:20px;
+  font-style:normal;
+  font-weight:700;
+  line-height:normal;
 }
-
 .system-message p {
-  color: var(--text-secondary);
-  text-align: center;
-  font-family: Figtree;
-  font-size: 16px;
-  font-style: normal;
-  font-weight: 500;
-  line-height: 130%;
+  color:var(--text-secondary);
+  text-align:center;
+  font-family:Figtree;
+  font-size:16px;
+  font-style:normal;
+  font-weight:500;
+  line-height:130%;
 }
-
 .login-footer {
-  align-self: stretch;
-  color: var(--text-secondary);
-  text-align: center;
-  font-family: Figtree;
-  font-size: 14px;
-  font-style: normal;
-  font-weight: 500;
-  line-height: 130%;
+  align-self:stretch;
+  color:var(--text-secondary);
+  text-align:center;
+  font-family:Figtree;
+  font-size:14px;
+  font-style:normal;
+  font-weight:500;
+  line-height:130%;
 }
-
 .privacy-link {
-  align-self: stretch;
-  color: var(--text-secondary);
-  text-align: center;
-  font-family: Figtree;
-  font-size: 14px;
-  font-style: normal;
-  font-weight: 500;
-  line-height: 130%;
-  text-decoration: none;
+  align-self:stretch;
+  color:var(--text-secondary);
+  text-align:center;
+  font-family:Figtree;
+  font-size:14px;
+  font-style:normal;
+  font-weight:500;
+  line-height:130%;
+  text-decoration:none;
 }
-
 .privacy-link:hover {
-  color: var(--text-teritary);
+  color:var(--text-teritary);
 }
-
-
 .form-control.error {
-  border-color: var(--error-accent) !important;
-  background: var(--error-card) !important;
+  border-color:var(--error-accent) !important;
+  background:var(--error-card) !important;
 }
-
 .error-message {
-  color: var(--error-text);
-  font-size: 14px;
-  margin-top: 4px;
-  display: none;
+  color:var(--error-text);
+  font-size:14px;
+  margin-top:4px;
+  display:none;
 }
-
 .error-message.show {
-  display: block;
-  animation: fadeIn 0.2s ease;
+  display:block;
+  animation:fadeIn 0.2s ease;
 }
-
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-4px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+  opacity:0;
+  transform:translateY(-4px);
 }
-
-@keyframes spin {
-  to { transform: translate(-50%, -50%) rotate(360deg); }
+to {
+  opacity:1;
+  transform:translateY(0);
 }
-
-@media (max-width: 480px) {
+}@keyframes spin {
+  to {
+  transform:translate(-50%,-50%) rotate(360deg);
+}
+}@media (max-width:480px) {
   .login-container {
-    padding: 16px;
-  }
-  
-  .login-card {
-    padding: 20px;
-  }
-  
-  .card-header {
-    margin-bottom: 20px;
-    padding-bottom: 16px;
-  }
-  
-  .logo-text {
-    font-size: 20px;
-  }
-  
-  .school-name {
-    font-size: 16px;
-  }
-  
-  .school-details {
-    font-size: 12px;
-  }
-  
-  .form-control {
-    height: 44px;
-    font-size: 14px;
-  }
-  
-  .btn-login {
-    padding: 10px;
-    font-size: 14px;
-  }
-  
-  .help-link {
-    font-size: 12px;
-  }
+  padding:16px;
+}
+.login-card {
+  padding:20px;
+}
+.card-header {
+  margin-bottom:20px;
+  padding-bottom:16px;
+}
+.logo-text {
+  font-size:20px;
+}
+.school-name {
+  font-size:16px;
+}
+.school-details {
+  font-size:12px;
+}
+.form-control {
+  height:44px;
+  font-size:14px;
+}
+.btn-login {
+  padding:10px;
+  font-size:14px;
+}
+.help-link {
+  font-size:12px;
+}
 }
