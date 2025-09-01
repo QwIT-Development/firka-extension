@@ -195,6 +195,31 @@ body {
   font-weight:500;
   line-height:130%;
 }
+.notice-header {
+  min-width:80px;
+}
+.notice-slot {
+  padding:4px 8px;
+  min-height:auto;
+}
+.special-day-notice {
+  background:#F99F50;
+  color:white;
+  padding:8px 12px;
+  border-radius:8px;
+  text-align:center;
+  box-shadow:0 1px 3px rgba(0,0,0,0.1);
+  font-size:0.85rem;
+}
+.special-day-notice .special-day-title {
+  font-weight:600;
+  margin-bottom:2px;
+}
+.special-day-notice .special-day-subtitle {
+  font-size:0.75rem;
+  opacity:0.9;
+  font-weight:400;
+}
 .time-slot {
   padding:12px;
   text-align:center;
@@ -659,6 +684,12 @@ body {
 }
 .grid-header.active {
   display:flex !important;
+}
+.notice-slot {
+  display:none;
+}
+.notice-slot.active {
+  display:block;
 }
 .lesson-slot {
   display:none;

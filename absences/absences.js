@@ -89,14 +89,14 @@ async function transformAbsencesPage() {
           <div class="filter-content">
             <div class="filter-group">
               <label>
-                <span class="material-icons-round">date_range</span>
+                <img src="${chrome.runtime.getURL("icons/Calendar.svg")}" alt="Dátum" style="width: 24px; height: 24px;">
                 ${LanguageManager.t("absences.date")}
               </label>
               <input type="date" id="dateFilter" class="filter-input">
             </div>
             <div class="filter-group">
               <label>
-                <span class="material-icons-round">school</span>
+                <img src="${chrome.runtime.getURL("icons/Subject.svg")}" alt="Tantárgy" style="width: 24px; height: 24px;">
                 ${LanguageManager.t("absences.subject")}
               </label>
               <select id="subjectFilter" class="filter-input">
@@ -112,7 +112,7 @@ async function transformAbsencesPage() {
             </div>
             <div class="filter-group">
               <label>
-                <span class="material-icons-round">check_circle</span>
+                <img src="${chrome.runtime.getURL("icons/BadgeCheck.svg")}" alt="Igazolás" style="width: 24px; height: 24px;">
                 ${LanguageManager.t("absences.justification")}
               </label>
               <select id="justificationFilter" class="filter-input">
@@ -218,7 +218,7 @@ function generateAbsencesHTML(absences) {
             <span class="status-badge ${absence.justificationStatus}">
               ${
                 absence.justificationStatus === "justified"
-                  ? `<span class="material-icons-round">check_circle</span> ${LanguageManager.t("absences.justified")}`
+                  ? `<img src="${chrome.runtime.getURL("icons/BadgeCheck.svg")}" alt="Igazolt" style="width: 16px; height: 16px;"> ${LanguageManager.t("absences.justified")}`
                   : absence.justificationStatus === "unjustified"
                     ? `<span class="material-icons-round">cancel</span> ${LanguageManager.t("absences.unjustified")}`
                     : `<span class="material-icons-round">pending</span> ${LanguageManager.t("absences.pending")}`

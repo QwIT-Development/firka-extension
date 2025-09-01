@@ -172,6 +172,9 @@
       LanguageManager.t("timetable.friday"),
     ];
 
+    // Check if there are any special days to show notice row
+    const hasSpecialDays = specialDayLessons.length > 0;
+
     return `
       <div class="grid-header"></div>
       ${days
@@ -184,6 +187,27 @@
         `;
         })
         .join("")}
+      ${hasSpecialDays ? `
+        <div class="notice-header"></div>
+        ${Array(5)
+          .fill()
+          .map((_, dayIndex) => {
+            const specialDay = specialDayLessons.find(
+              (l) => l.day === dayIndex,
+            );
+            return `
+            <div class="notice-slot">
+              ${specialDay ? `
+                <div class="special-day-notice" style="background-color: ${specialDay.color || "#F99F50"}" data-lesson='${JSON.stringify(specialDay)}'>
+                  <div class="special-day-title">${specialDay.subject}</div>
+                  ${specialDay.testInfo ? `<div class="special-day-subtitle">${specialDay.testInfo}</div>` : ""}
+                </div>
+              ` : ""}
+            </div>
+          `;
+          })
+          .join("")}
+      ` : ""}
       ${times
         .map(
           (time, timeIndex) => `
@@ -194,21 +218,10 @@
             const dayLessons = regularLessons.filter(
               (l) => l.startTime === time && l.day === dayIndex,
             );
-            const specialDay = specialDayLessons.find(
-              (l) => l.day === dayIndex,
-            );
 
             return `
-            <div class="lesson-slot ${specialDay ? "special-day-slot" : ""}">
-              ${
-                specialDay && timeIndex === 0
-                  ? `
-                <div class="special-day-card" style="background-color: ${specialDay.color || "#F99F50"}" data-lesson='${JSON.stringify(specialDay)}'>
-                  <div class="special-day-title">${specialDay.subject}</div>
-                  ${specialDay.testInfo ? `<div class="special-day-subtitle">${specialDay.testInfo}</div>` : ""}
-                </div>
-              `
-                  : dayLessons
+            <div class="lesson-slot">
+              ${dayLessons
                       .map(
                         (lesson) => `
                 <div class="lesson-card ${lesson.isSubstituted ? "substituted" : ""} 
@@ -269,7 +282,7 @@
         <div class="modal-header">
           <h3 class="modal-title">${lesson.subject}</h3>
           <button class="modal-close">
-            <span class="material-icons-round">close</span>
+            <img src="${chrome.runtime.getURL("icons/CloseCircle.svg")}" alt="Bezárás" style="width: 24px; height: 24px;">
           </button>
         </div>
         <div class="modal-body">
@@ -570,10 +583,18 @@
       const gridHeaders = document.querySelectorAll(
         ".grid-header:not(:first-child)",
       );
+      const noticeSlots = document.querySelectorAll(".notice-slot");
       const lessonSlots = document.querySelectorAll(".lesson-slot");
 
       gridHeaders.forEach((header, index) => {
         header.classList.toggle(
+          "active",
+          index === dayNavigationState.currentDayIndex,
+        );
+      });
+
+      noticeSlots.forEach((slot, index) => {
+        slot.classList.toggle(
           "active",
           index === dayNavigationState.currentDayIndex,
         );
@@ -891,15 +912,15 @@
               <div class="week-selector-container">
                 <div class="week-selector" id="week-selector">
                   <button class="week-nav-btn" id="prevWeekBtn" title="Előző hét">
-                    <span class="material-icons-round">chevron_left</span>
+                    <img src="${chrome.runtime.getURL("icons/ChevronLeftCircle.svg")}" alt="Előző" style="width: 24px; height: 24px;">
                   </button>
                   <div class="week-display" id="week-display">
                   </div>
                   <button class="week-nav-btn" id="nextWeekBtn" title="Következő hét">
-                    <span class="material-icons-round">chevron_right</span>
+                    <img src="${chrome.runtime.getURL("icons/ChevronRightCircle.svg")}" alt="Következő" style="width: 24px; height: 24px;">
                   </button>
                   <button class="expand-week-view-btn" id="expandWeekView" title="Teljes nézet">
-                    <span class="material-icons-round">open_in_full</span>
+                    <img src="${chrome.runtime.getURL("icons/ArrowsExpandFull.svg")}" alt="Teljes nézet" style="width: 18px; height: 18px;">
                   </button>
                 </div>
                 <div class="week-tooltip" id="week-tooltip"></div>
@@ -912,7 +933,7 @@
                 <div class="week-modal-header">
                   <h3></h3>
                   <button class="week-modal-close" id="closeWeekModal">
-                    <span class="material-icons-round">close</span>
+                    <img src="${chrome.runtime.getURL("icons/CloseCircle.svg")}" alt="Bezárás" style="width: 24px; height: 24px;">
                   </button>
                 </div>
                 <div class="week-modal-grid" id="weekModalGrid">
@@ -922,12 +943,12 @@
 
             <div class="day-navigation">
               <button class="day-nav-btn" id="prevDay">
-                <span class="material-icons-round">chevron_left</span>
+                <img src="${chrome.runtime.getURL("icons/ChevronLeftCircle.svg")}" alt="Előző" style="width: 24px; height: 24px;">
                 Előző
               </button>
               <button class="day-nav-btn" id="nextDay">
                 Következő
-                <span class="material-icons-round">chevron_right</span>
+                <img src="${chrome.runtime.getURL("icons/ChevronRightCircle.svg")}" alt="Következő" style="width: 24px; height: 24px;">
               </button>
             </div>
 
