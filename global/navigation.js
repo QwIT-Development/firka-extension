@@ -95,24 +95,77 @@ function setupMobileNavigation() {
       return;
     }
 
-    navToggle.addEventListener("click", (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      nav.classList.toggle("show");
-    });
-
-    document.addEventListener("click", (e) => {
-      if (!nav.contains(e.target) && !navToggle.contains(e.target)) {
-        nav.classList.remove("show");
-      }
-    });
-
-    const navItems = document.querySelectorAll(".nav-item");
-    navItems.forEach((item) => {
-      item.addEventListener("click", () => {
-        nav.classList.remove("show");
+    const isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+    
+    if (isFirefox) {
+      let isNavOpen = false;
+      
+      navToggle.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        if (isNavOpen) {
+          nav.style.display = "none";
+          nav.classList.remove("show");
+          isNavOpen = false;
+        } else {
+          nav.style.display = "flex";
+          nav.classList.add("show");
+          isNavOpen = true;
+        }
       });
-    });
+      
+      navToggle.addEventListener("touchend", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        if (isNavOpen) {
+          nav.style.display = "none";
+          nav.classList.remove("show");
+          isNavOpen = false;
+        } else {
+          nav.style.display = "flex";
+          nav.classList.add("show");
+          isNavOpen = true;
+        }
+      });
+      
+      document.addEventListener("click", (e) => {
+        if (!nav.contains(e.target) && !navToggle.contains(e.target) && isNavOpen) {
+          nav.style.display = "none";
+          nav.classList.remove("show");
+          isNavOpen = false;
+        }
+      });
+      
+      const navItems = document.querySelectorAll(".nav-item");
+      navItems.forEach((item) => {
+        item.addEventListener("click", () => {
+          nav.style.display = "none";
+          nav.classList.remove("show");
+          isNavOpen = false;
+        });
+      });
+    } else {
+      navToggle.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        nav.classList.toggle("show");
+      });
+
+      document.addEventListener("click", (e) => {
+        if (!nav.contains(e.target) && !navToggle.contains(e.target)) {
+          nav.classList.remove("show");
+        }
+      });
+
+      const navItems = document.querySelectorAll(".nav-item");
+      navItems.forEach((item) => {
+        item.addEventListener("click", () => {
+          nav.classList.remove("show");
+        });
+      });
+    }
   }, 100);
 }
 

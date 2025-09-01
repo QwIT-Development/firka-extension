@@ -300,24 +300,24 @@ to {
   font-size:10px;
 }
 }@media (max-width:360px) {
-  .kreta-header {
-  padding:0.5rem;
-}
-.logo-text {
-  font-size:14px;
-}
-.school-details {
-  font-size:9px;
-  max-width:120px;
-}
-.user-info {
-  max-width:80px;
-}
-.user-name {
-  font-size:11px;
-}
-.nav-logout-timer {
-  font-size:9px;
+    .kreta-header {
+    padding:0.5rem;
+  }
+  .logo-text {
+    font-size:14px;
+  }
+  .school-details {
+    font-size:9px;
+    max-width:120px;
+  }
+  .user-info {
+    max-width:80px;
+  }
+  .user-name {
+    font-size:11px;
+  }
+  .nav-logout-timer {
+    font-size:9px;
 }
 }@keyframes slideDown {
   from {
