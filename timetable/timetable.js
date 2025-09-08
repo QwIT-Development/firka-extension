@@ -242,7 +242,7 @@
                         lesson.hasHomework
                           ? `
                         <span class="lesson-indicator homework-indicator" title="${LanguageManager.t("timetable.homework_indicator")}">
-                          <span class="material-icons-round">assignment</span>
+                          <img src="${chrome.runtime.getURL("icons/homework.svg")}" alt="Házi feladat" style="width: 20px; height: 20px;">
                         </span>
                       `
                           : ""
@@ -251,7 +251,7 @@
                         lesson.testInfo
                           ? `
                         <span class="lesson-indicator test-indicator" title="${LanguageManager.t("timetable.test_indicator")}">
-                          <span class="material-icons-round">quiz</span>
+                          <img src="${chrome.runtime.getURL("icons/assigment.svg")}" alt="Teszt" style="width: 20px; height: 20px;">
                         </span>
                       `
                           : ""
@@ -330,7 +330,7 @@
               ? `
             <div class="modal-section homework-section">
               <h4>
-                <span class="material-icons-round">assignment</span>
+                <img src="${chrome.runtime.getURL("icons/homework.svg")}" alt="Házi feladat" style="width: 20px; height: 20px;">
                 ${LanguageManager.t("timetable.homework_indicator")}
               </h4>
               <div class="homework-content">
@@ -351,7 +351,7 @@
               ? `
             <div class="modal-section test-section">
               <h4>
-                <span class="material-icons-round">quiz</span>
+                <img src="${chrome.runtime.getURL("icons/assigment.svg")}" alt="Teszt" style="width: 20px; height: 20px;">
                 ${LanguageManager.t("timetable.test_indicator")}
               </h4>
               <div class="test-content">

@@ -140,9 +140,10 @@ h2 {
   font-weight: 600;
   font-size: 16px;
   line-height: 1.3;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+  max-width: 100%;
 }
 
 .widget-subtitle {
@@ -150,6 +151,8 @@ h2 {
   font-weight: 500;
   font-size: 14px;
   line-height: 1.2;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .widget-content {
@@ -186,6 +189,8 @@ h2 {
   font-size: 12px;
   font-weight: 400;
   margin-top: 4px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .grade-date {
@@ -196,20 +201,24 @@ h2 {
   text-align: right;
 }
 
-
-
 .widget-author {
   color: var(--text-tertiary);
   font-size: 12px;
   font-weight: 400;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  max-width: 100%;
 }
 
-.widget-meta {
+.news-author {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   gap: 4px;
   text-align: right;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
 }
 
 .widget-empty {
@@ -236,21 +245,27 @@ h2 {
   font-size: 16px;
   font-weight: 600;
   margin-bottom: 8px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+  line-height: 1.4;
 }
 
 .news-content {
   font-size: 14px;
   line-height: 1.4;
   color: var(--text-secondary);
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
 }
 
 .exam-type {
-  color: var(--accent-accent);
   font-size: 12px;
   font-weight: 500;
-  text-transform: uppercase;
   letter-spacing: 0.5px;
 }
+
 .more-link {
   margin-top: auto;
   display: inline-flex;
@@ -348,14 +363,6 @@ h2 {
   font-size: 14px;
   line-height: 1.4;
   color: var(--text-secondary);
-}
-
-.exam-type {
-  color: var(--accent-accent);
-  font-size: 12px;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
 }
 .more-link {
   margin-top: auto;

@@ -38,7 +38,18 @@
   "content_scripts": [
     {
       "matches": [
-        "https://*.e-kreta.hu/*"
+        "https://idp.e-kreta.hu/Account/Login*",
+        "https://idp.e-kreta.hu/Account/Logout*",
+        "https://idp.e-kreta.hu/Account/LoginWithTwoFactor*",
+        "https://*.e-kreta.hu/Hianyzas/Hianyzasok*",
+        "https://*.e-kreta.hu/Adminisztracio/BelepesKezelo*",
+        "https://*.e-kreta.hu/Intezmeny/Faliujsag*",
+        "https://*.e-kreta.hu/TanuloErtekeles/Osztalyzatok*",
+        "https://*.e-kreta.hu/Orarend/InformaciokOrarend*",
+        "https://*.e-kreta.hu/Adminisztracio/Profil*",
+        "https://*.e-kreta.hu/Tanulo/TanuloHaziFeladat*",
+        "https://*.e-kreta.hu/Adminisztracio/ElfelejtettJelszo*",
+        "https://intezmenykereso.e-kreta.hu/*"
       ],
       "js": [
         "global/language.js",
