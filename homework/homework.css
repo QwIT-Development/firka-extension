@@ -200,6 +200,108 @@ body {
   background-color: var(--card-card);
 }
 
+/* Checkbox oszlop stílusai */
+.checkbox-header {
+  width: 50px;
+  text-align: center;
+  font-size: 16px;
+}
+
+.checkbox-cell {
+  width: 50px;
+  text-align: center;
+  padding: 8px !important;
+}
+
+.homework-checkbox {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  appearance: none;
+  border: 2px solid var(--accent-30);
+  border-radius: 4px;
+  background-color: var(--card-card);
+  position: relative;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.homework-checkbox:hover {
+  border-color: var(--accent);
+  background-color: var(--accent-15);
+  transform: scale(1.05);
+}
+
+.homework-checkbox:checked {
+  background-color: var(--accent);
+  border-color: var(--accent);
+}
+
+.homework-checkbox:checked::after {
+  content: '✓';
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.homework-checkbox:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.homework-checkbox:active {
+  transform: scale(0.95);
+}
+
+/* Megjelölt házi feladatok stílusai */
+.table-row.user-completed {
+  opacity: 0.6;
+  background-color: var(--accent-15) !important;
+}
+
+.table-row.user-completed .table-cell {
+  color: var(--text-secondary);
+}
+
+.table-row.user-completed .status-badge.completed {
+  background-color: var(--success);
+  color: white;
+}
+
+
+
+/* Mobil nézet checkbox stílusai */
+@media (max-width: 768px) {
+  .checkbox-header {
+    width: 40px;
+    font-size: 14px;
+  }
+  
+  .checkbox-cell {
+    width: 40px;
+    padding: 6px !important;
+  }
+  
+  .homework-checkbox {
+    width: 18px;
+    height: 18px;
+  }
+  
+  .homework-checkbox:checked::after {
+    font-size: 12px;
+  }
+  
+  .table-row.user-completed {
+    opacity: 0.7;
+  }
+}
+
 .filter-content {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));

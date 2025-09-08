@@ -119,17 +119,10 @@ function isTomorrow(dateStr) {
 async function transformHomeworkPage() {
   const { basicData, homeworkItems, groupedHomework } =
     await collectHomeworkData();
-
-  // Biztonságos DOM létrehozás innerHTML helyett
   document.body.innerHTML = '';
-  
-  // Fő konténer létrehozása
   const kretaContainer = document.createElement('div');
   kretaContainer.className = 'kreta-container';
-  
-  // Header hozzáadása
   const headerDiv = document.createElement('div');
-  // Biztonságos HTML parsing DOMParser használatával
   const parser = new DOMParser();
   const headerDoc = parser.parseFromString(createTemplate.header(), 'text/html');
   const headerContent = headerDoc.body;
@@ -137,12 +130,9 @@ async function transformHomeworkPage() {
     headerDiv.appendChild(headerContent.firstChild);
   }
   kretaContainer.appendChild(headerDiv);
-  
-  // Main elem létrehozása
   const main = document.createElement('main');
   main.className = 'kreta-main';
-  
-  // Filter card létrehozása
+
   const filterCard = document.createElement('div');
   filterCard.className = 'filter-card';
   
@@ -154,8 +144,7 @@ async function transformHomeworkPage() {
   
   const filterContent = document.createElement('div');
   filterContent.className = 'filter-content';
-  
-  // Subject filter
+
   const subjectGroup = document.createElement('div');
   subjectGroup.className = 'filter-group';
   const subjectLabel = document.createElement('label');
@@ -179,8 +168,7 @@ async function transformHomeworkPage() {
   
   subjectGroup.appendChild(subjectLabel);
   subjectGroup.appendChild(subjectSelect);
-  
-  // Teacher filter
+
   const teacherGroup = document.createElement('div');
   teacherGroup.className = 'filter-group';
   const teacherLabel = document.createElement('label');
@@ -204,8 +192,7 @@ async function transformHomeworkPage() {
   
   teacherGroup.appendChild(teacherLabel);
   teacherGroup.appendChild(teacherSelect);
-  
-  // Deadline filter
+
   const deadlineGroup = document.createElement('div');
   deadlineGroup.className = 'filter-group';
   const deadlineLabel = document.createElement('label');
@@ -236,8 +223,7 @@ async function transformHomeworkPage() {
   
   filterCard.appendChild(filterHeader);
   filterCard.appendChild(filterContent);
-  
-  // Stats overview
+
   const statsOverview = document.createElement('div');
   statsOverview.className = 'stats-overview';
   statsOverview.id = 'statsOverview';
@@ -266,8 +252,7 @@ async function transformHomeworkPage() {
     statCard.appendChild(statLabel);
     statsOverview.appendChild(statCard);
   });
-  
-  // Homework container
+
   const homeworkContainer = document.createElement('div');
   homeworkContainer.className = 'homework-container';
   
@@ -280,6 +265,7 @@ async function transformHomeworkPage() {
   const headerRow = document.createElement('tr');
   
   const headers = [
+    '✓',
     LanguageManager.t('homework.due_date'),
     LanguageManager.t('homework.subject'),
     LanguageManager.t('homework.description'),
@@ -287,9 +273,12 @@ async function transformHomeworkPage() {
     LanguageManager.t('homework.status')
   ];
   
-  headers.forEach(headerText => {
+  headers.forEach((headerText, index) => {
     const th = document.createElement('th');
     th.textContent = headerText;
+    if (index === 0) {
+      th.className = 'checkbox-header';
+    }
     headerRow.appendChild(th);
   });
   
@@ -297,12 +286,9 @@ async function transformHomeworkPage() {
   
   const tbody = document.createElement('tbody');
   tbody.id = 'homeworkTableBody';
-  
-  // Biztonságos HTML tartalom hozzáadása
   const homeworkHTML = generateHomeworkHTML(homeworkItems);
   
   if (homeworkHTML.trim()) {
-    // Biztonságos HTML parsing DOMParser használatával - table kontextusban
     const parser = new DOMParser();
     const doc = parser.parseFromString(`<table><tbody>${homeworkHTML}</tbody></table>`, 'text/html');
     const tempTbody = doc.querySelector('tbody');
@@ -310,7 +296,6 @@ async function transformHomeworkPage() {
       tbody.appendChild(tempTbody.firstChild);
     }
   } else {
-    // Ha nincs házi feladat, üres sor hozzáadása
     const emptyRow = document.createElement('tr');
     const emptyCell = document.createElement('td');
     emptyCell.colSpan = 5;
@@ -324,8 +309,7 @@ async function transformHomeworkPage() {
   homeworkTable.appendChild(thead);
   homeworkTable.appendChild(tbody);
   homeworkContainer.appendChild(homeworkTable);
-  
-  // Összeállítás
+
   main.appendChild(filterCard);
   main.appendChild(statsOverview);
   main.appendChild(homeworkContainer);
@@ -355,22 +339,30 @@ function generateHomeworkHTML(homeworkItems) {
   return sortedHomework
     .map((homework) => {
       const isUrgent = isTomorrow(homework.deadline);
-      const status = homework.completed
+      const isUserCompleted = getHomeworkCompletionStatus(homework.id);
+      const status = homework.completed || isUserCompleted
         ? "completed"
         : isUrgent
           ? "urgent"
           : "pending";
-      const statusText = homework.completed
+      const statusText = homework.completed || isUserCompleted
         ? LanguageManager.t("homework.completed")
         : isUrgent
           ? LanguageManager.t("homework.urgent")
           : LanguageManager.t("homework.pending");
 
       return `
-      <tr class="table-row ${isUrgent ? "due-tomorrow" : ""}" 
+      <tr class="table-row ${isUrgent ? "due-tomorrow" : ""} ${isUserCompleted ? "user-completed" : ""}" 
           data-subject="${homework.subject}" 
           data-teacher="${homework.teacher}"
-          data-deadline="${homework.deadline}">
+          data-deadline="${homework.deadline}"
+          data-homework-id="${homework.id}">
+        <td class="table-cell checkbox-cell">
+          <input type="checkbox" class="homework-checkbox" 
+                 data-homework-id="${homework.id}" 
+                 ${isUserCompleted ? "checked" : ""}
+                 title="${isUserCompleted ? 'Megcsinált házi - kattints a visszaállításhoz' : 'Kattints a megjelöléshez'}">
+        </td>
         <td class="table-cell date-cell" data-label="${LanguageManager.t("homework.due_date")}:">${homework.deadline}</td>
         <td class="table-cell subject-cell" data-label="${LanguageManager.t("homework.subject")}:">${homework.subject}</td>
         <td class="table-cell description-cell" data-label="${LanguageManager.t("homework.description")}:">${homework.description}</td>
@@ -503,19 +495,7 @@ function setupFilters(homeworkItems, groupedHomework) {
 
     updateDateGroupsVisibility();
     updateStatistics();
-  };
-
-  const resetFilters = () => {
-    subjectFilter.value = "";
-    teacherFilter.value = "";
-    deadlineFilter.value = "";
-
-    document.querySelectorAll(".table-row").forEach((row) => {
-      row.style.display = "";
-    });
-
-    updateDateGroupsVisibility();
-    updateStatistics();
+    setupHomeworkCheckboxes();
   };
 
   subjectFilter.addEventListener("change", applyFilters);
@@ -611,6 +591,8 @@ function createMobileGroups() {
       dateGroup.appendChild(content);
       tableBody.appendChild(dateGroup);
     });
+
+  setupHomeworkCheckboxes();
 }
 
 function removeMobileGroups() {
@@ -627,6 +609,8 @@ function removeMobileGroups() {
 
   tableBody.innerHTML = "";
   allRows.forEach((row) => tableBody.appendChild(row));
+
+  setupHomeworkCheckboxes();
 }
 
 function updateDateGroupsVisibility() {
@@ -640,8 +624,89 @@ function updateDateGroupsVisibility() {
   });
 }
 
+function getHomeworkCompletionStatus(homeworkId) {
+  const completedHomework = cookieManager.get('completedHomework');
+  if (!completedHomework) return false;
+  
+  try {
+    const completedList = JSON.parse(completedHomework);
+    return completedList.includes(homeworkId.toString());
+  } catch (error) {
+    console.error('Error parsing completed homework cookie:', error);
+    return false;
+  }
+}
+
+function setHomeworkCompletionStatus(homeworkId, isCompleted) {
+  let completedHomework = cookieManager.get('completedHomework');
+  let completedList = [];
+  
+  if (completedHomework) {
+    try {
+      completedList = JSON.parse(completedHomework);
+    } catch (error) {
+      console.error('Error parsing completed homework cookie:', error);
+      completedList = [];
+    }
+  }
+  
+  const homeworkIdStr = homeworkId.toString();
+  
+  if (isCompleted) {
+    if (!completedList.includes(homeworkIdStr)) {
+      completedList.push(homeworkIdStr);
+    }
+  } else {
+    completedList = completedList.filter(id => id !== homeworkIdStr);
+  }
+  
+  cookieManager.set('completedHomework', JSON.stringify(completedList));
+}
+
+function setupHomeworkCheckboxes() {
+  const checkboxes = document.querySelectorAll('.homework-checkbox');
+  
+  checkboxes.forEach(checkbox => {
+    checkbox.addEventListener('change', function() {
+      const homeworkId = this.getAttribute('data-homework-id');
+      const isChecked = this.checked;
+      const row = this.closest('.table-row');
+      setHomeworkCompletionStatus(homeworkId, isChecked);
+
+      if (isChecked) {
+        row.classList.add('user-completed');
+        this.title = 'Megcsinált házi - kattints a visszaállításhoz';
+      } else {
+        row.classList.remove('user-completed');
+        this.title = 'Kattints a megjelöléshez';
+      }
+
+      const statusBadge = row.querySelector('.status-badge');
+      if (statusBadge) {
+        if (isChecked) {
+          statusBadge.className = 'status-badge completed';
+          statusBadge.textContent = LanguageManager.t('homework.completed');
+        } else {
+          const isUrgent = row.classList.contains('due-tomorrow');
+          if (isUrgent) {
+            statusBadge.className = 'status-badge urgent';
+            statusBadge.textContent = LanguageManager.t('homework.urgent');
+          } else {
+            statusBadge.className = 'status-badge pending';
+            statusBadge.textContent = LanguageManager.t('homework.pending');
+          }
+        }
+      }
+
+      updateStatistics();
+    });
+  });
+}
+
 if (window.location.href.includes("/Tanulo/TanuloHaziFeladat")) {
-  transformHomeworkPage().catch((error) => {
+  transformHomeworkPage().then(() => {
+    setupHomeworkCheckboxes();
+  }).catch((error) => {
     console.error("Error transforming homework page:", error);
   });
 }
