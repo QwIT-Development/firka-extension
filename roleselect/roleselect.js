@@ -127,12 +127,17 @@
       if (userName) {
         cookieManager.set("userName", userName);
       }
-
-      document.body.innerHTML = createHTML(
+      document.body.innerHTML = '';
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(createHTML(
         schoolCode,
         fullSchoolName,
         userName,
-      );
+      ), 'text/html');
+      const tempDiv = doc.body;
+      while (tempDiv.firstChild) {
+        document.body.appendChild(tempDiv.firstChild);
+      }
 
       
 

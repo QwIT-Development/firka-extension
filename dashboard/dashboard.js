@@ -476,12 +476,29 @@ class DashboardRenderer {
   }
 
   render() {
-    document.body.innerHTML = `
-      <div class="kreta-container">
-        ${createTemplate.header()}
-        ${this.generateMainContent()}
-      </div>
-    `;
+    document.body.innerHTML = '';
+    
+    const kretaContainer = document.createElement('div');
+    kretaContainer.className = 'kreta-container';
+    const headerDiv = document.createElement('div');
+    const parser = new DOMParser();
+    const headerDoc = parser.parseFromString(createTemplate.header(), 'text/html');
+    const headerContent = headerDoc.body;
+    while (headerContent.firstChild) {
+      headerDiv.appendChild(headerContent.firstChild);
+    }
+    kretaContainer.appendChild(headerDiv);
+    const mainContentDiv = document.createElement('div');
+    const parser2 = new DOMParser();
+    const mainDoc = parser2.parseFromString(this.generateMainContent(), 'text/html');
+    const mainContent = mainDoc.body;
+    while (mainContent.firstChild) {
+      mainContentDiv.appendChild(mainContent.firstChild);
+    }
+    kretaContainer.appendChild(mainContentDiv);
+    
+    document.body.appendChild(kretaContainer);
+    
     setupUserDropdown();
     setupMobileNavigation();
   }

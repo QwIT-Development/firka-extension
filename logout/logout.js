@@ -34,8 +34,13 @@
         </footer>
       </div>
     `;
-
-    document.body.innerHTML = newHTML;
+    document.body.innerHTML = '';
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(newHTML, 'text/html');
+    const tempDiv = doc.body;
+    while (tempDiv.firstChild) {
+      document.body.appendChild(tempDiv.firstChild);
+    }
 
     const timerElement = document.getElementById("automaticRedirectTimer");
     let remainingTime = 5;

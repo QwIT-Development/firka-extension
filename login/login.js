@@ -110,7 +110,15 @@ async function transformLoginPage() {
       </div>
     `;
 
-    document.body.innerHTML = newHTML;
+    // Biztonságos DOM létrehozás innerHTML helyett
+    document.body.innerHTML = '';
+    // Biztonságos HTML parsing DOMParser használatával
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(newHTML, 'text/html');
+    const tempDiv = doc.body;
+    while (tempDiv.firstChild) {
+      document.body.appendChild(tempDiv.firstChild);
+    }
 
     setupEventListeners();
   } catch (error) {
@@ -191,6 +199,5 @@ function handleSubmit(event) {
 
 if (window.location.href.includes("idp.e-kreta.hu/Account/Login")) {
   transformLoginPage().catch((error) => {
-    console.error("Error:", error);
   });
 }

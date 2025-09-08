@@ -9,12 +9,17 @@
       const classAverage = calculateOverallClassAverage(gradesData.subjects);
 
       window.currentGradesData = gradesData;
-
-      document.body.innerHTML = generatePageHTML(
+      document.body.innerHTML = '';
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(generatePageHTML(
         gradesData,
         studentAverage,
         classAverage,
-      );
+      ), 'text/html');
+      const tempDiv = doc.body;
+      while (tempDiv.firstChild) {
+        document.body.appendChild(tempDiv.firstChild);
+      }
 
       
       setupUserDropdown();

@@ -83,14 +83,19 @@ async function transformTwoFactorPage() {
       </div>
     `;
 
-    document.body.innerHTML = newHTML;
+    document.body.innerHTML = '';
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(newHTML, 'text/html');
+    const tempDiv = doc.body;
+    while (tempDiv.firstChild) {
+      document.body.appendChild(tempDiv.firstChild);
+    }
     applyTheme();
     setupEventListeners();
     if (typeof loadingScreen !== "undefined") {
       loadingScreen.hide();
     }
   } catch (error) {
-    console.error("Error transforming two-factor page:", error);
     if (typeof loadingScreen !== "undefined") {
       loadingScreen.hide();
     }
@@ -104,7 +109,6 @@ function applyTheme() {
       document.documentElement.setAttribute("data-theme", theme);
     }
   } catch (error) {
-    console.error("Error applying theme:", error);
   }
 }
 
@@ -168,7 +172,14 @@ function handleSubmit(event) {
     const submitButton = form.querySelector(".btn-kreta");
     if (submitButton) {
       submitButton.disabled = true;
-      submitButton.innerHTML = `<span class="spinner"></span><span class="btn-text">${LanguageManager.t("twofactor.verifying")}</span>`;
+      submitButton.innerHTML = '';
+      const spinnerSpan = document.createElement('span');
+      spinnerSpan.className = 'spinner';
+      const textSpan = document.createElement('span');
+      textSpan.className = 'btn-text';
+      textSpan.textContent = LanguageManager.t('twofactor.verifying');
+      submitButton.appendChild(spinnerSpan);
+      submitButton.appendChild(textSpan);
     }
 
     form.submit();

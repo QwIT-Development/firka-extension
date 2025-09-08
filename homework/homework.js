@@ -120,101 +120,218 @@ async function transformHomeworkPage() {
   const { basicData, homeworkItems, groupedHomework } =
     await collectHomeworkData();
 
-  document.body.innerHTML = `
-    <div class="kreta-container">
-      ${createTemplate.header()}
-
-      <main class="kreta-main">
-        <div class="filter-card">
-          <div class="filter-header">
-            <h2>${LanguageManager.t("homework.filter_title")}</h2>
-          </div>
-          <div class="filter-content">
-            <div class="filter-group">
-              <label>
-                <!--<span class="material-icons-round">subject</span>-->
-                ${LanguageManager.t("homework.subject")}
-              </label>
-              <select id="subjectFilter">
-                <option value="">${LanguageManager.t("homework.all_subjects")}</option>
-                ${[...new Set(homeworkItems.map((item) => item.subject))]
-                  .sort()
-                  .map(
-                    (subject) =>
-                      `<option value="${subject}">${subject}</option>`,
-                  )
-                  .join("")}
-              </select>
-            </div>
-            <div class="filter-group">
-              <label>
-                <!--<span class="material-icons-round">person</span>-->
-                ${LanguageManager.t("homework.teacher")}
-              </label>
-              <select id="teacherFilter">
-                <option value="">${LanguageManager.t("homework.all_teachers")}</option>
-                ${[...new Set(homeworkItems.map((item) => item.teacher))]
-                  .sort()
-                  .map(
-                    (teacher) =>
-                      `<option value="${teacher}">${teacher}</option>`,
-                  )
-                  .join("")}
-              </select>
-            </div>
-            <div class="filter-group">
-              <label>
-                <!--<span class="material-icons-round">date_range</span>-->
-                ${LanguageManager.t("homework.due_date")}
-              </label>
-              <select id="deadlineFilter">
-                <option value="">${LanguageManager.t("homework.all_deadlines")}</option>
-                <option value="tomorrow">${LanguageManager.t("homework.tomorrow_deadline")}</option>
-                <option value="thisWeek">${LanguageManager.t("homework.this_week")}</option>
-                <option value="nextWeek">${LanguageManager.t("homework.next_week")}</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        <div class="stats-overview" id="statsOverview">
-          <div class="stat-card">
-            <div class="stat-number" id="totalHomework">0</div>
-            <div class="stat-label">${LanguageManager.t("homework.total_homework")}</div>
-          </div>
-          <div class="stat-card urgent">
-            <div class="stat-number" id="urgentHomework">0</div>
-            <div class="stat-label">${LanguageManager.t("homework.urgent_homework")}</div>
-          </div>
-          <div class="stat-card completed">
-            <div class="stat-number" id="completedHomework">0</div>
-            <div class="stat-label">${LanguageManager.t("homework.completed_homework")}</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-number" id="pendingHomework">0</div>
-            <div class="stat-label">${LanguageManager.t("homework.pending_homework")}</div>
-          </div>
-        </div>
-
-        <div class="homework-container">
-          <table class="homework-table" id="homeworkTable">
-            <thead class="table-header">
-              <tr>
-                <th>${LanguageManager.t("homework.due_date")}</th>
-                <th>${LanguageManager.t("homework.subject")}</th>
-                <th>${LanguageManager.t("homework.description")}</th>
-                <th>${LanguageManager.t("homework.teacher")}</th>
-                <th>${LanguageManager.t("homework.status")}</th>
-              </tr>
-            </thead>
-            <tbody id="homeworkTableBody">
-              ${generateHomeworkHTML(homeworkItems)}
-            </tbody>
-          </table>
-        </div>
-      </main>
-    </div>
-  `;
+  // Biztonságos DOM létrehozás innerHTML helyett
+  document.body.innerHTML = '';
+  
+  // Fő konténer létrehozása
+  const kretaContainer = document.createElement('div');
+  kretaContainer.className = 'kreta-container';
+  
+  // Header hozzáadása
+  const headerDiv = document.createElement('div');
+  // Biztonságos HTML parsing DOMParser használatával
+  const parser = new DOMParser();
+  const headerDoc = parser.parseFromString(createTemplate.header(), 'text/html');
+  const headerContent = headerDoc.body;
+  while (headerContent.firstChild) {
+    headerDiv.appendChild(headerContent.firstChild);
+  }
+  kretaContainer.appendChild(headerDiv);
+  
+  // Main elem létrehozása
+  const main = document.createElement('main');
+  main.className = 'kreta-main';
+  
+  // Filter card létrehozása
+  const filterCard = document.createElement('div');
+  filterCard.className = 'filter-card';
+  
+  const filterHeader = document.createElement('div');
+  filterHeader.className = 'filter-header';
+  const filterTitle = document.createElement('h2');
+  filterTitle.textContent = LanguageManager.t('homework.filter_title');
+  filterHeader.appendChild(filterTitle);
+  
+  const filterContent = document.createElement('div');
+  filterContent.className = 'filter-content';
+  
+  // Subject filter
+  const subjectGroup = document.createElement('div');
+  subjectGroup.className = 'filter-group';
+  const subjectLabel = document.createElement('label');
+  subjectLabel.textContent = LanguageManager.t('homework.subject');
+  const subjectSelect = document.createElement('select');
+  subjectSelect.id = 'subjectFilter';
+  
+  const allSubjectsOption = document.createElement('option');
+  allSubjectsOption.value = '';
+  allSubjectsOption.textContent = LanguageManager.t('homework.all_subjects');
+  subjectSelect.appendChild(allSubjectsOption);
+  
+  [...new Set(homeworkItems.map((item) => item.subject))]
+    .sort()
+    .forEach((subject) => {
+      const option = document.createElement('option');
+      option.value = subject;
+      option.textContent = subject;
+      subjectSelect.appendChild(option);
+    });
+  
+  subjectGroup.appendChild(subjectLabel);
+  subjectGroup.appendChild(subjectSelect);
+  
+  // Teacher filter
+  const teacherGroup = document.createElement('div');
+  teacherGroup.className = 'filter-group';
+  const teacherLabel = document.createElement('label');
+  teacherLabel.textContent = LanguageManager.t('homework.teacher');
+  const teacherSelect = document.createElement('select');
+  teacherSelect.id = 'teacherFilter';
+  
+  const allTeachersOption = document.createElement('option');
+  allTeachersOption.value = '';
+  allTeachersOption.textContent = LanguageManager.t('homework.all_teachers');
+  teacherSelect.appendChild(allTeachersOption);
+  
+  [...new Set(homeworkItems.map((item) => item.teacher))]
+    .sort()
+    .forEach((teacher) => {
+      const option = document.createElement('option');
+      option.value = teacher;
+      option.textContent = teacher;
+      teacherSelect.appendChild(option);
+    });
+  
+  teacherGroup.appendChild(teacherLabel);
+  teacherGroup.appendChild(teacherSelect);
+  
+  // Deadline filter
+  const deadlineGroup = document.createElement('div');
+  deadlineGroup.className = 'filter-group';
+  const deadlineLabel = document.createElement('label');
+  deadlineLabel.textContent = LanguageManager.t('homework.due_date');
+  const deadlineSelect = document.createElement('select');
+  deadlineSelect.id = 'deadlineFilter';
+  
+  const deadlineOptions = [
+    { value: '', text: LanguageManager.t('homework.all_deadlines') },
+    { value: 'tomorrow', text: LanguageManager.t('homework.tomorrow_deadline') },
+    { value: 'thisWeek', text: LanguageManager.t('homework.this_week') },
+    { value: 'nextWeek', text: LanguageManager.t('homework.next_week') }
+  ];
+  
+  deadlineOptions.forEach(({ value, text }) => {
+    const option = document.createElement('option');
+    option.value = value;
+    option.textContent = text;
+    deadlineSelect.appendChild(option);
+  });
+  
+  deadlineGroup.appendChild(deadlineLabel);
+  deadlineGroup.appendChild(deadlineSelect);
+  
+  filterContent.appendChild(subjectGroup);
+  filterContent.appendChild(teacherGroup);
+  filterContent.appendChild(deadlineGroup);
+  
+  filterCard.appendChild(filterHeader);
+  filterCard.appendChild(filterContent);
+  
+  // Stats overview
+  const statsOverview = document.createElement('div');
+  statsOverview.className = 'stats-overview';
+  statsOverview.id = 'statsOverview';
+  
+  const statCards = [
+    { id: 'totalHomework', label: LanguageManager.t('homework.total_homework'), className: '' },
+    { id: 'urgentHomework', label: LanguageManager.t('homework.urgent_homework'), className: 'urgent' },
+    { id: 'completedHomework', label: LanguageManager.t('homework.completed_homework'), className: 'completed' },
+    { id: 'pendingHomework', label: LanguageManager.t('homework.pending_homework'), className: '' }
+  ];
+  
+  statCards.forEach(({ id, label, className }) => {
+    const statCard = document.createElement('div');
+    statCard.className = `stat-card ${className}`.trim();
+    
+    const statNumber = document.createElement('div');
+    statNumber.className = 'stat-number';
+    statNumber.id = id;
+    statNumber.textContent = '0';
+    
+    const statLabel = document.createElement('div');
+    statLabel.className = 'stat-label';
+    statLabel.textContent = label;
+    
+    statCard.appendChild(statNumber);
+    statCard.appendChild(statLabel);
+    statsOverview.appendChild(statCard);
+  });
+  
+  // Homework container
+  const homeworkContainer = document.createElement('div');
+  homeworkContainer.className = 'homework-container';
+  
+  const homeworkTable = document.createElement('table');
+  homeworkTable.className = 'homework-table';
+  homeworkTable.id = 'homeworkTable';
+  
+  const thead = document.createElement('thead');
+  thead.className = 'table-header';
+  const headerRow = document.createElement('tr');
+  
+  const headers = [
+    LanguageManager.t('homework.due_date'),
+    LanguageManager.t('homework.subject'),
+    LanguageManager.t('homework.description'),
+    LanguageManager.t('homework.teacher'),
+    LanguageManager.t('homework.status')
+  ];
+  
+  headers.forEach(headerText => {
+    const th = document.createElement('th');
+    th.textContent = headerText;
+    headerRow.appendChild(th);
+  });
+  
+  thead.appendChild(headerRow);
+  
+  const tbody = document.createElement('tbody');
+  tbody.id = 'homeworkTableBody';
+  
+  // Biztonságos HTML tartalom hozzáadása
+  const homeworkHTML = generateHomeworkHTML(homeworkItems);
+  
+  if (homeworkHTML.trim()) {
+    // Biztonságos HTML parsing DOMParser használatával - table kontextusban
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(`<table><tbody>${homeworkHTML}</tbody></table>`, 'text/html');
+    const tempTbody = doc.querySelector('tbody');
+    while (tempTbody.firstChild) {
+      tbody.appendChild(tempTbody.firstChild);
+    }
+  } else {
+    // Ha nincs házi feladat, üres sor hozzáadása
+    const emptyRow = document.createElement('tr');
+    const emptyCell = document.createElement('td');
+    emptyCell.colSpan = 5;
+    emptyCell.textContent = LanguageManager.t('homework.no_homework') || 'Nincs házi feladat';
+    emptyCell.style.textAlign = 'center';
+    emptyCell.style.padding = '20px';
+    emptyRow.appendChild(emptyCell);
+    tbody.appendChild(emptyRow);
+  }
+  
+  homeworkTable.appendChild(thead);
+  homeworkTable.appendChild(tbody);
+  homeworkContainer.appendChild(homeworkTable);
+  
+  // Összeállítás
+  main.appendChild(filterCard);
+  main.appendChild(statsOverview);
+  main.appendChild(homeworkContainer);
+  
+  kretaContainer.appendChild(main);
+  document.body.appendChild(kretaContainer);
 
   setupFilters(homeworkItems, groupedHomework);
   setupUserDropdown();

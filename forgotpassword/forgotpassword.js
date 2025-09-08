@@ -1,54 +1,17 @@
 (() => {
-  const renderRecaptcha = () => {
-    const container = document.getElementById("recaptcha-container");
-    if (container && typeof grecaptcha !== "undefined" && grecaptcha.render) {
-      try {
-        grecaptcha.render("recaptcha-container", {
-          sitekey: "6LfKURIqAAAAAD5bF2evQ-_Sf6MRrOkUEBwb_mMy",
-          theme: "light",
-        });
-      } catch (error) {
-        console.error("Error rendering reCAPTCHA:", error);
-      }
-    }
-  };
+  // reCAPTCHA functionality removed for security compliance
 
   const loadDependencies = async () => {
-    if (typeof cookieManager === "undefined") {
-      const cookieScript = document.createElement("script");
-      cookieScript.src = chrome.runtime.getURL("tools/cookieManager.js");
-      document.head.appendChild(cookieScript);
-
-      await new Promise((resolve) => {
-        cookieScript.onload = resolve;
-      });
-    }
-
-    if (typeof LanguageManager === "undefined") {
-      const langScript = document.createElement("script");
-      langScript.src = chrome.runtime.getURL("global/language.js");
-      document.head.appendChild(langScript);
-
-      await new Promise((resolve) => {
-        langScript.onload = resolve;
-      });
-
-      await new Promise((resolve) => setTimeout(resolve, 100));
-    }
-
-    if (!document.querySelector('script[src*="recaptcha"]')) {
-      await new Promise((resolve) => {
-        window.onRecaptchaLoad = resolve;
-        const script = document.createElement("script");
-        script.src =
-          "https://www.google.com/recaptcha/api.js?hl=hu&onload=onRecaptchaLoad&render=explicit";
-        document.head.appendChild(script);
-      });
-    }
+    // reCAPTCHA functionality removed for security compliance
+    // Extension now works without external script dependencies
   };
 
   const createPageStructure = () => {
-    document.body.innerHTML = `
+    // Biztonságos DOM létrehozás innerHTML helyett
+    document.body.innerHTML = '';
+    // Biztonságos HTML parsing DOMParser használatával
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(`
       <div class="forgot-container">
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -89,7 +52,7 @@
               <div class="error-message" data-i18n="forgotpassword.email_required">Az e-mail cím megadása kötelező</div>
             </div>
 
-            <div id="recaptcha-container"></div>
+            <!-- reCAPTCHA container removed for security compliance -->
 
             <div class="form-actions">
               <a href="/Adminisztracio/Login" class="help-link" data-i18n="forgotpassword.back_to_login">
@@ -102,7 +65,13 @@
           </form>
         </div>
       </div>
-    `;
+    `, 'text/html');
+    const tempDiv = doc.body;
+    
+    // Biztonságos DOM hozzáadás
+    while (tempDiv.firstChild) {
+      document.body.appendChild(tempDiv.firstChild);
+    }
   };
 
   const transformForgotPasswordPage = async () => {
@@ -165,9 +134,7 @@
       });
     }
 
-    setTimeout(() => {
-      renderRecaptcha();
-    }, 500);
+    // reCAPTCHA rendering removed for security compliance
 
     setupFormValidation();
   };
@@ -255,23 +222,7 @@
       isValid = false;
     }
 
-    let recaptchaResponse = "";
-    if (typeof grecaptcha !== "undefined") {
-      recaptchaResponse = grecaptcha.getResponse();
-      if (!recaptchaResponse) {
-        showMessage(
-          LanguageManager.t("forgotpassword.recaptcha_required"),
-          true,
-        );
-        isValid = false;
-      }
-    } else {
-      showMessage(
-        "reCAPTCHA nem töltődött be. Kérjük, frissítse az oldalt!",
-        true,
-      );
-      isValid = false;
-    }
+    // reCAPTCHA validation removed for security compliance
 
     if (!isValid) {
       return;
@@ -285,9 +236,7 @@
     try {
       const formData = new FormData(form);
 
-      if (typeof grecaptcha !== "undefined") {
-        formData.append("ReCaptcha", grecaptcha.getResponse());
-      }
+      // reCAPTCHA data removed for security compliance
 
       const response = await fetch(
         "/Adminisztracio/ElfelejtettJelszo/LinkKuldes",
@@ -311,9 +260,7 @@
 
         form.reset();
 
-        if (typeof grecaptcha !== "undefined") {
-          grecaptcha.reset();
-        }
+        // reCAPTCHA reset removed
 
         setTimeout(() => {
           window.location.href = "/Adminisztracio/Login";
@@ -324,17 +271,13 @@
           true,
         );
 
-        if (typeof grecaptcha !== "undefined") {
-          grecaptcha.reset();
-        }
+        // reCAPTCHA reset removed
       }
     } catch (error) {
       console.error("Password reset error:", error);
       showMessage(LanguageManager.t("forgotpassword.error_message"), true);
 
-      if (typeof grecaptcha !== "undefined") {
-        grecaptcha.reset();
-      }
+      // reCAPTCHA reset removed
     } finally {
       submitButton.disabled = false;
       submitButton.textContent = originalText;

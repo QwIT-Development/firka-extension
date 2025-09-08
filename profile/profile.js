@@ -208,7 +208,6 @@
           throw new Error(LanguageManager.t("profile.contacts_save_error"));
         }
       } catch (error) {
-        console.error("Error saving contacts:", error);
         alert(LanguageManager.t("profile.save_error"));
       }
     });
@@ -276,7 +275,6 @@
             throw new Error(LanguageManager.t("profile.settings_save_error"));
           }
         } catch (error) {
-          console.error("Error saving settings:", error);
           alert(LanguageManager.t("profile.save_error"));
         }
       });
@@ -333,7 +331,6 @@
             throw new Error(LanguageManager.t("profile.password_change_error"));
           }
         } catch (error) {
-          console.error("Error changing password:", error);
           alert(LanguageManager.t("profile.password_change_error"));
         }
       });
@@ -402,9 +399,13 @@
 
   async function init() {
     if (window.location.pathname.includes("/Adminisztracio/Profil")) {
-      
-
-      document.body.innerHTML = createProfileHTML();
+      document.body.innerHTML = '';
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(createProfileHTML(), 'text/html');
+      const tempDiv = doc.body;
+      while (tempDiv.firstChild) {
+        document.body.appendChild(tempDiv.firstChild);
+      }
       setupUserDropdown();
       setupMobileNavigation();
       setupEventListeners();

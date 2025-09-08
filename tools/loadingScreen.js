@@ -6,13 +6,29 @@ const loadingScreen = {
 
     const loadingScreen = document.createElement("div");
     loadingScreen.className = "loading-screen";
-    loadingScreen.innerHTML = `
-    <div class="loading-content">
-        <img src="${chrome.runtime.getURL("images/loading.gif")}" alt="Firka" class="loading-logo">
-        <div class="loading-text" data-i18n="loading.text">Betöltés alatt...</div>
-        <div class="loading-text2" data-i18n="loading.subtext">Kis türelmet!</div>
-    </div>
-    `;
+    
+    const loadingContent = document.createElement('div');
+    loadingContent.className = 'loading-content';
+    
+    const loadingLogo = document.createElement('img');
+    loadingLogo.src = chrome.runtime.getURL("images/loading.gif");
+    loadingLogo.alt = 'Firka';
+    loadingLogo.className = 'loading-logo';
+    
+    const loadingText = document.createElement('div');
+    loadingText.className = 'loading-text';
+    loadingText.setAttribute('data-i18n', 'loading.text');
+    loadingText.textContent = 'Betöltés alatt...';
+    
+    const loadingText2 = document.createElement('div');
+    loadingText2.className = 'loading-text2';
+    loadingText2.setAttribute('data-i18n', 'loading.subtext');
+    loadingText2.textContent = 'Kis türelmet!';
+    
+    loadingContent.appendChild(loadingLogo);
+    loadingContent.appendChild(loadingText);
+    loadingContent.appendChild(loadingText2);
+    loadingScreen.appendChild(loadingContent);
     document.body.appendChild(loadingScreen);
     document.body.classList.add("loaded");
   },

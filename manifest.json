@@ -15,7 +15,7 @@
   "browser_specific_settings": {
     "gecko": {
       "id": "firxa@zan1456.hu",
-      "strict_min_version": "58.0"
+      "strict_min_version": "109.0"
     }
   },
   "web_accessible_resources": [

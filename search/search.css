@@ -1,4 +1,3 @@
-/* Hide original elements */
 header,footer,.page-title,.card-kreta {
   display:none !important;
 }

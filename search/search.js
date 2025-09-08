@@ -41,21 +41,34 @@ function applyFirkaStyling() {
     searchWrapper.className = "firka-search-wrapper";
     const firkaHeader = document.createElement("div");
     firkaHeader.className = "firka-header";
-    firkaHeader.innerHTML = `
-      <p class="logo-text">
-        <img src="${chrome.runtime.getURL("images/firka_logo.png")}" alt="Firka" class="logo">
-        Firka
-      </p>
-      <h1 class="search-title">Válassz iskolát</h1>
-    `;
+    const logoText = document.createElement('p');
+    logoText.className = 'logo-text';
+    
+    const logoImg = document.createElement('img');
+    logoImg.src = chrome.runtime.getURL('images/firka_logo.png');
+    logoImg.alt = 'Firka';
+    logoImg.className = 'logo';
+    
+    logoText.appendChild(logoImg);
+    logoText.appendChild(document.createTextNode('Firka'));
+    
+    const searchTitle = document.createElement('h1');
+    searchTitle.className = 'search-title';
+    searchTitle.textContent = 'Válassz iskolát';
+    
+    firkaHeader.appendChild(logoText);
+    firkaHeader.appendChild(searchTitle);
     const formContainer = document.createElement("div");
     formContainer.className = "firka-form-container";
     const firkaFooter = document.createElement("div");
     firkaFooter.className = "firka-footer";
-    firkaFooter.innerHTML = `
-      <a href="https://tudasbazis.ekreta.hu/pages/viewpage.action?pageId=4064926" 
-         target="_blank" class="privacy-link">Adatkezelési tájékoztató</a>
-    `;
+    const privacyLink = document.createElement('a');
+    privacyLink.href = 'https://tudasbazis.ekreta.hu/pages/viewpage.action?pageId=4064926';
+    privacyLink.target = '_blank';
+    privacyLink.className = 'privacy-link';
+    privacyLink.textContent = 'Adatkezelési tájékoztató';
+    
+    firkaFooter.appendChild(privacyLink);
     const existingWrapper = document.querySelector(".firka-search-wrapper");
     if (existingWrapper) {
       existingWrapper.remove();
@@ -78,7 +91,6 @@ function applyFirkaStyling() {
     }
     observeAutocompleteValue(instituteCodeInput, redirectButton);
   } catch (error) {
-    console.error("Error applying Firka styling:", error);
   }
 }
 

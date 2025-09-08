@@ -143,11 +143,6 @@
         } else {
         }
       } catch (error) {
-        console.error(
-          `Hiba az API feldolgozása során (${index}):`,
-          error,
-          event,
-        );
       }
     });
     return lessons;
@@ -172,7 +167,7 @@
       LanguageManager.t("timetable.friday"),
     ];
 
-    // Check if there are any special days to show notice row
+    
     const hasSpecialDays = specialDayLessons.length > 0;
 
     return `
@@ -210,7 +205,18 @@
       ` : ""}
       ${times
         .map(
-          (time, timeIndex) => `
+          (time, timeIndex) => {
+
+            const lastLessonTimes = Array(5).fill().map((_, dayIndex) => {
+              const dayLessonsForDay = regularLessons.filter(l => l.day === dayIndex);
+              if (dayLessonsForDay.length === 0) return null;
+              const lastTime = dayLessonsForDay
+                .map(l => l.startTime)
+                .sort((a, b) => helper.convertTimeToMinutes(b) - helper.convertTimeToMinutes(a))[0];
+              return lastTime;
+            });
+            
+            return `
         <div class="time-slot">${time}</div>
         ${Array(5)
           .fill()
@@ -218,9 +224,19 @@
             const dayLessons = regularLessons.filter(
               (l) => l.startTime === time && l.day === dayIndex,
             );
+            
 
-            return `
-            <div class="lesson-slot">
+            const lastLessonTime = lastLessonTimes[dayIndex];
+            const isAfterLastLesson = lastLessonTime && helper.convertTimeToMinutes(time) > helper.convertTimeToMinutes(lastLessonTime);
+            
+
+            if (dayLessons.length === 0 && isAfterLastLesson) {
+              return `<div class="lesson-slot"></div>`;
+            }
+            
+              return `
+            <div class="lesson-slot ${dayLessons.length === 0 ? 'empty-slot' : ''}">
+              ${dayLessons.length === 0 ? '<div class="empty-lesson-placeholder"></div>' : ''}
               ${dayLessons
                       .map(
                         (lesson) => `
@@ -269,7 +285,8 @@
           `;
           })
           .join("")}
-      `,
+      `;
+          }
         )
         .join("")}
     `;
@@ -277,93 +294,213 @@
   function showLessonModal(lesson) {
     const modal = document.createElement("div");
     modal.className = "lesson-modal";
-    modal.innerHTML = `
-      <div class="modal-content">
-        <div class="modal-header">
-          <h3 class="modal-title">${lesson.subject}</h3>
-          <button class="modal-close">
-            <img src="${chrome.runtime.getURL("icons/CloseCircle.svg")}" alt="Bezárás" style="width: 24px; height: 24px;">
-          </button>
-        </div>
-        <div class="modal-body">
-          <div class="lesson-details">
-            <div class="detail-item">
-              <span class="detail-label">${LanguageManager.t("timetable.teacher_label")}</span>
-              <span class="detail-value ${lesson.originalTeacher != "" ? "line-through" : ""}">${lesson.originalTeacher != "" ? lesson.originalTeacher : lesson.teacher}</span>
-            </div>
-            <div class="detail-item ${lesson.originalTeacher != "" ? "" : "hidden"}">
-              <span class="detail-label">${LanguageManager.t("timetable.substitute_teacher_label")}</span>
-              <span class="detail-value">${lesson.teacher.replace("Helyettesítő:", "")}</span>
-            </div>
-            <div class="detail-item">
-              <span class="detail-label">${LanguageManager.t("timetable.classroom_label")}</span>
-              <span class="detail-value">${lesson.room}</span>
-            </div>
-            <div class="detail-item">
-              <span class="detail-label">${LanguageManager.t("timetable.time_label")}</span>
-              <span class="detail-value">${lesson.startTime} - ${lesson.endTime}</span>
-            </div>
-            ${
-              lesson.isSubstituted
-                ? `
-            <div class="detail-item">
-              <span class="detail-label">${LanguageManager.t("timetable.status_label")}</span>
-              <span class="detail-value"><span class="material-icons-round">sync_alt</span> ${LanguageManager.t("timetable.substitution")}</span>
-            </div>
-            `
-                : ""
-            }
-            ${
-              lesson.isCancelled
-                ? `
-            <div class="detail-item">
-              <span class="detail-label">${LanguageManager.t("timetable.status_label")}</span>
-              <span class="detail-value"><span class="material-icons-round">cancel</span> ${LanguageManager.t("timetable.cancelled")}</span>
-            </div>
-            `
-                : ""
-            }
-          </div>
-          
-          ${
-            lesson.hasHomework
-              ? `
-            <div class="modal-section homework-section">
-              <h4>
-                <img src="${chrome.runtime.getURL("icons/homework.svg")}" alt="Házi feladat" style="width: 20px; height: 20px;">
-                ${LanguageManager.t("timetable.homework_indicator")}
-              </h4>
-              <div class="homework-content">
-                ${lesson.homeworkDetails ? `<p>${lesson.homeworkDetails}</p>` : `<p>${LanguageManager.t("timetable.has_homework")}</p>`}
-                <a href='https://${window.location.hostname}/Tanulo/TanuloHaziFeladat' class="more-link">
-                  ${LanguageManager.t("timetable.open_homework")}
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="17" viewBox="0 0 16 17" fill="none">
-                    <path d="M11.2997 5.19947L5.64282 5.19947M11.2997 5.19947L11.2997 10.8563M11.2997 5.19947L4.70001 11.7991" stroke="var(--accent-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
-                  </svg>
-                </a>
-              </div>
-            </div>
-          `
-              : ""
-          }
-          ${
-            lesson.testInfo
-              ? `
-            <div class="modal-section test-section">
-              <h4>
-                <img src="${chrome.runtime.getURL("icons/assigment.svg")}" alt="Teszt" style="width: 20px; height: 20px;">
-                ${LanguageManager.t("timetable.test_indicator")}
-              </h4>
-              <div class="test-content">
-                <p>${lesson.testInfo}</p>
-              </div>
-            </div>
-          `
-              : ""
-          }
-        </div>
-      </div>
-    `;
+
+    const modalContent = document.createElement('div');
+    modalContent.className = 'modal-content';
+    
+
+    const header = document.createElement('div');
+    header.className = 'modal-header';
+    
+    const title = document.createElement('h3');
+    title.className = 'modal-title';
+    title.textContent = lesson.subject;
+    
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'modal-close';
+    
+    const closeIcon = document.createElement('img');
+    closeIcon.src = chrome.runtime.getURL('icons/CloseCircle.svg');
+    closeIcon.alt = 'Bezárás';
+    closeIcon.style.width = '24px';
+    closeIcon.style.height = '24px';
+    closeBtn.appendChild(closeIcon);
+    
+    header.appendChild(title);
+    header.appendChild(closeBtn);
+    
+
+    const body = document.createElement('div');
+    body.className = 'modal-body';
+    
+
+    const lessonDetails = document.createElement('div');
+    lessonDetails.className = 'lesson-details';
+    
+
+    const teacherItem = document.createElement('div');
+    teacherItem.className = 'detail-item';
+    const teacherLabel = document.createElement('span');
+    teacherLabel.className = 'detail-label';
+    teacherLabel.textContent = LanguageManager.t('timetable.teacher_label');
+    const teacherValue = document.createElement('span');
+    teacherValue.className = `detail-value ${lesson.originalTeacher != '' ? 'line-through' : ''}`;
+    teacherValue.textContent = lesson.originalTeacher != '' ? lesson.originalTeacher : lesson.teacher;
+    teacherItem.appendChild(teacherLabel);
+    teacherItem.appendChild(teacherValue);
+    lessonDetails.appendChild(teacherItem);
+    
+
+    if (lesson.originalTeacher != '') {
+      const substituteItem = document.createElement('div');
+      substituteItem.className = 'detail-item';
+      const substituteLabel = document.createElement('span');
+      substituteLabel.className = 'detail-label';
+      substituteLabel.textContent = LanguageManager.t('timetable.substitute_teacher_label');
+      const substituteValue = document.createElement('span');
+      substituteValue.className = 'detail-value';
+      substituteValue.textContent = lesson.teacher.replace('Helyettesítő:', '');
+      substituteItem.appendChild(substituteLabel);
+      substituteItem.appendChild(substituteValue);
+      lessonDetails.appendChild(substituteItem);
+    }
+    
+
+    const roomItem = document.createElement('div');
+    roomItem.className = 'detail-item';
+    const roomLabel = document.createElement('span');
+    roomLabel.className = 'detail-label';
+    roomLabel.textContent = LanguageManager.t('timetable.classroom_label');
+    const roomValue = document.createElement('span');
+    roomValue.className = 'detail-value';
+    roomValue.textContent = lesson.room;
+    roomItem.appendChild(roomLabel);
+    roomItem.appendChild(roomValue);
+    lessonDetails.appendChild(roomItem);
+    
+
+    const timeItem = document.createElement('div');
+    timeItem.className = 'detail-item';
+    const timeLabel = document.createElement('span');
+    timeLabel.className = 'detail-label';
+    timeLabel.textContent = LanguageManager.t('timetable.time_label');
+    const timeValue = document.createElement('span');
+    timeValue.className = 'detail-value';
+    timeValue.textContent = `${lesson.startTime} - ${lesson.endTime}`;
+    timeItem.appendChild(timeLabel);
+    timeItem.appendChild(timeValue);
+    lessonDetails.appendChild(timeItem);
+    
+
+    if (lesson.isSubstituted) {
+      const statusItem = document.createElement('div');
+      statusItem.className = 'detail-item';
+      const statusLabel = document.createElement('span');
+      statusLabel.className = 'detail-label';
+      statusLabel.textContent = LanguageManager.t('timetable.status_label');
+      const statusValue = document.createElement('span');
+      statusValue.className = 'detail-value';
+      const statusIcon = document.createElement('span');
+      statusIcon.className = 'material-icons-round';
+      statusIcon.textContent = 'sync_alt';
+      statusValue.appendChild(statusIcon);
+      statusValue.appendChild(document.createTextNode(' ' + LanguageManager.t('timetable.substitution')));
+      statusItem.appendChild(statusLabel);
+      statusItem.appendChild(statusValue);
+      lessonDetails.appendChild(statusItem);
+    }
+    
+    if (lesson.isCancelled) {
+      const statusItem = document.createElement('div');
+      statusItem.className = 'detail-item';
+      const statusLabel = document.createElement('span');
+      statusLabel.className = 'detail-label';
+      statusLabel.textContent = LanguageManager.t('timetable.status_label');
+      const statusValue = document.createElement('span');
+      statusValue.className = 'detail-value';
+      const statusIcon = document.createElement('span');
+      statusIcon.className = 'material-icons-round';
+      statusIcon.textContent = 'cancel';
+      statusValue.appendChild(statusIcon);
+      statusValue.appendChild(document.createTextNode(' ' + LanguageManager.t('timetable.cancelled')));
+      statusItem.appendChild(statusLabel);
+      statusItem.appendChild(statusValue);
+      lessonDetails.appendChild(statusItem);
+    }
+    
+    body.appendChild(lessonDetails);
+    
+
+    if (lesson.hasHomework) {
+      const homeworkSection = document.createElement('div');
+      homeworkSection.className = 'modal-section homework-section';
+      
+      const homeworkH4 = document.createElement('h4');
+      const homeworkIcon = document.createElement('img');
+      homeworkIcon.src = chrome.runtime.getURL('icons/homework.svg');
+      homeworkIcon.alt = 'Házi feladat';
+      homeworkIcon.style.width = '20px';
+      homeworkIcon.style.height = '20px';
+      homeworkH4.appendChild(homeworkIcon);
+      homeworkH4.appendChild(document.createTextNode(LanguageManager.t('timetable.homework_indicator')));
+      
+      const homeworkContent = document.createElement('div');
+      homeworkContent.className = 'homework-content';
+      
+      const homeworkP = document.createElement('p');
+      homeworkP.textContent = lesson.homeworkDetails ? lesson.homeworkDetails : LanguageManager.t('timetable.has_homework');
+      homeworkContent.appendChild(homeworkP);
+      
+      const moreLink = document.createElement('a');
+      moreLink.href = `https://${window.location.hostname}/Tanulo/TanuloHaziFeladat`;
+      moreLink.className = 'more-link';
+      moreLink.textContent = LanguageManager.t('timetable.open_homework');
+      
+      const linkSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      linkSvg.setAttribute('width', '16');
+      linkSvg.setAttribute('height', '17');
+      linkSvg.setAttribute('viewBox', '0 0 16 17');
+      linkSvg.setAttribute('fill', 'none');
+      
+      const linkPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      linkPath.setAttribute('d', 'M11.2997 5.19947L5.64282 5.19947M11.2997 5.19947L11.2997 10.8563M11.2997 5.19947L4.70001 11.7991');
+      linkPath.setAttribute('stroke', 'var(--accent-accent)');
+      linkPath.setAttribute('stroke-width', '2');
+      linkPath.setAttribute('stroke-linecap', 'round');
+      linkPath.setAttribute('stroke-linejoin', 'round');
+      
+      linkSvg.appendChild(linkPath);
+      moreLink.appendChild(linkSvg);
+      homeworkContent.appendChild(moreLink);
+      
+      homeworkSection.appendChild(homeworkH4);
+      homeworkSection.appendChild(homeworkContent);
+      body.appendChild(homeworkSection);
+    }
+    
+
+    if (lesson.testInfo) {
+      const testSection = document.createElement('div');
+      testSection.className = 'modal-section test-section';
+      
+      const testH4 = document.createElement('h4');
+      const testIcon = document.createElement('img');
+      testIcon.src = chrome.runtime.getURL('icons/assigment.svg');
+      testIcon.alt = 'Teszt';
+      testIcon.style.width = '20px';
+      testIcon.style.height = '20px';
+      testH4.appendChild(testIcon);
+      testH4.appendChild(document.createTextNode(LanguageManager.t('timetable.test_indicator')));
+      
+      const testContent = document.createElement('div');
+      testContent.className = 'test-content';
+      
+      const testP = document.createElement('p');
+      testP.textContent = lesson.testInfo;
+      testContent.appendChild(testP);
+      
+      testSection.appendChild(testH4);
+      testSection.appendChild(testContent);
+      body.appendChild(testSection);
+    }
+    
+
+    modalContent.appendChild(header);
+    modalContent.appendChild(body);
+    
+
+    modal.innerHTML = '';
+    modal.appendChild(modalContent);
 
     document.body.appendChild(modal);
 
@@ -431,7 +568,16 @@
       const allLessons = apiLessons;
       const timetableGrid = document.querySelector(".timetable-grid");
       if (timetableGrid) {
-        timetableGrid.innerHTML = generateTimeGrid(allLessons, weekDates);
+    
+        const newContent = generateTimeGrid(lessons, weekDates);
+        timetableGrid.innerHTML = '';
+    
+        const parser1 = new DOMParser();
+        const doc = parser1.parseFromString(`<div>${newContent}</div>`, 'text/html');
+        const tempDiv = doc.querySelector('div');
+        while (tempDiv.firstChild) {
+          timetableGrid.appendChild(tempDiv.firstChild);
+        }
         setupLessonCardListeners();
       }
 
@@ -648,7 +794,7 @@
       schoolYear = currentYear - 1;
     }
 
-    const schoolYearStart = new Date(schoolYear, 8, 1); // szeptember 1
+    const schoolYearStart = new Date(schoolYear, 8, 1);
     const startDayOfWeek = schoolYearStart.getDay();
     const daysToFirstMonday =
       startDayOfWeek === 1 ? 0 : (8 - startDayOfWeek) % 7;
@@ -664,8 +810,8 @@
   }
 
   function getDateOfWeek(year, week, dayOfWeek) {
-    // Tanév alapú hét számítás: szeptember 1-től kezdődik
-    const schoolYearStart = new Date(year, 8, 1); // szeptember 1
+
+    const schoolYearStart = new Date(year, 8, 1);
     const startDayOfWeek = schoolYearStart.getDay();
     const daysToFirstMonday =
       startDayOfWeek === 1 ? 0 : (8 - startDayOfWeek) % 7;
@@ -768,19 +914,19 @@
       });
     }
 
-    modalGrid.innerHTML = allWeeks
-      .map(
-        (week) => `
-      <div class="week-cell ${week.selected ? "selected" : ""}" 
-           data-week="${week.value}" 
-           data-start="${week.startDate}" 
-           data-end="${week.endDate}"
-           title="${week.text}">
-        ${week.value}
-      </div>
-    `,
-      )
-      .join("");
+
+    modalGrid.innerHTML = '';
+    allWeeks.forEach((week) => {
+      const weekCell = document.createElement('div');
+      weekCell.className = `week-cell ${week.selected ? 'selected' : ''} ${week.selected ? 'current-week' : ''}`;
+      weekCell.setAttribute('data-week', week.value);
+      weekCell.setAttribute('data-start', week.startDate);
+      weekCell.setAttribute('data-end', week.endDate);
+      weekCell.title = week.text;
+      weekCell.textContent = week.value;
+      
+      modalGrid.appendChild(weekCell);
+    });
     modalGrid.addEventListener("click", async (e) => {
       if (e.target.classList.contains("week-cell")) {
         const weekValue = e.target.dataset.week;
@@ -856,19 +1002,19 @@
   function updateMainWeekGrid(newWeekOptions) {
     const weekGrid = document.getElementById("week-grid");
     if (weekGrid) {
-      weekGrid.innerHTML = newWeekOptions
-        .map(
-          (opt) => `
-        <div class="week-cell ${opt.selected ? "selected" : ""}" 
-             data-week="${opt.value}" 
-             data-start="${opt.startDate}" 
-             data-end="${opt.endDate}"
-             title="${opt.text}">
-          ${opt.value}
-        </div>
-      `,
-        )
-        .join("");
+  
+      weekGrid.innerHTML = '';
+      newWeekOptions.forEach((opt) => {
+        const weekCell = document.createElement('div');
+        weekCell.className = `week-cell ${opt.selected ? 'selected' : ''}`;
+        weekCell.setAttribute('data-week', opt.value);
+        weekCell.setAttribute('data-start', opt.startDate);
+        weekCell.setAttribute('data-end', opt.endDate);
+        weekCell.title = opt.text;
+        weekCell.textContent = opt.value;
+        
+        weekGrid.appendChild(weekCell);
+      });
     }
   }
 
@@ -903,63 +1049,183 @@
         lessons: lessons,
       };
 
-      document.body.innerHTML = `
-        <div class="kreta-container">
-          ${createTemplate.header()}
 
-          <main class="kreta-main">
-            <div class="week-controls">
-              <div class="week-selector-container">
-                <div class="week-selector" id="week-selector">
-                  <button class="week-nav-btn" id="prevWeekBtn" title="Előző hét">
-                    <img src="${chrome.runtime.getURL("icons/ChevronLeftCircle.svg")}" alt="Előző" style="width: 24px; height: 24px;">
-                  </button>
-                  <div class="week-display" id="week-display">
-                  </div>
-                  <button class="week-nav-btn" id="nextWeekBtn" title="Következő hét">
-                    <img src="${chrome.runtime.getURL("icons/ChevronRightCircle.svg")}" alt="Következő" style="width: 24px; height: 24px;">
-                  </button>
-                  <button class="expand-week-view-btn" id="expandWeekView" title="Teljes nézet">
-                    <img src="${chrome.runtime.getURL("icons/ArrowsExpandFull.svg")}" alt="Teljes nézet" style="width: 18px; height: 18px;">
-                  </button>
-                </div>
-                <div class="week-tooltip" id="week-tooltip"></div>
-              </div>
-            </div>
-
-            <!-- Modal for expanded week view -->
-            <div class="week-modal" id="weekModal" style="display: none;">
-              <div class="week-modal-content">
-                <div class="week-modal-header">
-                  <h3></h3>
-                  <button class="week-modal-close" id="closeWeekModal">
-                    <img src="${chrome.runtime.getURL("icons/CloseCircle.svg")}" alt="Bezárás" style="width: 24px; height: 24px;">
-                  </button>
-                </div>
-                <div class="week-modal-grid" id="weekModalGrid">
-                </div>
-              </div>
-            </div>
-
-            <div class="day-navigation">
-              <button class="day-nav-btn" id="prevDay">
-                <img src="${chrome.runtime.getURL("icons/ChevronLeftCircle.svg")}" alt="Előző" style="width: 24px; height: 24px;">
-                Előző
-              </button>
-              <button class="day-nav-btn" id="nextDay">
-                Következő
-                <img src="${chrome.runtime.getURL("icons/ChevronRightCircle.svg")}" alt="Következő" style="width: 24px; height: 24px;">
-              </button>
-            </div>
-
-            <div class="timetable-container">
-              <div class="timetable-grid">
-                ${generateTimeGrid(data.lessons, data.weekDates)}
-              </div>
-            </div>
-          </main>
-        </div>
-      `;
+      document.body.innerHTML = '';
+      
+  
+      const kretaContainer = document.createElement('div');
+      kretaContainer.className = 'kreta-container';
+      
+  
+      const headerDiv = document.createElement('div');
+  
+      const parser2 = new DOMParser();
+      const headerDoc = parser2.parseFromString(createTemplate.header(), 'text/html');
+      const headerContent = headerDoc.body;
+      while (headerContent.firstChild) {
+        headerDiv.appendChild(headerContent.firstChild);
+      }
+      kretaContainer.appendChild(headerDiv);
+      
+  
+      const main = document.createElement('main');
+      main.className = 'kreta-main';
+      
+  
+      const weekControls = document.createElement('div');
+      weekControls.className = 'week-controls';
+      
+      const weekSelectorContainer = document.createElement('div');
+      weekSelectorContainer.className = 'week-selector-container';
+      
+      const weekSelector = document.createElement('div');
+      weekSelector.className = 'week-selector';
+      weekSelector.id = 'week-selector';
+      
+  
+      const prevWeekBtn = document.createElement('button');
+      prevWeekBtn.className = 'week-nav-btn';
+      prevWeekBtn.id = 'prevWeekBtn';
+      prevWeekBtn.title = 'Előző hét';
+      const prevIcon = document.createElement('img');
+      prevIcon.src = chrome.runtime.getURL('icons/ChevronLeftCircle.svg');
+      prevIcon.alt = 'Előző';
+      prevIcon.style.width = '24px';
+      prevIcon.style.height = '24px';
+      prevWeekBtn.appendChild(prevIcon);
+      
+  
+      const weekDisplay = document.createElement('div');
+      weekDisplay.className = 'week-display';
+      weekDisplay.id = 'week-display';
+      
+  
+      const nextWeekBtn = document.createElement('button');
+      nextWeekBtn.className = 'week-nav-btn';
+      nextWeekBtn.id = 'nextWeekBtn';
+      nextWeekBtn.title = 'Következő hét';
+      const nextIcon = document.createElement('img');
+      nextIcon.src = chrome.runtime.getURL('icons/ChevronRightCircle.svg');
+      nextIcon.alt = 'Következő';
+      nextIcon.style.width = '24px';
+      nextIcon.style.height = '24px';
+      nextWeekBtn.appendChild(nextIcon);
+      
+  
+      const expandBtn = document.createElement('button');
+      expandBtn.className = 'expand-week-view-btn';
+      expandBtn.id = 'expandWeekView';
+      expandBtn.title = 'Teljes nézet';
+      const expandIcon = document.createElement('img');
+      expandIcon.src = chrome.runtime.getURL('icons/ArrowsExpandFull.svg');
+      expandIcon.alt = 'Teljes nézet';
+      expandIcon.style.width = '18px';
+      expandIcon.style.height = '18px';
+      expandBtn.appendChild(expandIcon);
+      
+      weekSelector.appendChild(prevWeekBtn);
+      weekSelector.appendChild(weekDisplay);
+      weekSelector.appendChild(nextWeekBtn);
+      weekSelector.appendChild(expandBtn);
+      
+      const weekTooltip = document.createElement('div');
+      weekTooltip.className = 'week-tooltip';
+      weekTooltip.id = 'week-tooltip';
+      
+      weekSelectorContainer.appendChild(weekSelector);
+      weekSelectorContainer.appendChild(weekTooltip);
+      weekControls.appendChild(weekSelectorContainer);
+      
+  
+      const weekModal = document.createElement('div');
+      weekModal.className = 'week-modal';
+      weekModal.id = 'weekModal';
+      weekModal.style.display = 'none';
+      
+      const weekModalContent = document.createElement('div');
+      weekModalContent.className = 'week-modal-content';
+      
+      const weekModalHeader = document.createElement('div');
+      weekModalHeader.className = 'week-modal-header';
+      
+      const modalH3 = document.createElement('h3');
+      weekModalHeader.appendChild(modalH3);
+      
+      const closeWeekModalBtn = document.createElement('button');
+      closeWeekModalBtn.className = 'week-modal-close';
+      closeWeekModalBtn.id = 'closeWeekModal';
+      const closeModalIcon = document.createElement('img');
+      closeModalIcon.src = chrome.runtime.getURL('icons/CloseCircle.svg');
+      closeModalIcon.alt = 'Bezárás';
+      closeModalIcon.style.width = '24px';
+      closeModalIcon.style.height = '24px';
+      closeWeekModalBtn.appendChild(closeModalIcon);
+      weekModalHeader.appendChild(closeWeekModalBtn);
+      
+      const weekModalGrid = document.createElement('div');
+      weekModalGrid.className = 'week-modal-grid';
+      weekModalGrid.id = 'weekModalGrid';
+      
+      weekModalContent.appendChild(weekModalHeader);
+      weekModalContent.appendChild(weekModalGrid);
+      weekModal.appendChild(weekModalContent);
+      
+  
+      const dayNavigation = document.createElement('div');
+      dayNavigation.className = 'day-navigation';
+      
+      const prevDayBtn = document.createElement('button');
+      prevDayBtn.className = 'day-nav-btn';
+      prevDayBtn.id = 'prevDay';
+      const prevDayIcon = document.createElement('img');
+      prevDayIcon.src = chrome.runtime.getURL('icons/ChevronLeftCircle.svg');
+      prevDayIcon.alt = 'Előző';
+      prevDayIcon.style.width = '24px';
+      prevDayIcon.style.height = '24px';
+      prevDayBtn.appendChild(prevDayIcon);
+      prevDayBtn.appendChild(document.createTextNode('Előző'));
+      
+      const nextDayBtn = document.createElement('button');
+      nextDayBtn.className = 'day-nav-btn';
+      nextDayBtn.id = 'nextDay';
+      nextDayBtn.appendChild(document.createTextNode('Következő'));
+      const nextDayIcon = document.createElement('img');
+      nextDayIcon.src = chrome.runtime.getURL('icons/ChevronRightCircle.svg');
+      nextDayIcon.alt = 'Következő';
+      nextDayIcon.style.width = '24px';
+      nextDayIcon.style.height = '24px';
+      nextDayBtn.appendChild(nextDayIcon);
+      
+      dayNavigation.appendChild(prevDayBtn);
+      dayNavigation.appendChild(nextDayBtn);
+      
+  
+      const timetableContainer = document.createElement('div');
+      timetableContainer.className = 'timetable-container';
+      
+      const timetableGrid = document.createElement('div');
+      timetableGrid.className = 'timetable-grid';
+      
+  
+      const gridContent = generateTimeGrid(data.lessons, data.weekDates);
+  
+      const parser3 = new DOMParser();
+      const doc = parser3.parseFromString(`<div>${gridContent}</div>`, 'text/html');
+      const tempDiv = doc.querySelector('div');
+      while (tempDiv.firstChild) {
+        timetableGrid.appendChild(tempDiv.firstChild);
+      }
+      
+      timetableContainer.appendChild(timetableGrid);
+      
+  
+      main.appendChild(weekControls);
+      main.appendChild(weekModal);
+      main.appendChild(dayNavigation);
+      main.appendChild(timetableContainer);
+      
+      kretaContainer.appendChild(main);
+      document.body.appendChild(kretaContainer);
 
       
       setupUserDropdown();
@@ -990,7 +1256,7 @@
     const weekDisplay = document.getElementById("week-display");
     if (!weekDisplay) return;
 
-    // Mindig 5 hetet mutatunk, a kiválasztott hét középen
+
     const visibleWeeks = [];
     for (let i = -2; i <= 2; i++) {
       let weekNum = selectedWeekNumber + i;
@@ -999,21 +1265,31 @@
       visibleWeeks.push(weekNum);
     }
 
-    weekDisplay.innerHTML = visibleWeeks
-      .map((weekNum, index) => {
-        const isSelected = index === 2; // A középső elem mindig a kiválasztott
-        const isCurrent = weekNum === currentWeekNumber;
 
-        return `
-        <div class="week-cell ${isSelected ? "selected" : ""} ${isCurrent ? "current-week" : ""}" 
-             data-week="${weekNum}"
-             title="${weekNum}. hét${isCurrent ? " (Jelenlegi hét)" : ""}">
-          <span class="week-number">${weekNum}</span>
-          ${isCurrent ? '<span class="current-indicator">●</span>' : ""}
-        </div>
-      `;
-      })
-      .join("");
+    weekDisplay.innerHTML = '';
+    visibleWeeks.forEach((weekNum, index) => {
+      const isSelected = index === 2;
+      const isCurrent = weekNum === currentWeekNumber;
+      
+      const weekCell = document.createElement('div');
+      weekCell.className = `week-cell ${isSelected ? 'selected' : ''} ${isCurrent ? 'current-week' : ''}`;
+      weekCell.setAttribute('data-week', weekNum);
+      weekCell.title = `${weekNum}. hét${isCurrent ? ' (Jelenlegi hét)' : ''}`;
+      
+      const weekNumber = document.createElement('span');
+      weekNumber.className = 'week-number';
+      weekNumber.textContent = weekNum;
+      weekCell.appendChild(weekNumber);
+      
+      if (isCurrent) {
+        const currentIndicator = document.createElement('span');
+        currentIndicator.className = 'current-indicator';
+        currentIndicator.textContent = '●';
+        weekCell.appendChild(currentIndicator);
+      }
+      
+      weekDisplay.appendChild(weekCell);
+    });
   }
 
   function setupWeekNavigation() {
@@ -1065,11 +1341,11 @@
   }
 
   function loadWeekData(weekNumber) {
-    // Hét adatainak betöltése
+
     const today = new Date();
     let currentYear = today.getFullYear();
 
-    // Ha szeptember előtt vagyunk, akkor az előző tanévet használjuk
+
     if (today.getMonth() < 8) {
       currentYear--;
     }
@@ -1086,7 +1362,16 @@
 
         const timetableContainer = document.querySelector(".timetable-grid");
         if (timetableContainer) {
-          timetableContainer.innerHTML = generateTimeGrid(lessons, weekDates);
+      
+          timetableContainer.innerHTML = '';
+          const gridContent = generateTimeGrid(lessons, weekDates);
+      
+          const parser2 = new DOMParser();
+          const doc = parser2.parseFromString(`<div>${gridContent}</div>`, 'text/html');
+          const tempDiv = doc.querySelector('div');
+          while (tempDiv.firstChild) {
+            timetableContainer.appendChild(tempDiv.firstChild);
+          }
           setupLessonCardListeners();
         }
       })
@@ -1106,21 +1391,31 @@
       allWeeks.push(week);
     }
 
-    modalGrid.innerHTML = allWeeks
-      .map((weekNumber) => {
-        const isSelected = weekNumber === selectedWeekNumber;
-        const isCurrent = weekNumber === currentWeekNumber;
-
-        return `
-        <div class="week-cell modal-week-cell ${isSelected ? "selected" : ""} ${isCurrent ? "current-week" : ""}" 
-             data-week="${weekNumber}"
-             title="${weekNumber}. hét${isCurrent ? " (Jelenlegi hét)" : ""}">
-          <span class="week-number">${weekNumber}</span>
-          ${isCurrent ? '<span class="current-indicator">●</span>' : ""}
-        </div>
-      `;
-      })
-      .join("");
+    
+    modalGrid.innerHTML = '';
+    allWeeks.forEach((weekNumber) => {
+      const isSelected = weekNumber === selectedWeekNumber;
+      const isCurrent = weekNumber === currentWeekNumber;
+      
+      const weekCell = document.createElement('div');
+      weekCell.className = `week-cell modal-week-cell ${isSelected ? 'selected' : ''} ${isCurrent ? 'current-week' : ''}`;
+      weekCell.setAttribute('data-week', weekNumber);
+      weekCell.title = `${weekNumber}. hét${isCurrent ? ' (Jelenlegi hét)' : ''}`;
+      
+      const weekNumberSpan = document.createElement('span');
+      weekNumberSpan.className = 'week-number';
+      weekNumberSpan.textContent = weekNumber;
+      weekCell.appendChild(weekNumberSpan);
+      
+      if (isCurrent) {
+        const currentIndicator = document.createElement('span');
+        currentIndicator.className = 'current-indicator';
+        currentIndicator.textContent = '●';
+        weekCell.appendChild(currentIndicator);
+      }
+      
+      modalGrid.appendChild(weekCell);
+    });
 
     modal.style.display = "flex";
     document.body.style.overflow = "hidden";
