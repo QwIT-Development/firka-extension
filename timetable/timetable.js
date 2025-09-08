@@ -1,4 +1,32 @@
 (() => {
+  async function loadTestDetailsFromAPI(testId) {
+    try {
+      const timestamp = Date.now();
+      const apiUrl = `https://${window.location.hostname}/api/TanuloBejelentettSzamonkeresekApi/GetBejelentettSzamonkeresekGrid?sort=SzamonkeresDatuma-asc~Oraszam-asc&page=1&pageSize=100&group=&filter=&data=%7B%22RegiSzamonkeresekElrejtese%22%3Atrue%7D&_=${timestamp}`;
+
+      const response = await fetch(apiUrl, {
+        credentials: "include",
+        headers: {
+          Accept: "application/json",
+          "X-Requested-With": "XMLHttpRequest",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(
+          `${LanguageManager.t("common.api_error")}: ${response.status}`,
+        );
+      }
+
+      const data = await response.json();
+      const testItem = data.Data?.find(item => item.Uid === testId);
+      return testItem ? testItem.SzamonkeresMegnevezese : null;
+    } catch (error) {
+      console.error("Számonkérés részletek betöltési hiba:", error);
+      return null;
+    }
+  }
+
   async function loadWeekDataFromAPI(startDate, endDate) {
     try {
       const timestamp = Date.now();
@@ -22,6 +50,44 @@
     } catch (error) {
       console.error(LanguageManager.t("common.api_load_error"), error);
       return [];
+    }
+  }
+
+  async function loadTestDetailsFromAPI(testId) {
+    try {
+      const timestamp = Date.now();
+      const apiUrl = `https://${window.location.hostname}/api/TanuloBejelentettSzamonkeresekApi/GetBejelentettSzamonkeresekGrid?sort=SzamonkeresDatuma-asc~Oraszam-asc&page=1&pageSize=100&group=&filter=&data=%7B%22RegiSzamonkeresekElrejtese%22%3Atrue%7D&_=${timestamp}`;
+
+      const response = await fetch(apiUrl, {
+        credentials: "include",
+        headers: {
+          Accept: "application/json",
+          "X-Requested-With": "XMLHttpRequest",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(
+          `Számonkérés API hiba: ${response.status}`,
+        );
+      }
+
+      const data = await response.json();
+      const testData = data.Data || [];
+      const testDetail = testData.find(test => test.ID === testId.toString());
+      
+      if (testDetail) {
+        return {
+          name: testDetail.SzamonkeresMegnevezes || 'Nincs megnevezés',
+          type: testDetail.ErtekelesModNev || 'Nincs típus megadva',
+          announceDate: testDetail.BejelentesDatuma ? new Date(testDetail.BejelentesDatuma).toLocaleDateString('hu-HU') : 'Nincs dátum'
+        };
+      }
+      
+      return null;
+    } catch (error) {
+      console.error("Számonkérés adatok betöltési hiba:", error);
+      return null;
     }
   }
 
@@ -133,7 +199,12 @@
               testInfo: event.hasBejelentettSzamonkeres
                 ? event.Tema || LanguageManager.t("timetable.test_indicator")
                 : "",
+              testId: event.hasBejelentettSzamonkeres && event.BejelentettSzamonkeresIdList && event.BejelentettSzamonkeresIdList.length > 0 
+                ? event.BejelentettSzamonkeresIdList[0] 
+                : null,
+              testDetails: "",
               homeworkDetails: "",
+              tema: event.Tema || "",
               isSpecialDay: false,
               color: event.color,
             };
@@ -291,13 +362,12 @@
         .join("")}
     `;
   }
-  function showLessonModal(lesson) {
+  async function showLessonModal(lesson) {
     const modal = document.createElement("div");
     modal.className = "lesson-modal";
 
     const modalContent = document.createElement('div');
     modalContent.className = 'modal-content';
-    
 
     const header = document.createElement('div');
     header.className = 'modal-header';
@@ -319,14 +389,11 @@
     header.appendChild(title);
     header.appendChild(closeBtn);
     
-
     const body = document.createElement('div');
     body.className = 'modal-body';
-    
 
     const lessonDetails = document.createElement('div');
     lessonDetails.className = 'lesson-details';
-    
 
     const teacherItem = document.createElement('div');
     teacherItem.className = 'detail-item';
@@ -340,7 +407,6 @@
     teacherItem.appendChild(teacherValue);
     lessonDetails.appendChild(teacherItem);
     
-
     if (lesson.originalTeacher != '') {
       const substituteItem = document.createElement('div');
       substituteItem.className = 'detail-item';
@@ -355,7 +421,6 @@
       lessonDetails.appendChild(substituteItem);
     }
     
-
     const roomItem = document.createElement('div');
     roomItem.className = 'detail-item';
     const roomLabel = document.createElement('span');
@@ -368,7 +433,6 @@
     roomItem.appendChild(roomValue);
     lessonDetails.appendChild(roomItem);
     
-
     const timeItem = document.createElement('div');
     timeItem.className = 'detail-item';
     const timeLabel = document.createElement('span');
@@ -381,7 +445,6 @@
     timeItem.appendChild(timeValue);
     lessonDetails.appendChild(timeItem);
     
-
     if (lesson.isSubstituted) {
       const statusItem = document.createElement('div');
       statusItem.className = 'detail-item';
@@ -419,8 +482,32 @@
     }
     
     body.appendChild(lessonDetails);
-    
 
+    if (lesson.tema) {
+      const temaSection = document.createElement('div');
+      temaSection.className = 'modal-section tema-section';
+      
+      const temaH4 = document.createElement('h4');
+      const temaIcon = document.createElement('img');
+      temaIcon.src = chrome.runtime.getURL('icons/Subject.svg');
+      temaIcon.alt = 'Óra témája';
+      temaIcon.style.width = '20px';
+      temaIcon.style.height = '20px';
+      temaH4.appendChild(temaIcon);
+      temaH4.appendChild(document.createTextNode('Óra témája'));
+      
+      const temaContent = document.createElement('div');
+      temaContent.className = 'tema-content';
+      
+      const temaP = document.createElement('p');
+      temaP.textContent = lesson.tema;
+      temaContent.appendChild(temaP);
+      
+      temaSection.appendChild(temaH4);
+      temaSection.appendChild(temaContent);
+      body.appendChild(temaSection);
+    }
+    
     if (lesson.hasHomework) {
       const homeworkSection = document.createElement('div');
       homeworkSection.className = 'modal-section homework-section';
@@ -468,7 +555,6 @@
       body.appendChild(homeworkSection);
     }
     
-
     if (lesson.testInfo) {
       const testSection = document.createElement('div');
       testSection.className = 'modal-section test-section';
@@ -484,21 +570,56 @@
       
       const testContent = document.createElement('div');
       testContent.className = 'test-content';
-      
-      const testP = document.createElement('p');
-      testP.textContent = lesson.testInfo;
-      testContent.appendChild(testP);
+
+      if (lesson.testId) {
+        const loadingDiv = document.createElement('div');
+        loadingDiv.className = 'test-details-loading';
+        loadingDiv.textContent = 'Részletek betöltése...';
+        testContent.appendChild(loadingDiv);
+
+        loadTestDetailsFromAPI(lesson.testId).then(testDetails => {
+          loadingDiv.remove();
+          
+          if (testDetails) {
+            const detailsDiv = document.createElement('div');
+            detailsDiv.className = 'test-details';
+            
+            const nameP = document.createElement('p');
+            nameP.innerHTML = `<strong>Megnevezés:</strong> ${testDetails.name}`;
+            detailsDiv.appendChild(nameP);
+            
+            const typeP = document.createElement('p');
+            typeP.innerHTML = `<strong>Típus:</strong> ${testDetails.type}`;
+            detailsDiv.appendChild(typeP);
+            
+            const dateP = document.createElement('p');
+            dateP.innerHTML = `<strong>Bejelentés dátuma:</strong> ${testDetails.announceDate}`;
+            detailsDiv.appendChild(dateP);
+            
+            testContent.appendChild(detailsDiv);
+          } else {
+            const errorP = document.createElement('p');
+            errorP.className = 'test-details-error';
+            errorP.textContent = 'Nem sikerült betölteni a számonkérés részleteit.';
+            testContent.appendChild(errorP);
+          }
+        }).catch(error => {
+          loadingDiv.remove();
+          const errorP = document.createElement('p');
+          errorP.className = 'test-details-error';
+          errorP.textContent = 'Hiba történt a számonkérés részletek betöltése során.';
+          testContent.appendChild(errorP);
+        });
+      }
       
       testSection.appendChild(testH4);
       testSection.appendChild(testContent);
       body.appendChild(testSection);
     }
     
-
     modalContent.appendChild(header);
     modalContent.appendChild(body);
     
-
     modal.innerHTML = '';
     modal.appendChild(modalContent);
 
@@ -596,9 +717,9 @@
 
   function setupLessonCardListeners() {
     document.querySelectorAll(".lesson-card").forEach((card) => {
-      card.addEventListener("click", () => {
+      card.addEventListener("click", async () => {
         const lessonData = JSON.parse(card.dataset.lesson);
-        showLessonModal(lessonData);
+        await showLessonModal(lessonData);
       });
     });
   }

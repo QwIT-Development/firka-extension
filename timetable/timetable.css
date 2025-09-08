@@ -826,11 +826,50 @@ body {
 .test-section h4 {
   color:var(--warning-accent);
 }
-.homework-content,.test-content {
+.tema-section h4 {
+  color:var(--primary-accent);
+}
+.homework-content,.test-content,.tema-content {
   background:var(--card-translucent);
   padding:1rem;
   border-radius:8px;
   color:var(--text-primary);
+}
+.test-details-loading {
+  color:var(--text-secondary);
+  font-style:italic;
+  margin-top:0.5rem;
+}
+.test-details {
+  color:var(--text-primary);
+  margin-top:0.5rem;
+  padding:0.75rem;
+  background:var(--background-0);
+  border-radius:6px;
+  border-left:3px solid var(--warning-accent);
+}
+
+.test-details p {
+  margin:0.5rem 0;
+  line-height:1.4;
+}
+
+.test-details p:first-child {
+  margin-top:0;
+}
+
+.test-details p:last-child {
+  margin-bottom:0;
+}
+
+.test-details strong {
+  color:var(--warning-accent);
+  font-weight:600;
+}
+.test-details-error {
+  color:var(--error-accent);
+  font-style:italic;
+  margin-top:0.5rem;
 }
 .detail-item .line-through {
   text-decoration:line-through;
