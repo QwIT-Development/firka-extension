@@ -842,10 +842,32 @@ body {
   font-style:italic;
   margin-top:0.5rem;
 }
+.homework-details-loading {
+  color:var(--text-secondary);
+  font-style:italic;
+  margin-top:0.5rem;
+}
 .test-details {
   color:var(--text-primary);
   padding:0.75rem;
   background:var(--background-0);
+}
+.homework-details {
+  color:var(--text-primary);
+  padding:0.75rem;
+  background:var(--background-0);
+  border-radius:6px;
+  margin-bottom:0.75rem;
+}
+.homework-details p {
+  margin:0.5rem 0;
+  line-height:1.4;
+}
+.homework-details p:first-child {
+  margin-top:0;
+}
+.homework-details p:last-child {
+  margin-bottom:0;
 }
 
 .test-details p {

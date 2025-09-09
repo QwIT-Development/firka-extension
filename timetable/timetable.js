@@ -1,4 +1,49 @@
 (() => {
+  async function loadHomeworkDetailsFromAPI(lessonId) {
+    try {
+      const timestamp = Date.now();
+      const apiUrl = `https://${window.location.hostname}/Orarend/InformaciokOrarend/GetHaziFeladat_Tab?Id=${lessonId}&EventType=2&Date=${new Date().getFullYear()}.%20${String(new Date().getMonth() + 1).padStart(2, '0')}.%20${String(new Date().getDate()).padStart(2, '0')}.%200:00:00&_=${timestamp}`;
+
+      const response = await fetch(apiUrl, {
+        credentials: "include",
+        headers: {
+          Accept: "text/html",
+          "X-Requested-With": "XMLHttpRequest",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(
+          `Házi feladat API hiba: ${response.status}`,
+        );
+      }
+
+      const htmlText = await response.text();
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(htmlText, 'text/html');
+      const panelBody = doc.querySelector('.panel-body');
+      const panelFooter = doc.querySelector('.panel-footer');
+      const teacherInfo = doc.querySelector('.panel-heading');
+      
+      if (panelBody) {
+        const homeworkText = panelBody.textContent.trim();
+        const deadline = panelFooter ? panelFooter.textContent.replace('Határidő: ', '').trim() : '';
+        const teacher = teacherInfo ? teacherInfo.textContent.split(' ').slice(-2).join(' ').trim() : '';
+        
+        return {
+          content: homeworkText,
+          deadline: deadline,
+          teacher: teacher
+        };
+      }
+      
+      return null;
+    } catch (error) {
+      console.error("Házi feladat részletek betöltési hiba:", error);
+      return null;
+    }
+  }
+
   async function loadTestDetailsFromAPI(testId) {
     try {
       const timestamp = Date.now();
@@ -204,6 +249,7 @@
                 : null,
               testDetails: "",
               homeworkDetails: "",
+              lessonId: event.id || event.ID || null,
               tema: event.Tema || "",
               isSpecialDay: false,
               color: event.color,
@@ -523,32 +569,121 @@
       
       const homeworkContent = document.createElement('div');
       homeworkContent.className = 'homework-content';
-      
-      const homeworkP = document.createElement('p');
-      homeworkP.textContent = lesson.homeworkDetails ? lesson.homeworkDetails : LanguageManager.t('timetable.has_homework');
-      homeworkContent.appendChild(homeworkP);
-      
-      const moreLink = document.createElement('a');
-      moreLink.href = `https://${window.location.hostname}/Tanulo/TanuloHaziFeladat`;
-      moreLink.className = 'more-link';
-      moreLink.textContent = LanguageManager.t('timetable.open_homework');
-      
-      const linkSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-      linkSvg.setAttribute('width', '16');
-      linkSvg.setAttribute('height', '17');
-      linkSvg.setAttribute('viewBox', '0 0 16 17');
-      linkSvg.setAttribute('fill', 'none');
-      
-      const linkPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-      linkPath.setAttribute('d', 'M11.2997 5.19947L5.64282 5.19947M11.2997 5.19947L11.2997 10.8563M11.2997 5.19947L4.70001 11.7991');
-      linkPath.setAttribute('stroke', 'var(--accent-accent)');
-      linkPath.setAttribute('stroke-width', '2');
-      linkPath.setAttribute('stroke-linecap', 'round');
-      linkPath.setAttribute('stroke-linejoin', 'round');
-      
-      linkSvg.appendChild(linkPath);
-      moreLink.appendChild(linkSvg);
-      homeworkContent.appendChild(moreLink);
+
+      if (lesson.lessonId) {
+        const loadingDiv = document.createElement('div');
+        loadingDiv.className = 'homework-details-loading';
+        loadingDiv.textContent = 'Házi feladat részletek betöltése...';
+        homeworkContent.appendChild(loadingDiv);
+
+        loadHomeworkDetailsFromAPI(lesson.lessonId).then(homeworkDetails => {
+          loadingDiv.remove();
+          
+          if (homeworkDetails && homeworkDetails.content) {
+            const detailsDiv = document.createElement('div');
+            detailsDiv.className = 'homework-details';
+            
+            const contentP = document.createElement('p');
+            contentP.innerHTML = `<strong>Feladat:</strong> ${homeworkDetails.content}`;
+            detailsDiv.appendChild(contentP);
+            
+            if (homeworkDetails.deadline) {
+              const deadlineP = document.createElement('p');
+              deadlineP.innerHTML = `<strong>Határidő:</strong> ${homeworkDetails.deadline}`;
+              detailsDiv.appendChild(deadlineP);
+            }
+            
+            if (homeworkDetails.teacher) {
+              const teacherP = document.createElement('p');
+              teacherP.innerHTML = `<strong>Tanár:</strong> ${homeworkDetails.teacher}`;
+              detailsDiv.appendChild(teacherP);
+            }
+            
+            homeworkContent.appendChild(detailsDiv);
+          } else {
+            const noDetailsP = document.createElement('p');
+            noDetailsP.textContent = LanguageManager.t('timetable.has_homework');
+            homeworkContent.appendChild(noDetailsP);
+          }
+          
+          const moreLink = document.createElement('a');
+          moreLink.href = `https://${window.location.hostname}/Tanulo/TanuloHaziFeladat`;
+          moreLink.className = 'more-link';
+          moreLink.textContent = LanguageManager.t('timetable.open_homework');
+          
+          const linkSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+          linkSvg.setAttribute('width', '16');
+          linkSvg.setAttribute('height', '17');
+          linkSvg.setAttribute('viewBox', '0 0 16 17');
+          linkSvg.setAttribute('fill', 'none');
+          
+          const linkPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+          linkPath.setAttribute('d', 'M11.2997 5.19947L5.64282 5.19947M11.2997 5.19947L11.2997 10.8563M11.2997 5.19947L4.70001 11.7991');
+          linkPath.setAttribute('stroke', 'var(--accent-accent)');
+          linkPath.setAttribute('stroke-width', '2');
+          linkPath.setAttribute('stroke-linecap', 'round');
+          linkPath.setAttribute('stroke-linejoin', 'round');
+          
+          linkSvg.appendChild(linkPath);
+          moreLink.appendChild(linkSvg);
+          homeworkContent.appendChild(moreLink);
+        }).catch(error => {
+          loadingDiv.remove();
+          console.error('Hiba a házi feladat betöltésekor:', error);
+          
+          const errorP = document.createElement('p');
+          errorP.textContent = 'Hiba történt a házi feladat részletek betöltésekor.';
+          homeworkContent.appendChild(errorP);
+          
+          const moreLink = document.createElement('a');
+          moreLink.href = `https://${window.location.hostname}/Tanulo/TanuloHaziFeladat`;
+          moreLink.className = 'more-link';
+          moreLink.textContent = LanguageManager.t('timetable.open_homework');
+          
+          const linkSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+          linkSvg.setAttribute('width', '16');
+          linkSvg.setAttribute('height', '17');
+          linkSvg.setAttribute('viewBox', '0 0 16 17');
+          linkSvg.setAttribute('fill', 'none');
+          
+          const linkPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+          linkPath.setAttribute('d', 'M11.2997 5.19947L5.64282 5.19947M11.2997 5.19947L11.2997 10.8563M11.2997 5.19947L4.70001 11.7991');
+          linkPath.setAttribute('stroke', 'var(--accent-accent)');
+          linkPath.setAttribute('stroke-width', '2');
+          linkPath.setAttribute('stroke-linecap', 'round');
+          linkPath.setAttribute('stroke-linejoin', 'round');
+          
+          linkSvg.appendChild(linkPath);
+          moreLink.appendChild(linkSvg);
+          homeworkContent.appendChild(moreLink);
+        });
+      } else {
+        const homeworkP = document.createElement('p');
+        homeworkP.textContent = lesson.homeworkDetails ? lesson.homeworkDetails : LanguageManager.t('timetable.has_homework');
+        homeworkContent.appendChild(homeworkP);
+        
+        const moreLink = document.createElement('a');
+        moreLink.href = `https://${window.location.hostname}/Tanulo/TanuloHaziFeladat`;
+        moreLink.className = 'more-link';
+        moreLink.textContent = LanguageManager.t('timetable.open_homework');
+        
+        const linkSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        linkSvg.setAttribute('width', '16');
+        linkSvg.setAttribute('height', '17');
+        linkSvg.setAttribute('viewBox', '0 0 16 17');
+        linkSvg.setAttribute('fill', 'none');
+        
+        const linkPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        linkPath.setAttribute('d', 'M11.2997 5.19947L5.64282 5.19947M11.2997 5.19947L11.2997 10.8563M11.2997 5.19947L4.70001 11.7991');
+        linkPath.setAttribute('stroke', 'var(--accent-accent)');
+        linkPath.setAttribute('stroke-width', '2');
+        linkPath.setAttribute('stroke-linecap', 'round');
+        linkPath.setAttribute('stroke-linejoin', 'round');
+        
+        linkSvg.appendChild(linkPath);
+        moreLink.appendChild(linkSvg);
+        homeworkContent.appendChild(moreLink);
+      }
       
       homeworkSection.appendChild(homeworkH4);
       homeworkSection.appendChild(homeworkContent);
