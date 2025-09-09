@@ -1,4 +1,56 @@
 (() => {
+  function getCompletedHomework() {
+    if (typeof cookieManager !== 'undefined') {
+      try {
+        const value = cookieManager.get('completedHomework');
+        if (value) {
+          return JSON.parse(value);
+        }
+      } catch (e) {
+        return [];
+      }
+    }
+    return [];
+  }
+
+  function saveCompletedHomework(completedList) {
+    if (typeof cookieManager !== 'undefined') {
+      cookieManager.set('completedHomework', JSON.stringify(completedList), 365);
+    }
+  }
+
+  function toggleHomeworkCompletion(lessonId) {
+    const completed = getCompletedHomework();
+    const index = completed.indexOf(lessonId);
+    
+    if (index > -1) {
+      completed.splice(index, 1);
+    } else {
+      completed.push(lessonId);
+    }
+    
+    saveCompletedHomework(completed);
+    return index === -1;
+  }
+
+  function isHomeworkCompleted(lessonId) {
+    return getCompletedHomework().includes(lessonId);
+  }
+
+  function updateHomeworkIconsFromCookie() {
+    const completedHomework = getCompletedHomework();
+    completedHomework.forEach(lessonId => {
+      const lessonCards = document.querySelectorAll(`[data-lesson-id="${lessonId}"]`);
+      lessonCards.forEach(card => {
+        const homeworkImg = card.querySelector('.homework-indicator img');
+        if (homeworkImg) {
+          homeworkImg.src = chrome.runtime.getURL('icons/pipa.svg');
+          homeworkImg.alt = 'Megoldott házi feladat';
+        }
+      });
+    });
+  }
+
   async function loadHomeworkDetailsFromAPI(lessonId) {
     try {
       const timestamp = Date.now();
@@ -360,7 +412,8 @@
                 <div class="lesson-card ${lesson.isSubstituted ? "substituted" : ""} 
                                       ${lesson.isCancelled ? "cancelled" : ""}
                                       ${lesson.hasHomework ? "has-homework" : ""}"
-                     data-lesson='${JSON.stringify(lesson)}'>
+                     data-lesson='${JSON.stringify(lesson)}'
+                     data-lesson-id='${lesson.lessonId || ""}'>
                   <div class="lesson-subject">${lesson.subject}</div>
                   <div class="lesson-teacher">${lesson.teacher}</div>
                   <div class="lesson-bottom">
@@ -375,7 +428,7 @@
                         lesson.hasHomework
                           ? `
                         <span class="lesson-indicator homework-indicator" title="${LanguageManager.t("timetable.homework_indicator")}">
-                          <img src="${chrome.runtime.getURL("icons/homework.svg")}" alt="Házi feladat" style="width: 20px; height: 20px;">
+                          <img src="${chrome.runtime.getURL(lesson.lessonId && isHomeworkCompleted(lesson.lessonId) ? "icons/pipa.svg" : "icons/homework.svg")}" alt="${lesson.lessonId && isHomeworkCompleted(lesson.lessonId) ? 'Megoldott házi feladat' : 'Házi feladat'}" style="width: 20px; height: 20px;">
                         </span>
                       `
                           : ""
@@ -558,6 +611,9 @@
       const homeworkSection = document.createElement('div');
       homeworkSection.className = 'modal-section homework-section';
       
+      const homeworkHeader = document.createElement('div');
+      homeworkHeader.className = 'homework-header';
+      
       const homeworkH4 = document.createElement('h4');
       const homeworkIcon = document.createElement('img');
       homeworkIcon.src = chrome.runtime.getURL('icons/homework.svg');
@@ -566,6 +622,40 @@
       homeworkIcon.style.height = '20px';
       homeworkH4.appendChild(homeworkIcon);
       homeworkH4.appendChild(document.createTextNode(LanguageManager.t('timetable.homework_indicator')));
+      
+      homeworkHeader.appendChild(homeworkH4);
+      
+      if (lesson.lessonId) {
+        const completionBtn = document.createElement('button');
+        completionBtn.className = 'homework-completion-header-btn';
+        
+        const isCompleted = isHomeworkCompleted(lesson.lessonId);
+        const checkIcon = document.createElement('img');
+        checkIcon.src = chrome.runtime.getURL('icons/pipa.svg');
+        checkIcon.alt = 'Megoldva';
+        checkIcon.style.width = '16px';
+        checkIcon.style.height = '16px';
+        
+        completionBtn.appendChild(checkIcon);
+        completionBtn.classList.toggle('completed', isCompleted);
+        completionBtn.title = isCompleted ? 'Megoldva - kattints a visszavonáshoz' : 'Megoldottként jelöl';
+        
+        completionBtn.addEventListener('click', () => {
+          const nowCompleted = toggleHomeworkCompletion(lesson.lessonId);
+          completionBtn.classList.toggle('completed', nowCompleted);
+          completionBtn.title = nowCompleted ? 'Megoldva - kattints a visszavonáshoz' : 'Megoldottként jelöl';
+          const lessonCards = document.querySelectorAll(`[data-lesson-id="${lesson.lessonId}"]`);
+          lessonCards.forEach(card => {
+            const homeworkImg = card.querySelector('.homework-indicator img');
+            if (homeworkImg) {
+              homeworkImg.src = chrome.runtime.getURL(nowCompleted ? 'icons/pipa.svg' : 'icons/homework.svg');
+              homeworkImg.alt = nowCompleted ? 'Megoldott házi feladat' : 'Házi feladat';
+            }
+          });
+        });
+        
+        homeworkHeader.appendChild(completionBtn);
+      }
       
       const homeworkContent = document.createElement('div');
       homeworkContent.className = 'homework-content';
@@ -605,6 +695,7 @@
             noDetailsP.textContent = LanguageManager.t('timetable.has_homework');
             homeworkContent.appendChild(noDetailsP);
           }
+          
           
           const moreLink = document.createElement('a');
           moreLink.href = `https://${window.location.hostname}/Tanulo/TanuloHaziFeladat`;
@@ -685,7 +776,7 @@
         homeworkContent.appendChild(moreLink);
       }
       
-      homeworkSection.appendChild(homeworkH4);
+      homeworkSection.appendChild(homeworkHeader);
       homeworkSection.appendChild(homeworkContent);
       body.appendChild(homeworkSection);
     }
@@ -1474,6 +1565,9 @@
       
       timetableContainer.appendChild(timetableGrid);
       
+      setTimeout(() => {
+        updateHomeworkIconsFromCookie();
+      }, 100);
   
       main.appendChild(weekControls);
       main.appendChild(weekModal);
@@ -1629,6 +1723,10 @@
             timetableContainer.appendChild(tempDiv.firstChild);
           }
           setupLessonCardListeners();
+          
+          setTimeout(() => {
+            updateHomeworkIconsFromCookie();
+          }, 100);
         }
       })
       .catch((error) => {

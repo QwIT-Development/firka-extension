@@ -870,6 +870,99 @@ body {
   margin-bottom:0;
 }
 
+.homework-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.homework-header h4 {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.homework-completion-header-btn {
+  background: transparent;
+  border: 2px solid var(--border-color);
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  opacity: 0.6;
+}
+
+.homework-completion-header-btn:hover {
+  opacity: 1;
+  border-color: var(--accent-accent);
+  background: var(--background-hover);
+}
+
+.homework-completion-header-btn.completed {
+  background: var(--success-color, #4caf50);
+  border-color: var(--success-color, #4caf50);
+  opacity: 1;
+}
+
+.homework-completion-header-btn.completed:hover {
+  background: var(--success-color-hover, #45a049);
+  border-color: var(--success-color-hover, #45a049);
+}
+
+.homework-completion-header-btn img {
+  filter: var(--icon-filter, none);
+}
+
+.homework-completion-header-btn.completed img {
+  filter: brightness(0) invert(1);
+}
+
+.homework-completion {
+  margin-top:15px;
+  text-align:center;
+}
+
+.homework-completion-btn {
+  background:var(--background-secondary);
+  border:2px solid var(--border-color);
+  color:var(--text-primary);
+  padding:10px 20px;
+  border-radius:8px;
+  cursor:pointer;
+  font-size:14px;
+  font-weight:500;
+  transition:all 0.2s ease;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+}
+
+.homework-completion-btn:hover {
+  background:var(--background-hover);
+  border-color:var(--accent-accent);
+}
+
+.homework-completion-btn.completed {
+  background:var(--success-background, #e8f5e8);
+  border-color:var(--success-color, #4caf50);
+  color:var(--success-color, #4caf50);
+}
+
+.homework-completion-btn.completed:hover {
+  background:var(--success-background-hover, #d4edda);
+}
+
+.homework-completion-btn span {
+  font-size:16px;
+  font-weight:bold;
+}
+
 .test-details p {
   margin:0.5rem 0;
   line-height:1.4;
