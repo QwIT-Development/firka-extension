@@ -744,9 +744,10 @@ body {
   opacity:1;
 }
 .modal-content {
-  background:var(--card-card);
+  background:var(--card-card) !important;
   border-radius:24px;
   border-width:0 !important;
+  box-shadow: 0 1px var(--shadow-blur) 0 var(--accent-shadow);
   width:100%;
   max-width:500px;
   max-height:90vh;
@@ -766,6 +767,7 @@ body {
   align-items:center;
   padding:1.5rem;
   background:var(--button-secondaryFill);
+  border: none !important;
 }
 .modal-title {
   font-size:18px;
@@ -842,11 +844,8 @@ body {
 }
 .test-details {
   color:var(--text-primary);
-  margin-top:0.5rem;
   padding:0.75rem;
   background:var(--background-0);
-  border-radius:6px;
-  border-left:3px solid var(--warning-accent);
 }
 
 .test-details p {
