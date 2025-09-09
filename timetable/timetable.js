@@ -260,7 +260,8 @@
           event.oraType === 2 ||
           event.oraType === 1 ||
           event.oraType === 3 ||
-          event.oraType === 4
+          event.oraType === 4 ||
+          event.oraType === 6
         ) {
           const startTime = new Date(event.start);
           const endTime = new Date(event.end);
@@ -282,6 +283,9 @@
             "Ismeretlen tantárgy";
 
           if (startTimeStr && subject) {
+            const isCancelled = event.isElmaradt || event.Elmaradt || event.cancelled || event.isCancelled || 
+                               event.oraType === 6 || (event.title && event.title.toLowerCase().includes('elmarad'));
+            
             const lesson = {
               startTime: startTimeStr,
               endTime: endTimeStr,
@@ -291,7 +295,7 @@
               room: room,
               day: dayIndex,
               isSubstituted: !!event.helyettesitoId,
-              isCancelled: event.isElmaradt || false,
+              isCancelled: isCancelled,
               hasHomework: event.hasHaziFeladat || false,
               testInfo: event.hasBejelentettSzamonkeres
                 ? event.Tema || LanguageManager.t("timetable.test_indicator")
@@ -571,8 +575,6 @@
       const statusValue = document.createElement('span');
       statusValue.className = 'detail-value';
       const statusIcon = document.createElement('span');
-      statusIcon.className = 'material-icons-round';
-      statusIcon.textContent = 'cancel';
       statusValue.appendChild(statusIcon);
       statusValue.appendChild(document.createTextNode(' ' + LanguageManager.t('timetable.cancelled')));
       statusItem.appendChild(statusLabel);
