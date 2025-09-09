@@ -110,9 +110,7 @@ async function transformLoginPage() {
       </div>
     `;
 
-    // Biztonságos DOM létrehozás innerHTML helyett
     document.body.innerHTML = '';
-    // Biztonságos HTML parsing DOMParser használatával
     const parser = new DOMParser();
     const doc = parser.parseFromString(newHTML, 'text/html');
     const tempDiv = doc.body;
