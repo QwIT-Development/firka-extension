@@ -65,8 +65,18 @@
   }
 
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", transformLogoutPage);
+    document.addEventListener("DOMContentLoaded", () => {
+      setTimeout(() => {
+        if (typeof loadingScreen !== 'undefined') {
+          loadingScreen.hide();
+        }
+      }, 100);
+      transformLogoutPage();
+    });
   } else {
+    if (typeof loadingScreen !== 'undefined') {
+      loadingScreen.hide();
+    }
     transformLogoutPage();
   }
 })();

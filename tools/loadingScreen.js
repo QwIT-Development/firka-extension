@@ -65,7 +65,13 @@ window.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  if (urls.some((url) => url.includes(location.pathname))) {
+  const currentUrl = location.href;
+  const shouldShowLoading = urls.some((urlPattern) => {
+    const regex = new RegExp(urlPattern.replace(/\*/g, '.*'));
+    return regex.test(currentUrl);
+  });
+  
+  if (shouldShowLoading) {
     loadingScreen.show();
   }
 });
