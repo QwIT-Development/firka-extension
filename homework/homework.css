@@ -169,6 +169,7 @@ body {
 
 .dropdown-item:hover {
   background-color: var(--accent-15);
+  text-decoration: none;
 }
 
 

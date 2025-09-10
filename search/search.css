@@ -126,9 +126,11 @@ form {
 li.dropdown-item:hover,li.dropdown-item:focus {
   background-color:var(--accent-15) !important;
   color:var(--text-primary) !important;
+  text-decoration:none !important;
 }
 a.dropdown-item:hover,a.dropdown-item:focus {
   background-color:#00000000 !important;
+  text-decoration:none !important;
 }
 .dropdown-item.active {
   background-color:var(--accent-accent) !important;

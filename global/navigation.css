@@ -146,6 +146,7 @@
   background:var(--hover);
   color:var(--accent-accent);
   border-radius:8px;
+  text-decoration:none;
 }
 @keyframes dropdownShow {
   from {

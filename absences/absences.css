@@ -139,6 +139,7 @@ body {
 }
 .dropdown-item:hover {
   background:var(--button-secondaryFill);
+  text-decoration:none;
 }
 .kreta-main {
   flex:1;
