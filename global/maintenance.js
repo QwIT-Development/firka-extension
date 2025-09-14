@@ -9,12 +9,7 @@ function checkMaintenancePage() {
   const maintenanceContent = document.querySelector(".login_content");
   const bodyText = document.body ? document.body.textContent : "";
 
-  const specificMaintenanceMessage =
-    "Kedves Felhasználók! A KRÉTA rendszer jelenleg frissítés alatt van, hamarosan újra elérhetővé válik. Köszönjük türelmüket és megértésüket! KRÉTA Csapat";
-  const hasSpecificMessage =
-    bodyText.includes("Kedves Felhasználók!") &&
-    bodyText.includes("A KRÉTA rendszer jelenleg frissítés alatt van") &&
-    bodyText.includes("KRÉTA Csapat");
+  const hasSpecificMessage = bodyText.includes("A KRÉTA rendszer jelenleg frissítés alatt van");
 
   const hasGeneralMaintenance =
     maintenanceContent &&
