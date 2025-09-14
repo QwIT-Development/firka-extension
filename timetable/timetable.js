@@ -37,6 +37,131 @@
     return getCompletedHomework().includes(lessonId);
   }
 
+  
+  function getCustomHomework() {
+    if (typeof cookieManager !== 'undefined') {
+      try {
+        const value = cookieManager.get('customHomework');
+        if (value) {
+          return JSON.parse(value);
+        }
+      } catch (e) {
+        return {};
+      }
+    }
+    return {};
+  }
+
+  function saveCustomHomework(customHomework) {
+    if (typeof cookieManager !== 'undefined') {
+      cookieManager.set('customHomework', JSON.stringify(customHomework), 365);
+    }
+  }
+
+  function getCustomTests() {
+    if (typeof cookieManager !== 'undefined') {
+      try {
+        const value = cookieManager.get('customTests');
+        if (value) {
+          return JSON.parse(value);
+        }
+      } catch (e) {
+        return {};
+      }
+    }
+    return {};
+  }
+
+  function saveCustomTests(customTests) {
+    if (typeof cookieManager !== 'undefined') {
+      cookieManager.set('customTests', JSON.stringify(customTests), 365);
+    }
+  }
+
+  function addCustomHomework(lessonKey, homeworkText) {
+    const customHomework = getCustomHomework();
+    if (!customHomework[lessonKey]) {
+      customHomework[lessonKey] = [];
+    }
+    const homeworkId = Date.now().toString();
+    customHomework[lessonKey].push({
+      id: homeworkId,
+      text: homeworkText,
+      completed: false,
+      createdAt: new Date().toISOString()
+    });
+    saveCustomHomework(customHomework);
+    return homeworkId;
+  }
+
+  function removeCustomHomework(lessonKey, homeworkId) {
+    const customHomework = getCustomHomework();
+    if (customHomework[lessonKey]) {
+      customHomework[lessonKey] = customHomework[lessonKey].filter(hw => hw.id !== homeworkId);
+      if (customHomework[lessonKey].length === 0) {
+        delete customHomework[lessonKey];
+      }
+      saveCustomHomework(customHomework);
+    }
+  }
+
+  function toggleCustomHomeworkCompletion(lessonKey, homeworkId) {
+    const customHomework = getCustomHomework();
+    if (customHomework[lessonKey]) {
+      const homework = customHomework[lessonKey].find(hw => hw.id === homeworkId);
+      if (homework) {
+        homework.completed = !homework.completed;
+        saveCustomHomework(customHomework);
+        return homework.completed;
+      }
+    }
+    return false;
+  }
+
+  function addCustomTest(lessonKey, testText) {
+    const customTests = getCustomTests();
+    if (!customTests[lessonKey]) {
+      customTests[lessonKey] = [];
+    }
+    const testId = Date.now().toString();
+    customTests[lessonKey].push({
+      id: testId,
+      text: testText,
+      completed: false,
+      createdAt: new Date().toISOString()
+    });
+    saveCustomTests(customTests);
+    return testId;
+  }
+
+  function removeCustomTest(lessonKey, testId) {
+    const customTests = getCustomTests();
+    if (customTests[lessonKey]) {
+      customTests[lessonKey] = customTests[lessonKey].filter(test => test.id !== testId);
+      if (customTests[lessonKey].length === 0) {
+        delete customTests[lessonKey];
+      }
+      saveCustomTests(customTests);
+    }
+  }
+
+  function toggleCustomTestCompletion(lessonKey, testId) {
+    const customTests = getCustomTests();
+    if (customTests[lessonKey]) {
+      const test = customTests[lessonKey].find(t => t.id === testId);
+      if (test) {
+        test.completed = !test.completed;
+        saveCustomTests(customTests);
+        return test.completed;
+      }
+    }
+    return false;
+  }
+
+  function getLessonKey(lesson) {
+    return `${lesson.subject}_${lesson.startTime}_${lesson.day}`;
+  }
+
   function updateHomeworkIconsFromCookie() {
     const completedHomework = getCompletedHomework();
     completedHomework.forEach(lessonId => {
@@ -99,7 +224,7 @@
   async function loadTestDetailsFromAPI(testId) {
     try {
       const timestamp = Date.now();
-      const apiUrl = `https://${window.location.hostname}/api/TanuloBejelentettSzamonkeresekApi/GetBejelentettSzamonkeresekGrid?sort=SzamonkeresDatuma-asc~Oraszam-asc&page=1&pageSize=100&group=&filter=&data=%7B%22RegiSzamonkeresekElrejtese%22%3Atrue%7D&_=${timestamp}`;
+      const apiUrl = `https://${window.location.hostname}/api/TanuloBejelentettSzamonkeresekApi/GetBejelentettSzamonkeresekGrid?sort=SzamonkeresDatuma-asc~Oraszam-asc&page=1&pageSize=100&group=&filter=&data=%7B%22RegiSzamonkeresekElrejtese%22%3Afalse%7D&_=${timestamp}`;
 
       const response = await fetch(apiUrl, {
         credentials: "include",
@@ -153,7 +278,7 @@
   async function loadTestDetailsFromAPI(testId) {
     try {
       const timestamp = Date.now();
-      const apiUrl = `https://${window.location.hostname}/api/TanuloBejelentettSzamonkeresekApi/GetBejelentettSzamonkeresekGrid?sort=SzamonkeresDatuma-asc~Oraszam-asc&page=1&pageSize=100&group=&filter=&data=%7B%22RegiSzamonkeresekElrejtese%22%3Atrue%7D&_=${timestamp}`;
+      const apiUrl = `https://${window.location.hostname}/api/TanuloBejelentettSzamonkeresekApi/GetBejelentettSzamonkeresekGrid?sort=SzamonkeresDatuma-asc~Oraszam-asc&page=1&pageSize=100&group=&filter=&data=%7B%22RegiSzamonkeresekElrejtese%22%3Afalse%7D&_=${timestamp}`;
 
       const response = await fetch(apiUrl, {
         credentials: "include",
@@ -425,8 +550,16 @@
                     <div class="lesson-time">${lesson.isCancelled ? LanguageManager.t("timetable.cancelled") : lesson.startTime}</div>
                   </div>
                   ${
-                    lesson.hasHomework || lesson.testInfo
-                      ? `
+                    (() => {
+                      const lessonKey = `${lesson.subject}_${lesson.startTime}_${lesson.day}`;
+                      const customHomework = getCustomHomework();
+                      const customTests = getCustomTests();
+                      const hasCustomHomework = customHomework[lessonKey] && customHomework[lessonKey].length > 0;
+                      const hasCustomTests = customTests[lessonKey] && customTests[lessonKey].length > 0;
+                      
+                      const hasAnyIndicators = lesson.hasHomework || lesson.testInfo || hasCustomHomework || hasCustomTests;
+                      
+                      return hasAnyIndicators ? `
                     <div class="lesson-indicators">
                       ${
                         lesson.hasHomework
@@ -446,9 +579,27 @@
                       `
                           : ""
                       }
+                      ${
+                        hasCustomHomework
+                          ? `
+                        <span class="lesson-indicator custom-homework-indicator" title="Saját házi feladat">
+                          <img src="${chrome.runtime.getURL("icons/homework.svg")}" alt="Saját házi feladat" style="width: 20px; height: 20px; opacity: 0.7;">
+                        </span>
+                      `
+                          : ""
+                      }
+                      ${
+                        hasCustomTests
+                          ? `
+                        <span class="lesson-indicator custom-test-indicator" title="Saját számonkérés">
+                          <img src="${chrome.runtime.getURL("icons/assigment.svg")}" alt="Saját számonkérés" style="width: 20px; height: 20px; opacity: 0.7;">
+                        </span>
+                      `
+                          : ""
+                      }
                     </div>
-                  `
-                      : ""
+                  ` : "";
+                    })()
                   }
                 </div>
               `,
@@ -479,6 +630,20 @@
     title.className = 'modal-title';
     title.textContent = lesson.subject;
     
+    const headerButtons = document.createElement('div');
+    headerButtons.className = 'modal-header-buttons';
+    
+    const addBtn = document.createElement('button');
+    addBtn.className = 'modal-add-btn';
+    addBtn.title = 'Házi feladat vagy számonkérés hozzáadása';
+    
+    const addIcon = document.createElement('img');
+    addIcon.src = chrome.runtime.getURL('icons/plus.svg');
+    addIcon.alt = 'Hozzáadás';
+    addIcon.style.width = '24px';
+    addIcon.style.height = '24px';
+    addBtn.appendChild(addIcon);
+    
     const closeBtn = document.createElement('button');
     closeBtn.className = 'modal-close';
     
@@ -489,8 +654,15 @@
     closeIcon.style.height = '24px';
     closeBtn.appendChild(closeIcon);
     
+    addBtn.addEventListener('click', () => {
+      showAddItemModal(lesson);
+    });
+    
+    headerButtons.appendChild(addBtn);
+    headerButtons.appendChild(closeBtn);
+    
     header.appendChild(title);
-    header.appendChild(closeBtn);
+    header.appendChild(headerButtons);
     
     const body = document.createElement('div');
     body.className = 'modal-body';
@@ -778,6 +950,136 @@
         homeworkContent.appendChild(moreLink);
       }
       
+      
+      const lessonKey = getLessonKey(lesson);
+      const customHomework = getCustomHomework();
+      const customHomeworkItems = customHomework[lessonKey] || [];
+      
+      if (customHomeworkItems.length > 0) {
+        const customHomeworkDiv = document.createElement('div');
+        customHomeworkDiv.className = 'custom-homework-in-section';
+        customHomeworkDiv.style.marginTop = '1rem';
+        customHomeworkDiv.style.paddingTop = '1rem';
+        customHomeworkDiv.style.borderTop = '1px solid var(--background-0)';
+        
+        const customHomeworkTitle = document.createElement('h5');
+        customHomeworkTitle.textContent = 'Saját házi feladatok:';
+        customHomeworkTitle.style.fontSize = '14px';
+        customHomeworkTitle.style.fontWeight = '600';
+        customHomeworkTitle.style.color = 'var(--accent-accent)';
+        customHomeworkTitle.style.marginBottom = '0.5rem';
+        customHomeworkDiv.appendChild(customHomeworkTitle);
+        
+        const customHomeworkList = document.createElement('div');
+        customHomeworkList.className = 'custom-homework-list-integrated';
+        
+        customHomeworkItems.forEach(homework => {
+          const homeworkItem = document.createElement('div');
+          homeworkItem.className = `custom-homework-item-integrated ${homework.completed ? 'completed' : ''}`;
+          homeworkItem.style.display = 'flex';
+          homeworkItem.style.alignItems = 'center';
+          homeworkItem.style.justifyContent = 'space-between';
+          homeworkItem.style.padding = '0.5rem';
+          homeworkItem.style.marginBottom = '0.5rem';
+          homeworkItem.style.background = 'var(--background)';
+          homeworkItem.style.borderRadius = '6px';
+          homeworkItem.style.border = '1px solid var(--background-0)';
+          
+          const homeworkText = document.createElement('span');
+          homeworkText.className = 'homework-text-integrated';
+          homeworkText.textContent = homework.text;
+          homeworkText.style.flex = '1';
+          homeworkText.style.color = 'var(--text-primary)';
+          if (homework.completed) {
+            homeworkText.style.textDecoration = 'line-through';
+            homeworkText.style.opacity = '0.6';
+          }
+          
+          const homeworkActions = document.createElement('div');
+          homeworkActions.className = 'homework-actions-integrated';
+          homeworkActions.style.display = 'flex';
+          homeworkActions.style.gap = '0.5rem';
+          
+          const completeBtn = document.createElement('button');
+          completeBtn.className = 'homework-complete-btn-integrated';
+          completeBtn.title = homework.completed ? 'Megoldva - kattints a visszavonáshoz' : 'Megoldottként jelöl';
+          completeBtn.style.background = 'none';
+          completeBtn.style.border = 'none';
+          completeBtn.style.cursor = 'pointer';
+          completeBtn.style.padding = '4px';
+          completeBtn.style.borderRadius = '4px';
+          completeBtn.style.display = 'flex';
+          completeBtn.style.alignItems = 'center';
+          completeBtn.style.justifyContent = 'center';
+          
+          const completeIcon = document.createElement('img');
+          completeIcon.src = chrome.runtime.getURL('icons/pipa.svg');
+          completeIcon.alt = 'Megoldva';
+          completeIcon.style.width = '16px';
+          completeIcon.style.height = '16px';
+          if (homework.completed) {
+            completeIcon.style.opacity = '1';
+            completeBtn.style.background = 'var(--accent-accent)';
+          } else {
+            completeIcon.style.opacity = '0.5';
+          }
+          completeBtn.appendChild(completeIcon);
+          
+          const deleteBtn = document.createElement('button');
+          deleteBtn.className = 'homework-delete-btn-integrated';
+          deleteBtn.title = 'Törlés';
+          deleteBtn.style.background = 'none';
+          deleteBtn.style.border = 'none';
+          deleteBtn.style.cursor = 'pointer';
+          deleteBtn.style.padding = '4px';
+          deleteBtn.style.borderRadius = '4px';
+          deleteBtn.style.display = 'flex';
+          deleteBtn.style.alignItems = 'center';
+          deleteBtn.style.justifyContent = 'center';
+          
+          const deleteIcon = document.createElement('img');
+          deleteIcon.src = chrome.runtime.getURL('icons/delete.svg');
+          deleteIcon.alt = 'Törlés';
+          deleteIcon.style.width = '16px';
+          deleteIcon.style.height = '16px';
+          deleteIcon.style.opacity = '0.5';
+          deleteBtn.appendChild(deleteIcon);
+          
+          completeBtn.addEventListener('click', () => {
+            const newCompleted = toggleCustomHomeworkCompletion(lessonKey, homework.id);
+            if (newCompleted) {
+              homeworkText.style.textDecoration = 'line-through';
+              homeworkText.style.opacity = '0.6';
+              completeIcon.style.opacity = '1';
+              completeBtn.style.background = 'var(--accent-accent)';
+              completeBtn.title = 'Megoldva - kattints a visszavonáshoz';
+            } else {
+              homeworkText.style.textDecoration = 'none';
+              homeworkText.style.opacity = '1';
+              completeIcon.style.opacity = '0.5';
+              completeBtn.style.background = 'none';
+              completeBtn.title = 'Megoldottként jelöl';
+            }
+          });
+          
+          deleteBtn.addEventListener('click', () => {
+            if (confirm('Biztosan törölni szeretnéd ezt a házi feladatot?')) {
+              removeCustomHomework(lessonKey, homework.id);
+              homeworkItem.remove();
+            }
+          });
+          
+          homeworkActions.appendChild(completeBtn);
+          homeworkActions.appendChild(deleteBtn);
+          homeworkItem.appendChild(homeworkText);
+          homeworkItem.appendChild(homeworkActions);
+          customHomeworkList.appendChild(homeworkItem);
+        });
+        
+        customHomeworkDiv.appendChild(customHomeworkList);
+        homeworkContent.appendChild(customHomeworkDiv);
+      }
+      
       homeworkSection.appendChild(homeworkHeader);
       homeworkSection.appendChild(homeworkContent);
       body.appendChild(homeworkSection);
@@ -840,9 +1142,394 @@
         });
       }
       
+      
+      const lessonKey = getLessonKey(lesson);
+      const customTests = getCustomTests();
+      const customTestItems = customTests[lessonKey] || [];
+      
+      if (customTestItems.length > 0) {
+        const customTestsDiv = document.createElement('div');
+        customTestsDiv.className = 'custom-tests-in-section';
+        customTestsDiv.style.marginTop = '1rem';
+        customTestsDiv.style.paddingTop = '1rem';
+        customTestsDiv.style.borderTop = '1px solid var(--background-0)';
+        
+        const customTestsTitle = document.createElement('h5');
+        customTestsTitle.textContent = 'Saját számonkérések:';
+        customTestsTitle.style.fontSize = '14px';
+        customTestsTitle.style.fontWeight = '600';
+        customTestsTitle.style.color = 'var(--warning-accent)';
+        customTestsTitle.style.marginBottom = '0.5rem';
+        customTestsDiv.appendChild(customTestsTitle);
+        
+        const customTestsList = document.createElement('div');
+        customTestsList.className = 'custom-tests-list-integrated';
+        
+        customTestItems.forEach(test => {
+          const testItem = document.createElement('div');
+          testItem.className = `custom-test-item-integrated ${test.completed ? 'completed' : ''}`;
+          testItem.style.display = 'flex';
+          testItem.style.alignItems = 'center';
+          testItem.style.justifyContent = 'space-between';
+          testItem.style.padding = '0.5rem';
+          testItem.style.marginBottom = '0.5rem';
+          testItem.style.background = 'var(--background)';
+          testItem.style.borderRadius = '6px';
+          testItem.style.border = '1px solid var(--background-0)';
+          
+          const testText = document.createElement('span');
+          testText.className = 'test-text-integrated';
+          testText.textContent = test.text;
+          testText.style.flex = '1';
+          testText.style.color = 'var(--text-primary)';
+          if (test.completed) {
+            testText.style.textDecoration = 'line-through';
+            testText.style.opacity = '0.6';
+          }
+          
+          const testActions = document.createElement('div');
+          testActions.className = 'test-actions-integrated';
+          testActions.style.display = 'flex';
+          testActions.style.gap = '0.5rem';
+          
+          const completeBtn = document.createElement('button');
+          completeBtn.className = 'test-complete-btn-integrated';
+          completeBtn.title = test.completed ? 'Megoldva - kattints a visszavonáshoz' : 'Megoldottként jelöl';
+          completeBtn.style.background = 'none';
+          completeBtn.style.border = 'none';
+          completeBtn.style.cursor = 'pointer';
+          completeBtn.style.padding = '4px';
+          completeBtn.style.borderRadius = '4px';
+          completeBtn.style.display = 'flex';
+          completeBtn.style.alignItems = 'center';
+          completeBtn.style.justifyContent = 'center';
+          
+          const completeIcon = document.createElement('img');
+          completeIcon.src = chrome.runtime.getURL('icons/pipa.svg');
+          completeIcon.alt = 'Megoldva';
+          completeIcon.style.width = '16px';
+          completeIcon.style.height = '16px';
+          if (test.completed) {
+            completeIcon.style.opacity = '1';
+            completeBtn.style.background = 'var(--warning-accent)';
+          } else {
+            completeIcon.style.opacity = '0.5';
+          }
+          completeBtn.appendChild(completeIcon);
+          
+          const deleteBtn = document.createElement('button');
+          deleteBtn.className = 'test-delete-btn-integrated';
+          deleteBtn.title = 'Törlés';
+          deleteBtn.style.background = 'none';
+          deleteBtn.style.border = 'none';
+          deleteBtn.style.cursor = 'pointer';
+          deleteBtn.style.padding = '4px';
+          deleteBtn.style.borderRadius = '4px';
+          deleteBtn.style.display = 'flex';
+          deleteBtn.style.alignItems = 'center';
+          deleteBtn.style.justifyContent = 'center';
+          
+          const deleteIcon = document.createElement('img');
+          deleteIcon.src = chrome.runtime.getURL('icons/delete.svg');
+          deleteIcon.alt = 'Törlés';
+          deleteIcon.style.width = '16px';
+          deleteIcon.style.height = '16px';
+          deleteIcon.style.opacity = '0.5';
+          deleteBtn.appendChild(deleteIcon);
+          
+          completeBtn.addEventListener('click', () => {
+            const newCompleted = toggleCustomTestCompletion(lessonKey, test.id);
+            if (newCompleted) {
+              testText.style.textDecoration = 'line-through';
+              testText.style.opacity = '0.6';
+              completeIcon.style.opacity = '1';
+              completeBtn.style.background = 'var(--warning-accent)';
+              completeBtn.title = 'Megoldva - kattints a visszavonáshoz';
+            } else {
+              testText.style.textDecoration = 'none';
+              testText.style.opacity = '1';
+              completeIcon.style.opacity = '0.5';
+              completeBtn.style.background = 'none';
+              completeBtn.title = 'Megoldottként jelöl';
+            }
+          });
+          
+          deleteBtn.addEventListener('click', () => {
+            if (confirm('Biztosan törölni szeretnéd ezt a számonkérést?')) {
+              removeCustomTest(lessonKey, test.id);
+              testItem.remove();
+            }
+          });
+          
+          testActions.appendChild(completeBtn);
+          testActions.appendChild(deleteBtn);
+          testItem.appendChild(testText);
+          testItem.appendChild(testActions);
+          customTestsList.appendChild(testItem);
+        });
+        
+        customTestsDiv.appendChild(customTestsList);
+        testContent.appendChild(customTestsDiv);
+      }
+      
       testSection.appendChild(testH4);
       testSection.appendChild(testContent);
       body.appendChild(testSection);
+    }
+    
+
+    const lessonKey = getLessonKey(lesson);
+    const customHomework = getCustomHomework();
+    const customHomeworkItems = customHomework[lessonKey] || [];
+    
+    if (!lesson.hasHomework && customHomeworkItems.length > 0) {
+      const customHomeworkSection = document.createElement('div');
+      customHomeworkSection.className = 'modal-section homework-section';
+      
+      const customHomeworkH4 = document.createElement('h4');
+      const customHomeworkIcon = document.createElement('img');
+      customHomeworkIcon.src = chrome.runtime.getURL('icons/homework.svg');
+      customHomeworkIcon.alt = 'Saját házi feladat';
+      customHomeworkIcon.style.width = '20px';
+      customHomeworkIcon.style.height = '20px';
+      customHomeworkH4.appendChild(customHomeworkIcon);
+      customHomeworkH4.appendChild(document.createTextNode('Saját házi feladatok'));
+      
+      const customHomeworkContent = document.createElement('div');
+      customHomeworkContent.className = 'homework-content';
+      
+      const customHomeworkList = document.createElement('div');
+      customHomeworkList.className = 'custom-homework-list-integrated';
+      
+      customHomeworkItems.forEach(homework => {
+        const homeworkItem = document.createElement('div');
+        homeworkItem.className = `custom-homework-item-integrated ${homework.completed ? 'completed' : ''}`;
+        homeworkItem.style.display = 'flex';
+        homeworkItem.style.alignItems = 'center';
+        homeworkItem.style.justifyContent = 'space-between';
+        
+        const homeworkText = document.createElement('span');
+        homeworkText.className = 'homework-text-integrated';
+        homeworkText.textContent = homework.text;
+        homeworkText.style.flex = '1';
+        homeworkText.style.color = 'var(--text-primary)';
+        if (homework.completed) {
+          homeworkText.style.textDecoration = 'line-through';
+          homeworkText.style.opacity = '0.6';
+        }
+        
+        const homeworkActions = document.createElement('div');
+        homeworkActions.className = 'homework-actions-integrated';
+        homeworkActions.style.display = 'flex';
+        homeworkActions.style.gap = '0.5rem';
+        
+        const completeBtn = document.createElement('button');
+        completeBtn.className = 'homework-complete-btn-integrated';
+        completeBtn.title = homework.completed ? 'Megoldva - kattints a visszavonáshoz' : 'Megoldottként jelöl';
+        completeBtn.style.background = 'none';
+        completeBtn.style.border = 'none';
+        completeBtn.style.cursor = 'pointer';
+        completeBtn.style.padding = '4px';
+        completeBtn.style.borderRadius = '4px';
+        completeBtn.style.display = 'flex';
+        completeBtn.style.alignItems = 'center';
+        completeBtn.style.justifyContent = 'center';
+        
+        const completeIcon = document.createElement('img');
+        completeIcon.src = chrome.runtime.getURL('icons/pipa.svg');
+        completeIcon.alt = 'Megoldva';
+        completeIcon.style.width = '16px';
+        completeIcon.style.height = '16px';
+        if (homework.completed) {
+          completeIcon.style.opacity = '1';
+          completeBtn.style.background = 'var(--accent-accent)';
+        } else {
+          completeIcon.style.opacity = '0.5';
+        }
+        completeBtn.appendChild(completeIcon);
+        
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'homework-delete-btn-integrated';
+        deleteBtn.title = 'Törlés';
+        deleteBtn.style.background = 'none';
+        deleteBtn.style.border = 'none';
+        deleteBtn.style.cursor = 'pointer';
+        deleteBtn.style.padding = '4px';
+        deleteBtn.style.borderRadius = '4px';
+        deleteBtn.style.display = 'flex';
+        deleteBtn.style.alignItems = 'center';
+        deleteBtn.style.justifyContent = 'center';
+        
+        const deleteIcon = document.createElement('img');
+        deleteIcon.src = chrome.runtime.getURL('icons/delete.svg');
+        deleteIcon.alt = 'Törlés';
+        deleteIcon.style.width = '16px';
+        deleteIcon.style.height = '16px';
+        deleteIcon.style.opacity = '0.5';
+        deleteBtn.appendChild(deleteIcon);
+        
+        completeBtn.addEventListener('click', () => {
+          const newCompleted = toggleCustomHomeworkCompletion(lessonKey, homework.id);
+          if (newCompleted) {
+            homeworkText.style.textDecoration = 'line-through';
+            homeworkText.style.opacity = '0.6';
+            completeIcon.style.opacity = '1';
+            completeBtn.style.background = 'var(--accent-accent)';
+            completeBtn.title = 'Megoldva - kattints a visszavonáshoz';
+          } else {
+            homeworkText.style.textDecoration = 'none';
+            homeworkText.style.opacity = '1';
+            completeIcon.style.opacity = '0.5';
+            completeBtn.style.background = 'none';
+            completeBtn.title = 'Megoldottként jelöl';
+          }
+        });
+        
+        deleteBtn.addEventListener('click', () => {
+          if (confirm('Biztosan törölni szeretnéd ezt a házi feladatot?')) {
+            removeCustomHomework(lessonKey, homework.id);
+            homeworkItem.remove();
+          }
+        });
+        
+        homeworkActions.appendChild(completeBtn);
+        homeworkActions.appendChild(deleteBtn);
+        homeworkItem.appendChild(homeworkText);
+        homeworkItem.appendChild(homeworkActions);
+        customHomeworkList.appendChild(homeworkItem);
+      });
+      
+      customHomeworkContent.appendChild(customHomeworkList);
+      customHomeworkSection.appendChild(customHomeworkH4);
+      customHomeworkSection.appendChild(customHomeworkContent);
+      body.appendChild(customHomeworkSection);
+    }
+    
+
+    const customTests = getCustomTests();
+    const customTestItems = customTests[lessonKey] || [];
+    
+    if (!lesson.testInfo && customTestItems.length > 0) {
+      const customTestSection = document.createElement('div');
+      customTestSection.className = 'modal-section test-section';
+      
+      const customTestH4 = document.createElement('h4');
+      const customTestIcon = document.createElement('img');
+      customTestIcon.src = chrome.runtime.getURL('icons/assigment.svg');
+      customTestIcon.alt = 'Saját számonkérés';
+      customTestIcon.style.width = '20px';
+      customTestIcon.style.height = '20px';
+      customTestH4.appendChild(customTestIcon);
+      customTestH4.appendChild(document.createTextNode('Saját számonkérések'));
+      
+      const customTestContent = document.createElement('div');
+      customTestContent.className = 'test-content';
+      
+      const customTestsList = document.createElement('div');
+      customTestsList.className = 'custom-tests-list-integrated';
+      
+      customTestItems.forEach(test => {
+        const testItem = document.createElement('div');
+        testItem.className = `custom-test-item-integrated ${test.completed ? 'completed' : ''}`;
+        testItem.style.display = 'flex';
+        testItem.style.alignItems = 'center';
+        testItem.style.justifyContent = 'space-between';
+        
+        const testText = document.createElement('span');
+        testText.className = 'test-text-integrated';
+        testText.textContent = test.text;
+        testText.style.flex = '1';
+        testText.style.color = 'var(--text-primary)';
+        if (test.completed) {
+          testText.style.textDecoration = 'line-through';
+          testText.style.opacity = '0.6';
+        }
+        
+        const testActions = document.createElement('div');
+        testActions.className = 'test-actions-integrated';
+        testActions.style.display = 'flex';
+        testActions.style.gap = '0.5rem';
+        
+        const completeBtn = document.createElement('button');
+        completeBtn.className = 'test-complete-btn-integrated';
+        completeBtn.title = test.completed ? 'Megoldva - kattints a visszavonáshoz' : 'Megoldottként jelöl';
+        completeBtn.style.background = 'none';
+        completeBtn.style.border = 'none';
+        completeBtn.style.cursor = 'pointer';
+        completeBtn.style.padding = '4px';
+        completeBtn.style.borderRadius = '4px';
+        completeBtn.style.display = 'flex';
+        completeBtn.style.alignItems = 'center';
+        completeBtn.style.justifyContent = 'center';
+        
+        const completeIcon = document.createElement('img');
+        completeIcon.src = chrome.runtime.getURL('icons/pipa.svg');
+        completeIcon.alt = 'Megoldva';
+        completeIcon.style.width = '16px';
+        completeIcon.style.height = '16px';
+        if (test.completed) {
+          completeIcon.style.opacity = '1';
+          completeBtn.style.background = 'var(--warning-accent)';
+        } else {
+          completeIcon.style.opacity = '0.5';
+        }
+        completeBtn.appendChild(completeIcon);
+        
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'test-delete-btn-integrated';
+        deleteBtn.title = 'Törlés';
+        deleteBtn.style.background = 'none';
+        deleteBtn.style.border = 'none';
+        deleteBtn.style.cursor = 'pointer';
+        deleteBtn.style.padding = '4px';
+        deleteBtn.style.borderRadius = '4px';
+        deleteBtn.style.display = 'flex';
+        deleteBtn.style.alignItems = 'center';
+        deleteBtn.style.justifyContent = 'center';
+        
+        const deleteIcon = document.createElement('img');
+        deleteIcon.src = chrome.runtime.getURL('icons/delete.svg');
+        deleteIcon.alt = 'Törlés';
+        deleteIcon.style.width = '16px';
+        deleteIcon.style.height = '16px';
+        deleteIcon.style.opacity = '0.5';
+        deleteBtn.appendChild(deleteIcon);
+        
+        completeBtn.addEventListener('click', () => {
+          const newCompleted = toggleCustomTestCompletion(lessonKey, test.id);
+          if (newCompleted) {
+            testText.style.textDecoration = 'line-through';
+            testText.style.opacity = '0.6';
+            completeIcon.style.opacity = '1';
+            completeBtn.style.background = 'var(--warning-accent)';
+            completeBtn.title = 'Megoldva - kattints a visszavonáshoz';
+          } else {
+            testText.style.textDecoration = 'none';
+            testText.style.opacity = '1';
+            completeIcon.style.opacity = '0.5';
+            completeBtn.style.background = 'none';
+            completeBtn.title = 'Megoldottként jelöl';
+          }
+        });
+        
+        deleteBtn.addEventListener('click', () => {
+          if (confirm('Biztosan törölni szeretnéd ezt a számonkérést?')) {
+            removeCustomTest(lessonKey, test.id);
+            testItem.remove();
+          }
+        });
+        
+        testActions.appendChild(completeBtn);
+        testActions.appendChild(deleteBtn);
+        testItem.appendChild(testText);
+        testItem.appendChild(testActions);
+        customTestsList.appendChild(testItem);
+      });
+      
+      customTestContent.appendChild(customTestsList);
+      customTestSection.appendChild(customTestH4);
+      customTestSection.appendChild(customTestContent);
+      body.appendChild(customTestSection);
     }
     
     modalContent.appendChild(header);
@@ -941,6 +1628,142 @@
     } finally {
       loadingScreen.hide();
     }
+  }
+
+  function showAddItemModal(lesson) {
+    const addModal = document.createElement('div');
+    addModal.className = 'add-item-modal';
+    
+    const addModalContent = document.createElement('div');
+    addModalContent.className = 'add-modal-content';
+    
+    const addModalHeader = document.createElement('div');
+    addModalHeader.className = 'add-modal-header';
+    
+    const addModalTitle = document.createElement('h3');
+    addModalTitle.textContent = 'Új elem hozzáadása';
+    
+    const addModalClose = document.createElement('button');
+    addModalClose.className = 'add-modal-close';
+    
+    const addModalCloseIcon = document.createElement('img');
+    addModalCloseIcon.src = chrome.runtime.getURL('icons/CloseCircle.svg');
+    addModalCloseIcon.alt = 'Bezárás';
+    addModalCloseIcon.style.width = '24px';
+    addModalCloseIcon.style.height = '24px';
+    addModalClose.appendChild(addModalCloseIcon);
+    
+    addModalHeader.appendChild(addModalTitle);
+    addModalHeader.appendChild(addModalClose);
+    
+    const addModalBody = document.createElement('div');
+    addModalBody.className = 'add-modal-body';
+    
+    const typeSelection = document.createElement('div');
+    typeSelection.className = 'type-selection';
+    
+    const typeLabel = document.createElement('label');
+    typeLabel.textContent = 'Típus:';
+    
+    const typeSelect = document.createElement('select');
+    typeSelect.className = 'type-select';
+    
+    const homeworkOption = document.createElement('option');
+    homeworkOption.value = 'homework';
+    homeworkOption.textContent = 'Házi feladat';
+    
+    const testOption = document.createElement('option');
+    testOption.value = 'test';
+    testOption.textContent = 'Számonkérés';
+    
+    typeSelect.appendChild(homeworkOption);
+    typeSelect.appendChild(testOption);
+    
+    typeSelection.appendChild(typeLabel);
+    typeSelection.appendChild(typeSelect);
+    
+    const textInput = document.createElement('div');
+    textInput.className = 'text-input';
+    
+    const textLabel = document.createElement('label');
+    textLabel.textContent = 'Leírás:';
+    
+    const textArea = document.createElement('textarea');
+    textArea.className = 'item-text';
+    textArea.placeholder = 'Írja be a leírást...';
+    textArea.rows = 3;
+    
+    textInput.appendChild(textLabel);
+    textInput.appendChild(textArea);
+    
+    const addModalActions = document.createElement('div');
+    addModalActions.className = 'add-modal-actions';
+    
+    const cancelBtn = document.createElement('button');
+    cancelBtn.className = 'cancel-btn';
+    cancelBtn.textContent = 'Mégse';
+    
+    const saveBtn = document.createElement('button');
+    saveBtn.className = 'save-btn';
+    saveBtn.textContent = 'Mentés';
+    
+    addModalActions.appendChild(cancelBtn);
+    addModalActions.appendChild(saveBtn);
+    
+    addModalBody.appendChild(typeSelection);
+    addModalBody.appendChild(textInput);
+    addModalBody.appendChild(addModalActions);
+    
+    addModalContent.appendChild(addModalHeader);
+    addModalContent.appendChild(addModalBody);
+    addModal.appendChild(addModalContent);
+    
+    document.body.appendChild(addModal);
+    
+    const closeAddModal = () => {
+      addModal.classList.remove('show');
+      setTimeout(() => addModal.remove(), 300);
+    };
+    
+    addModalClose.addEventListener('click', closeAddModal);
+    cancelBtn.addEventListener('click', closeAddModal);
+    
+    addModal.addEventListener('click', (e) => {
+      if (e.target === addModal) closeAddModal();
+    });
+    
+    saveBtn.addEventListener('click', () => {
+      const text = textArea.value.trim();
+      const type = typeSelect.value;
+      
+      if (!text) {
+        textArea.focus();
+        return;
+      }
+      
+      const lessonKey = getLessonKey(lesson);
+      
+      if (type === 'homework') {
+        addCustomHomework(lessonKey, text);
+      } else {
+        addCustomTest(lessonKey, text);
+      }
+      
+      closeAddModal();
+    });
+    
+    const handleEscape = (e) => {
+      if (e.key === 'Escape') {
+        closeAddModal();
+        document.removeEventListener('keydown', handleEscape);
+      }
+    };
+    document.addEventListener('keydown', handleEscape);
+    
+    requestAnimationFrame(() => {
+      addModal.classList.add('show');
+      textArea.focus();
+    });
   }
 
   function setupLessonCardListeners() {

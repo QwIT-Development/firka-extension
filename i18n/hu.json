@@ -116,7 +116,36 @@
     "thursday": "Csütörtök",
     "friday": "Péntek",
     "found_current_week": "Megtalált jelenlegi hét",
-    "open_homework": "Ugrás a házi feladatokhoz"
+    "open_homework": "Ugrás a házi feladatokhoz",
+    "all_day": "Egész nap",
+    "special_day": "Különleges nap",
+    "unknown_subject": "Ismeretlen tantárgy",
+    "lesson_topic": "Óra témája",
+    "homework_completed": "Megoldott házi feladat",
+    "homework_mark_completed": "Megoldottként jelöl",
+    "homework_mark_uncompleted": "Megoldva - kattints a visszavonáshoz",
+    "custom_homework": "Saját házi feladat",
+    "custom_test": "Saját számonkérés",
+    "add_homework_test": "Házi feladat vagy számonkérés hozzáadása",
+    "close": "Bezárás",
+    "add": "Hozzáadás",
+    "homework_details_loading": "Házi feladat részletek betöltése...",
+    "homework_details_error": "Hiba történt a házi feladat részletek betöltésekor.",
+    "test_details_loading": "Részletek betöltése...",
+    "test_details_error": "Nem sikerült betölteni a számonkérés részleteit.",
+    "test_details_error_general": "Hiba történt a számonkérés részletek betöltése során.",
+    "custom_homework_title": "Saját házi feladatok:",
+    "custom_tests_title": "Saját számonkérések:",
+    "delete_homework_confirm": "Biztosan törölni szeretnéd ezt a házi feladatot?",
+    "delete_test_confirm": "Biztosan törölni szeretnéd ezt a számonkérést?",
+    "task_label": "Feladat:",
+    "deadline_label": "Határidő:",
+    "name_label": "Megnevezés:",
+    "type_label": "Típus:",
+    "announce_date_label": "Bejelentés dátuma:",
+    "no_name": "Nincs megnevezés",
+    "no_type": "Nincs típus megadva",
+    "no_date": "Nincs dátum"
   },
   "homework": {
     "title": "Házi feladatok",
@@ -352,5 +381,25 @@
     "invalid_data": "Hibás adatok",
     "invalid_email": "Érvénytelen e-mail cím formátum",
     "recaptcha_required": "Kérjük, töltse ki a reCAPTCHA-t"
+  },
+  "modal": {
+    "add_item_title": "Új elem hozzáadása",
+    "type_label": "Típus:",
+    "homework_option": "Házi feladat",
+    "test_option": "Számonkérés",
+    "description_label": "Leírás:",
+    "cancel": "Mégse",
+    "save": "Mentés"
+  },
+  "grades": {
+    "semester_evaluation": "Félévi értékelés"
+  },
+  "search": {
+    "choose_school": "Válassz iskolát",
+    "privacy_policy": "Adatkezelési tájékoztató"
+  },
+  "icons": {
+    "cancel": "cancel",
+    "pending": "pending"
   }
 }

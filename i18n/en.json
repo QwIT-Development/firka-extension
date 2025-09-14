@@ -116,7 +116,36 @@
     "thursday": "Thursday",
     "friday": "Friday",
     "found_current_week": "Found current week",
-    "open_homework": "Open homework"
+    "open_homework": "Open homework",
+    "all_day": "All day",
+    "special_day": "Special day",
+    "unknown_subject": "Unknown subject",
+    "lesson_topic": "Lesson topic",
+    "homework_completed": "Completed homework",
+    "homework_mark_completed": "Mark as completed",
+    "homework_mark_uncompleted": "Completed - click to undo",
+    "custom_homework": "Custom homework",
+    "custom_test": "Custom test",
+    "add_homework_test": "Add homework or test",
+    "close": "Close",
+    "add": "Add",
+    "homework_details_loading": "Loading homework details...",
+    "homework_details_error": "Error occurred while loading homework details.",
+    "test_details_loading": "Loading details...",
+    "test_details_error": "Failed to load test details.",
+    "test_details_error_general": "Error occurred while loading test details.",
+    "custom_homework_title": "Custom homework:",
+    "custom_tests_title": "Custom tests:",
+    "delete_homework_confirm": "Are you sure you want to delete this homework?",
+    "delete_test_confirm": "Are you sure you want to delete this test?",
+    "task_label": "Task:",
+    "deadline_label": "Deadline:",
+    "name_label": "Name:",
+    "type_label": "Type:",
+    "announce_date_label": "Announcement date:",
+    "no_name": "No name",
+    "no_type": "No type specified",
+    "no_date": "No date"
   },
   "homework": {
     "title": "Homework",
@@ -350,7 +379,27 @@
     "error_message": "An error occurred during password reset",
     "success_message": "Password reset link sent to your email address",
     "invalid_data": "Invalid data",
-    "invalid_email": "Invalid email address format",
+    "invalid_email": "Invalid email format",
     "recaptcha_required": "Please complete the reCAPTCHA"
+  },
+  "modal": {
+    "add_item_title": "Add new item",
+    "type_label": "Type:",
+    "homework_option": "Homework",
+    "test_option": "Test",
+    "description_label": "Description:",
+    "cancel": "Cancel",
+    "save": "Save"
+  },
+  "grades": {
+    "semester_evaluation": "Semester evaluation"
+  },
+  "search": {
+    "choose_school": "Choose school",
+    "privacy_policy": "Privacy policy"
+  },
+  "icons": {
+    "cancel": "cancel",
+    "pending": "pending"
   }
 }
