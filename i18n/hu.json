@@ -75,6 +75,7 @@
     "teacher": "Tanár",
     "average": "Átlag",
     "chart_title": "Jegyek",
+    "semester_evaluation": "Félévi értékelés",
     "semester_evaluations": "Félévi értékelések",
     "year_end_evaluations": "Év végi értékelések",
     "semester_average": "Félévi átlag",
@@ -336,10 +337,6 @@
     "november": "november",
     "december": "december"
   },
-  "search": {
-    "title": "Válassz iskolát",
-    "select_institution": "Kérjük, válasszon egy intézményt a folytatáshoz!"
-  },
   "roleselect": {
     "student_book": "Ellenőrzőkönyv",
     "student_description": "Jegyek, hiányzások, órarended és egyéb információk megtekintése.",
@@ -391,12 +388,11 @@
     "cancel": "Mégse",
     "save": "Mentés"
   },
-  "grades": {
-    "semester_evaluation": "Félévi értékelés"
-  },
   "search": {
     "choose_school": "Válassz iskolát",
-    "privacy_policy": "Adatkezelési tájékoztató"
+    "privacy_policy": "Adatkezelési tájékoztató",
+    "title": "Válassz iskolát",
+    "select_institution": "Kérjük, válasszon egy intézményt a folytatáshoz!"
   },
   "icons": {
     "cancel": "cancel",
