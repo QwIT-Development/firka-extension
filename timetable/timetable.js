@@ -79,8 +79,8 @@
     }
   }
 
-  function addCustomHomework(lessonKey, homeworkText) {
-    const customHomework = getCustomHomework();
+  async function addCustomHomework(lessonKey, homeworkText) {
+    const customHomework = await getCustomHomework();
     if (!customHomework[lessonKey]) {
       customHomework[lessonKey] = [];
     }
@@ -91,36 +91,36 @@
       completed: false,
       createdAt: new Date().toISOString()
     });
-    saveCustomHomework(customHomework);
+    await saveCustomHomework(customHomework);
     return homeworkId;
   }
 
-  function removeCustomHomework(lessonKey, homeworkId) {
-    const customHomework = getCustomHomework();
+  async function removeCustomHomework(lessonKey, homeworkId) {
+    const customHomework = await getCustomHomework();
     if (customHomework[lessonKey]) {
       customHomework[lessonKey] = customHomework[lessonKey].filter(hw => hw.id !== homeworkId);
       if (customHomework[lessonKey].length === 0) {
         delete customHomework[lessonKey];
       }
-      saveCustomHomework(customHomework);
+      await saveCustomHomework(customHomework);
     }
   }
 
-  function toggleCustomHomeworkCompletion(lessonKey, homeworkId) {
-    const customHomework = getCustomHomework();
+  async function toggleCustomHomeworkCompletion(lessonKey, homeworkId) {
+    const customHomework = await getCustomHomework();
     if (customHomework[lessonKey]) {
       const homework = customHomework[lessonKey].find(hw => hw.id === homeworkId);
       if (homework) {
         homework.completed = !homework.completed;
-        saveCustomHomework(customHomework);
+        await saveCustomHomework(customHomework);
         return homework.completed;
       }
     }
     return false;
   }
 
-  function addCustomTest(lessonKey, testText) {
-    const customTests = getCustomTests();
+  async function addCustomTest(lessonKey, testText) {
+    const customTests = await getCustomTests();
     if (!customTests[lessonKey]) {
       customTests[lessonKey] = [];
     }
@@ -131,28 +131,28 @@
       completed: false,
       createdAt: new Date().toISOString()
     });
-    saveCustomTests(customTests);
+    await saveCustomTests(customTests);
     return testId;
   }
 
-  function removeCustomTest(lessonKey, testId) {
-    const customTests = getCustomTests();
+  async function removeCustomTest(lessonKey, testId) {
+    const customTests = await getCustomTests();
     if (customTests[lessonKey]) {
       customTests[lessonKey] = customTests[lessonKey].filter(test => test.id !== testId);
       if (customTests[lessonKey].length === 0) {
         delete customTests[lessonKey];
       }
-      saveCustomTests(customTests);
+      await saveCustomTests(customTests);
     }
   }
 
-  function toggleCustomTestCompletion(lessonKey, testId) {
-    const customTests = getCustomTests();
+  async function toggleCustomTestCompletion(lessonKey, testId) {
+    const customTests = await getCustomTests();
     if (customTests[lessonKey]) {
       const test = customTests[lessonKey].find(t => t.id === testId);
       if (test) {
         test.completed = !test.completed;
-        saveCustomTests(customTests);
+        await saveCustomTests(customTests);
         return test.completed;
       }
     }
@@ -447,9 +447,18 @@
     return lessons;
   }
 
-  function generateTimeGrid(lessons, weekDates) {
+  async function generateTimeGrid(lessons, weekDates) {
     const specialDayLessons = lessons.filter((l) => l.isSpecialDay);
     const regularLessons = lessons.filter((l) => !l.isSpecialDay);
+    const customHomework = await getCustomHomework();
+    const customTests = await getCustomTests();
+
+    const homeworkCompletionMap = {};
+    for (const lesson of lessons) {
+      if (lesson.lessonId) {
+        homeworkCompletionMap[lesson.lessonId] = await isHomeworkCompleted(lesson.lessonId);
+      }
+    }
 
     const times = [...new Set(regularLessons.map((l) => l.startTime))].sort(
       (a, b) => {
@@ -524,11 +533,9 @@
               (l) => l.startTime === time && l.day === dayIndex,
             );
             
-
             const lastLessonTime = lastLessonTimes[dayIndex];
             const isAfterLastLesson = lastLessonTime && helper.convertTimeToMinutes(time) > helper.convertTimeToMinutes(lastLessonTime);
-            
-
+        
             if (dayLessons.length === 0 && isAfterLastLesson) {
               return `<div class="lesson-slot"></div>`;
             }
@@ -553,11 +560,8 @@
                   ${
                     (() => {
                       const lessonKey = `${lesson.subject}_${lesson.startTime}_${lesson.day}`;
-                      const customHomework = getCustomHomework();
-                      const customTests = getCustomTests();
                       const hasCustomHomework = customHomework[lessonKey] && customHomework[lessonKey].length > 0;
                       const hasCustomTests = customTests[lessonKey] && customTests[lessonKey].length > 0;
-                      
                       const hasAnyIndicators = lesson.hasHomework || lesson.testInfo || hasCustomHomework || hasCustomTests;
                       
                       return hasAnyIndicators ? `
@@ -566,7 +570,7 @@
                         lesson.hasHomework
                           ? `
                         <span class="lesson-indicator homework-indicator" title="${LanguageManager.t("timetable.homework_indicator")}">
-                          <img src="${chrome.runtime.getURL(lesson.lessonId && isHomeworkCompleted(lesson.lessonId) ? "icons/pipa.svg" : "icons/homework.svg")}" alt="${lesson.lessonId && isHomeworkCompleted(lesson.lessonId) ? 'Megoldott házi feladat' : 'Házi feladat'}" style="width: 20px; height: 20px;">
+                          <img src="${chrome.runtime.getURL(lesson.lessonId && homeworkCompletionMap[lesson.lessonId] ? "icons/pipa.svg" : "icons/homework.svg")}" alt="${lesson.lessonId && homeworkCompletionMap[lesson.lessonId] ? 'Megoldott házi feladat' : 'Házi feladat'}" style="width: 20px; height: 20px;">
                         </span>
                       `
                           : ""
@@ -804,7 +808,7 @@
         const completionBtn = document.createElement('button');
         completionBtn.className = 'homework-completion-header-btn';
         
-        const isCompleted = isHomeworkCompleted(lesson.lessonId);
+        const isCompleted = await isHomeworkCompleted(lesson.lessonId);
         const checkIcon = document.createElement('img');
         checkIcon.src = chrome.runtime.getURL('icons/pipa.svg');
         checkIcon.alt = 'Megoldva';
@@ -815,8 +819,8 @@
         completionBtn.classList.toggle('completed', isCompleted);
         completionBtn.title = isCompleted ? 'Megoldva - kattints a visszavonáshoz' : 'Megoldottként jelöl';
         
-        completionBtn.addEventListener('click', () => {
-          const nowCompleted = toggleHomeworkCompletion(lesson.lessonId);
+        completionBtn.addEventListener('click', async () => {
+          const nowCompleted = await toggleHomeworkCompletion(lesson.lessonId);
           completionBtn.classList.toggle('completed', nowCompleted);
           completionBtn.title = nowCompleted ? 'Megoldva - kattints a visszavonáshoz' : 'Megoldottként jelöl';
           const lessonCards = document.querySelectorAll(`[data-lesson-id="${lesson.lessonId}"]`);
@@ -953,7 +957,7 @@
       
       
       const lessonKey = getLessonKey(lesson);
-      const customHomework = getCustomHomework();
+      const customHomework = await getCustomHomework();
       const customHomeworkItems = customHomework[lessonKey] || [];
       
       if (customHomeworkItems.length > 0) {
@@ -1046,8 +1050,8 @@
           deleteIcon.style.opacity = '0.5';
           deleteBtn.appendChild(deleteIcon);
           
-          completeBtn.addEventListener('click', () => {
-            const newCompleted = toggleCustomHomeworkCompletion(lessonKey, homework.id);
+          completeBtn.addEventListener('click', async () => {
+            const newCompleted = await toggleCustomHomeworkCompletion(lessonKey, homework.id);
             if (newCompleted) {
               homeworkText.style.textDecoration = 'line-through';
               homeworkText.style.opacity = '0.6';
@@ -1063,9 +1067,9 @@
             }
           });
           
-          deleteBtn.addEventListener('click', () => {
+          deleteBtn.addEventListener('click', async () => {
             if (confirm('Biztosan törölni szeretnéd ezt a házi feladatot?')) {
-              removeCustomHomework(lessonKey, homework.id);
+              await removeCustomHomework(lessonKey, homework.id);
               homeworkItem.remove();
             }
           });
@@ -1145,7 +1149,7 @@
       
       
       const lessonKey = getLessonKey(lesson);
-      const customTests = getCustomTests();
+      const customTests = await getCustomTests();
       const customTestItems = customTests[lessonKey] || [];
       
       if (customTestItems.length > 0) {
@@ -1238,8 +1242,8 @@
           deleteIcon.style.opacity = '0.5';
           deleteBtn.appendChild(deleteIcon);
           
-          completeBtn.addEventListener('click', () => {
-            const newCompleted = toggleCustomTestCompletion(lessonKey, test.id);
+          completeBtn.addEventListener('click', async () => {
+            const newCompleted = await toggleCustomTestCompletion(lessonKey, test.id);
             if (newCompleted) {
               testText.style.textDecoration = 'line-through';
               testText.style.opacity = '0.6';
@@ -1255,9 +1259,9 @@
             }
           });
           
-          deleteBtn.addEventListener('click', () => {
+          deleteBtn.addEventListener('click', async () => {
             if (confirm('Biztosan törölni szeretnéd ezt a számonkérést?')) {
-              removeCustomTest(lessonKey, test.id);
+              await removeCustomTest(lessonKey, test.id);
               testItem.remove();
             }
           });
@@ -1280,7 +1284,7 @@
     
 
     const lessonKey = getLessonKey(lesson);
-    const customHomework = getCustomHomework();
+    const customHomework = await getCustomHomework();
     const customHomeworkItems = customHomework[lessonKey] || [];
     
     if (!lesson.hasHomework && customHomeworkItems.length > 0) {
@@ -1369,8 +1373,8 @@
         deleteIcon.style.opacity = '0.5';
         deleteBtn.appendChild(deleteIcon);
         
-        completeBtn.addEventListener('click', () => {
-          const newCompleted = toggleCustomHomeworkCompletion(lessonKey, homework.id);
+        completeBtn.addEventListener('click', async () => {
+          const newCompleted = await toggleCustomHomeworkCompletion(lessonKey, homework.id);
           if (newCompleted) {
             homeworkText.style.textDecoration = 'line-through';
             homeworkText.style.opacity = '0.6';
@@ -1386,9 +1390,9 @@
           }
         });
         
-        deleteBtn.addEventListener('click', () => {
+        deleteBtn.addEventListener('click', async () => {
           if (confirm('Biztosan törölni szeretnéd ezt a házi feladatot?')) {
-            removeCustomHomework(lessonKey, homework.id);
+            await removeCustomHomework(lessonKey, homework.id);
             homeworkItem.remove();
           }
         });
@@ -1406,8 +1410,7 @@
       body.appendChild(customHomeworkSection);
     }
     
-
-    const customTests = getCustomTests();
+    const customTests = await getCustomTests();
     const customTestItems = customTests[lessonKey] || [];
     
     if (!lesson.testInfo && customTestItems.length > 0) {
@@ -1496,8 +1499,8 @@
         deleteIcon.style.opacity = '0.5';
         deleteBtn.appendChild(deleteIcon);
         
-        completeBtn.addEventListener('click', () => {
-          const newCompleted = toggleCustomTestCompletion(lessonKey, test.id);
+        completeBtn.addEventListener('click', async () => {
+          const newCompleted = await toggleCustomTestCompletion(lessonKey, test.id);
           if (newCompleted) {
             testText.style.textDecoration = 'line-through';
             testText.style.opacity = '0.6';
@@ -1513,9 +1516,9 @@
           }
         });
         
-        deleteBtn.addEventListener('click', () => {
+        deleteBtn.addEventListener('click', async () => {
           if (confirm('Biztosan törölni szeretnéd ezt a számonkérést?')) {
-            removeCustomTest(lessonKey, test.id);
+            await removeCustomTest(lessonKey, test.id);
             testItem.remove();
           }
         });
@@ -1606,7 +1609,7 @@
       const timetableGrid = document.querySelector(".timetable-grid");
       if (timetableGrid) {
     
-        const newContent = generateTimeGrid(lessons, weekDates);
+        const newContent = await generateTimeGrid(lessons, weekDates);
         timetableGrid.innerHTML = '';
     
         const parser1 = new DOMParser();
@@ -1733,7 +1736,7 @@
       if (e.target === addModal) closeAddModal();
     });
     
-    saveBtn.addEventListener('click', () => {
+    saveBtn.addEventListener('click', async () => {
       const text = textArea.value.trim();
       const type = typeSelect.value;
       
@@ -1745,9 +1748,9 @@
       const lessonKey = getLessonKey(lesson);
       
       if (type === 'homework') {
-        addCustomHomework(lessonKey, text);
+        await addCustomHomework(lessonKey, text);
       } else {
-        addCustomTest(lessonKey, text);
+        await addCustomTest(lessonKey, text);
       }
       
       closeAddModal();
@@ -2380,7 +2383,7 @@
       timetableGrid.className = 'timetable-grid';
       
   
-      const gridContent = generateTimeGrid(data.lessons, data.weekDates);
+      const gridContent = await generateTimeGrid(data.lessons, data.weekDates);
   
       const parser3 = new DOMParser();
       const doc = parser3.parseFromString(`<div>${gridContent}</div>`, 'text/html');
@@ -2478,20 +2481,20 @@
     const expandBtn = document.getElementById("expandWeekView");
 
     if (prevBtn) {
-      prevBtn.addEventListener("click", () => {
+      prevBtn.addEventListener("click", async () => {
         selectedWeekNumber--;
         if (selectedWeekNumber < 1) selectedWeekNumber = 52;
         updateWeekDisplay();
-        loadWeekData(selectedWeekNumber);
+        await loadWeekData(selectedWeekNumber);
       });
     }
 
     if (nextBtn) {
-      nextBtn.addEventListener("click", () => {
+      nextBtn.addEventListener("click", async () => {
         selectedWeekNumber++;
         if (selectedWeekNumber > 52) selectedWeekNumber = 1;
         updateWeekDisplay();
-        loadWeekData(selectedWeekNumber);
+        await loadWeekData(selectedWeekNumber);
       });
     }
 
@@ -2501,14 +2504,14 @@
       });
     }
 
-    const weekClickHandler = (e) => {
+    const weekClickHandler = async (e) => {
       const weekCell = e.target.closest(".week-cell");
       if (weekCell) {
         const weekNumber = parseInt(weekCell.dataset.week);
         if (!isNaN(weekNumber)) {
           selectedWeekNumber = weekNumber;
           updateWeekDisplay();
-          loadWeekData(selectedWeekNumber);
+          await loadWeekData(selectedWeekNumber);
         }
       }
     };
@@ -2520,48 +2523,46 @@
     setupWeekModal();
   }
 
-  function loadWeekData(weekNumber) {
+  async function loadWeekData(weekNumber) {
+    try {
+      const today = new Date();
+      let currentYear = today.getFullYear();
 
-    const today = new Date();
-    let currentYear = today.getFullYear();
 
+      if (today.getMonth() < 8) {
+        currentYear--;
+      }
 
-    if (today.getMonth() < 8) {
-      currentYear--;
-    }
+      const startOfWeek = getDateOfWeek(currentYear, weekNumber, 1);
+      const endOfWeek = getDateOfWeek(currentYear, weekNumber, 7);
+      const startDate = startOfWeek.toISOString().split("T")[0];
+      const endDate = endOfWeek.toISOString().split("T")[0];
 
-    const startOfWeek = getDateOfWeek(currentYear, weekNumber, 1);
-    const endOfWeek = getDateOfWeek(currentYear, weekNumber, 7);
-    const startDate = startOfWeek.toISOString().split("T")[0];
-    const endDate = endOfWeek.toISOString().split("T")[0];
+    const apiData = await loadWeekDataFromAPI(startDate, endDate);
+    const weekDates = generateWeekDates(startDate);
+    const lessons = convertAPIDataToLessons(apiData, weekDates);
 
-    loadWeekDataFromAPI(startDate, endDate)
-      .then((apiData) => {
-        const weekDates = generateWeekDates(startDate);
-        const lessons = convertAPIDataToLessons(apiData, weekDates);
-
-        const timetableContainer = document.querySelector(".timetable-grid");
-        if (timetableContainer) {
-      
-          timetableContainer.innerHTML = '';
-          const gridContent = generateTimeGrid(lessons, weekDates);
+    const timetableContainer = document.querySelector(".timetable-grid");
+    if (timetableContainer) {
+  
+      timetableContainer.innerHTML = '';
+      const gridContent = await generateTimeGrid(lessons, weekDates);
       
           const parser2 = new DOMParser();
-          const doc = parser2.parseFromString(`<div>${gridContent}</div>`, 'text/html');
-          const tempDiv = doc.querySelector('div');
-          while (tempDiv.firstChild) {
-            timetableContainer.appendChild(tempDiv.firstChild);
-          }
-          setupLessonCardListeners();
-          
-          setTimeout(async () => {
-            await updateHomeworkIconsFromCookie();
-          }, 100);
-        }
-      })
-      .catch((error) => {
-        console.error("Hét adatainak betöltése sikertelen:", error);
-      });
+      const doc = parser2.parseFromString(`<div>${gridContent}</div>`, 'text/html');
+      const tempDiv = doc.querySelector('div');
+      while (tempDiv.firstChild) {
+        timetableContainer.appendChild(tempDiv.firstChild);
+      }
+      setupLessonCardListeners();
+      
+      setTimeout(async () => {
+        await updateHomeworkIconsFromCookie();
+      }, 100);
+    }
+  } catch (error) {
+    console.error("Hét adatainak betöltése sikertelen:", error);
+  }
   }
 
   function openWeekModal() {
@@ -2629,14 +2630,14 @@
       });
     }
 
-    const modalWeekClickHandler = (e) => {
+    const modalWeekClickHandler = async (e) => {
       const weekCell = e.target.closest(".modal-week-cell");
       if (weekCell) {
         const weekNumber = parseInt(weekCell.dataset.week);
         if (!isNaN(weekNumber)) {
           selectedWeekNumber = weekNumber;
           updateWeekDisplay();
-          loadWeekData(selectedWeekNumber);
+          await loadWeekData(selectedWeekNumber);
           closeWeekModal();
         }
       }
