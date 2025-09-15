@@ -11,16 +11,16 @@ const DEFAULT_VALUES = {
   TIMER: "45:00",
 };
 
-function updateHeaderInfo() {
+async function updateHeaderInfo() {
   const schoolName = document.querySelector(".nav-school-name");
   const userName = document.querySelector(".nav-user-name");
   const logoutTimer = document.querySelector(".nav-logout-timer");
 
   const userData = {
     schoolName:
-      cookieManager.get(COOKIE_KEYS.SCHOOL_NAME) || DEFAULT_VALUES.SCHOOL,
-    schoolId: cookieManager.get(COOKIE_KEYS.SCHOOL_CODE) || "",
-    name: cookieManager.get(COOKIE_KEYS.USER_NAME) || DEFAULT_VALUES.USER,
+      await storageManager.get("schoolName", DEFAULT_VALUES.SCHOOL),
+    schoolId: await storageManager.get("schoolCode", ""),
+    name: await storageManager.get("userName", DEFAULT_VALUES.USER),
     time:
       document.querySelector(".usermenu_timer")?.textContent?.trim() ||
       DEFAULT_VALUES.TIMER,
@@ -59,8 +59,8 @@ function startLogoutTimer(timeString) {
   setInterval(updateTimer, 1000);
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  updateHeaderInfo();
+document.addEventListener("DOMContentLoaded", async () => {
+  await updateHeaderInfo();
 });
 
 function setupUserDropdown() {
@@ -169,8 +169,8 @@ function setupMobileNavigation() {
   }, 100);
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  updateHeaderInfo();
+document.addEventListener("DOMContentLoaded", async () => {
+  await updateHeaderInfo();
   setupUserDropdown();
   setupSettingsButton();
   setupMobileNavigation();

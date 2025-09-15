@@ -6,7 +6,8 @@
     try {
       currentLanguage = language;
 
-      cookieManager.set("languagePreference", language);
+      await storageManager.set("languagePreference", language);
+
       localStorage.setItem("languagePreference", language);
 
       await loadTranslations(language);
@@ -82,20 +83,25 @@
   }
 
   async function initializeLanguage() {
-    const cookieLanguage = cookieManager.get("languagePreference");
-    const localStorageLanguage = localStorage.getItem("languagePreference");
+    try {
+      const storageLanguage = await storageManager.get("languagePreference");
+      const localStorageLanguage = localStorage.getItem("languagePreference");
+      const language = storageLanguage || localStorageLanguage || "hu";
 
-    const language = cookieLanguage || localStorageLanguage || "hu";
+      await setLanguage(language);
+      loadTranslationsForPage();
 
-    await setLanguage(language);
-    loadTranslationsForPage();
-
-    if (cookieLanguage !== localStorageLanguage) {
-      if (cookieLanguage) {
-        localStorage.setItem("languagePreference", cookieLanguage);
-      } else if (localStorageLanguage) {
-        cookieManager.set("languagePreference", localStorageLanguage);
+      if (storageLanguage !== localStorageLanguage) {
+        if (storageLanguage) {
+          localStorage.setItem("languagePreference", storageLanguage);
+        } else if (localStorageLanguage) {
+          await storageManager.set("languagePreference", localStorageLanguage);
+        }
       }
+    } catch (error) {
+      console.error("Error initializing language:", error);
+      await setLanguage("hu");
+      loadTranslationsForPage();
     }
   }
 
@@ -121,8 +127,7 @@
   function loadTranslationsForPage() {
     try {
       applyTranslations();
-      
-      // Figyeljük a DOM változásokat és alkalmazzuk a fordításokat új elemekre
+
       const observer = new MutationObserver((mutations) => {
         mutations.forEach((mutation) => {
           if (mutation.type === 'childList') {
@@ -142,8 +147,7 @@
                     }
                   }
                 });
-                
-                // Ha maga az elem is tartalmaz data-i18n attribútumot
+
                 if (node.hasAttribute && node.hasAttribute('data-i18n')) {
                   const key = node.getAttribute('data-i18n');
                   const translation = getTranslation(key);

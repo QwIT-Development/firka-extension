@@ -29,11 +29,11 @@ async function collectHomeworkData() {
 
   const basicData = {
     schoolInfo: {
-      name: cookieManager.get("schoolName") || "Iskola",
-      id: cookieManager.get("schoolCode") || "",
+      name: await storageManager.get("schoolName", "OM azonosító - Iskola neve"),
+      id: await storageManager.get("schoolCode", ""),
     },
     userData: {
-      name: cookieManager.get("userName") || "Felhasználó",
+      name: await storageManager.get("userName", "Felhasználónév"),
       time:
         document.querySelector(".usermenu_timer")?.textContent?.trim() ||
         "45:00",
@@ -124,7 +124,7 @@ async function transformHomeworkPage() {
   kretaContainer.className = 'kreta-container';
   const headerDiv = document.createElement('div');
   const parser = new DOMParser();
-  const headerDoc = parser.parseFromString(createTemplate.header(), 'text/html');
+  const headerDoc = parser.parseFromString(await createTemplate.header(), 'text/html');
   const headerContent = headerDoc.body;
   while (headerContent.firstChild) {
     headerDiv.appendChild(headerContent.firstChild);
@@ -624,28 +624,28 @@ function updateDateGroupsVisibility() {
   });
 }
 
-function getHomeworkCompletionStatus(homeworkId) {
-  const completedHomework = cookieManager.get('completedHomework');
+async function getHomeworkCompletionStatus(homeworkId) {
+  const completedHomework = await storageManager.get('completedHomework');
   if (!completedHomework) return false;
   
   try {
     const completedList = JSON.parse(completedHomework);
     return completedList.includes(homeworkId.toString());
   } catch (error) {
-    console.error('Error parsing completed homework cookie:', error);
+    console.error('Error parsing completed homework storage:', error);
     return false;
   }
 }
 
-function setHomeworkCompletionStatus(homeworkId, isCompleted) {
-  let completedHomework = cookieManager.get('completedHomework');
+async function setHomeworkCompletionStatus(homeworkId, isCompleted) {
+  let completedHomework = await storageManager.get('completedHomework');
   let completedList = [];
   
   if (completedHomework) {
     try {
       completedList = JSON.parse(completedHomework);
     } catch (error) {
-      console.error('Error parsing completed homework cookie:', error);
+      console.error('Error parsing completed homework storage:', error);
       completedList = [];
     }
   }
@@ -660,7 +660,7 @@ function setHomeworkCompletionStatus(homeworkId, isCompleted) {
     completedList = completedList.filter(id => id !== homeworkIdStr);
   }
   
-  cookieManager.set('completedHomework', JSON.stringify(completedList));
+  await storageManager.set('completedHomework', JSON.stringify(completedList));
 }
 
 function setupHomeworkCheckboxes() {

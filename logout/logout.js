@@ -1,10 +1,10 @@
 (() => {
-  function transformLogoutPage() {
+  async function transformLogoutPage() {
     const theme =
-      cookieManager.get("themePreference") ||
+      await storageManager.get("themePreference", null) ||
       localStorage.getItem("themePreference") ||
       "light-green";
-    const instituteCode = cookieManager.get("schoolSubdomain");
+    const instituteCode = await storageManager.get("schoolSubdomain", null);
     document.documentElement.setAttribute("data-theme", theme);
 
     const newHTML = `

@@ -12,6 +12,12 @@
       "128": "images/firka_logo_128.png"
     }
   },
+  "permissions": [
+    "storage"
+  ],
+  "background": {
+    "service_worker": "tools/background.js"
+  },
   "browser_specific_settings": {
     "gecko": {
       "id": "firxa@zan1456.hu",
@@ -31,7 +37,9 @@
         "icons/*.svg",
         "grades/chart.js",
         "i18n/*.json",
-        "tools/cookieManager.js"
+        "tools/cookieManager.js",
+        "tools/storageManager.js",
+        "tools/storageTest.js"
       ],
       "matches": [
         "<all_urls>"
@@ -58,7 +66,7 @@
         "global/language.js",
         "global/theme.js",
         "tools/loadingScreen.js",
-        "tools/cookieManager.js",
+        "tools/storageManager.js",
         "tools/helper.js",
         "tools/createTemplate.js",
         "global/maintenance.js",

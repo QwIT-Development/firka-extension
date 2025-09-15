@@ -11,7 +11,7 @@
       window.currentGradesData = gradesData;
       document.body.innerHTML = '';
       const parser = new DOMParser();
-      const doc = parser.parseFromString(generatePageHTML(
+      const doc = parser.parseFromString(await generatePageHTML(
         gradesData,
         studentAverage,
         classAverage,
@@ -61,24 +61,24 @@
       }
 
       const data = await response.json();
-      return processAPIGradesData(data);
+      return await processAPIGradesData(data);
     } catch (error) {
       console.error("Error fetching grades from API:", error);
-      return extractGradesDataFromDOM();
+      return await extractGradesDataFromDOM();
     }
   }
 
-  function processAPIGradesData(apiData) {
+  async function processAPIGradesData(apiData) {
     const subjects = [];
 
     if (!apiData.Data || !Array.isArray(apiData.Data)) {
       return {
         schoolInfo: {
-          id: cookieManager.get("schoolCode") || "",
-          name: cookieManager.get("schoolName") || "Iskola",
+          id: await storageManager.get("schoolCode", ""),
+          name: await storageManager.get("schoolName", "OM azonosító - Iskola neve"),
         },
         userData: {
-          name: cookieManager.get("userName") || "Felhasználó",
+          name: await storageManager.get("userName", "Felhasználónév"),
           time:
             document.querySelector(".usermenu_timer")?.textContent?.trim() ||
             "45:00",
@@ -195,11 +195,11 @@
 
     return {
       schoolInfo: {
-        id: cookieManager.get("schoolCode") || "",
-        name: cookieManager.get("schoolName") || "Iskola",
+        id: await storageManager.get("schoolCode", ""),
+        name: await storageManager.get("schoolName", "Iskola"),
       },
       userData: {
-        name: cookieManager.get("userName") || "Felhasználó",
+        name: await storageManager.get("userName", "Felhasználó"),
         time:
           document.querySelector(".usermenu_timer")?.textContent?.trim() ||
           "45:00",
@@ -208,7 +208,7 @@
     };
   }
 
-  function extractGradesDataFromDOM() {
+  async function extractGradesDataFromDOM() {
     const subjects = [];
     const rows = document.querySelectorAll(
       "#Osztalyzatok_7895TanuloErtekelesByTanuloGrid tbody tr",
@@ -293,11 +293,11 @@
 
     return {
       schoolInfo: {
-        id: cookieManager.get("schoolCode") || "",
-        name: cookieManager.get("schoolName") || "Iskola",
+        id: await storageManager.get("schoolCode", ""),
+        name: await storageManager.get("schoolName", "Iskola"),
       },
       userData: {
-        name: cookieManager.get("userName") || "Felhasználó",
+        name: await storageManager.get("userName", "Felhasználó"),
         time:
           document.querySelector(".usermenu_timer")?.textContent?.trim() ||
           "45:00",
@@ -376,7 +376,7 @@
     return distribution;
   }
 
-  function generatePageHTML(data, studentAverage, classAverage) {
+  async function generatePageHTML(data, studentAverage, classAverage) {
     const totalGrades = data.subjects.reduce(
       (sum, subject) => sum + subject.grades.length,
       0,
@@ -393,7 +393,7 @@
 
     return `
       <div class="kreta-container">
-        ${createTemplate.header()}
+        ${await createTemplate.header()}
 
         <main class="kreta-main">
           <div class="grades-overview">

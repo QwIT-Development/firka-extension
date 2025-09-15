@@ -1,10 +1,12 @@
 (() => {
-  function setTheme(theme) {
+  async function setTheme(theme) {
     try {
       const actualTheme = theme === "default" ? "light-blue" : theme;
 
       document.documentElement.setAttribute("data-theme", actualTheme);
-      cookieManager.set("themePreference", actualTheme);
+
+      await storageManager.set("themePreference", actualTheme);
+
       localStorage.setItem("themePreference", actualTheme);
 
       chrome.runtime
@@ -104,22 +106,29 @@
     }
   }
 
-  function initializeTheme() {
-    const cookieTheme = cookieManager.get("themePreference");
-    const localStorageTheme = localStorage.getItem("themePreference");
+  async function initializeTheme() {
+    try {
+      const storageTheme = await storageManager.get("themePreference");
+      const localStorageTheme = localStorage.getItem("themePreference");
 
-    const theme = cookieTheme || localStorageTheme || "light-green";
+      const theme = storageTheme || localStorageTheme || "light-green";
 
-    setTheme(theme);
-    setPageTitleAndFavicon();
-    importFonts();
+      await setTheme(theme);
+      setPageTitleAndFavicon();
+      importFonts();
 
-    if (cookieTheme !== localStorageTheme) {
-      if (cookieTheme) {
-        localStorage.setItem("themePreference", cookieTheme);
-      } else if (localStorageTheme) {
-        cookieManager.set("themePreference", localStorageTheme);
+      if (storageTheme !== localStorageTheme) {
+        if (storageTheme) {
+          localStorage.setItem("themePreference", storageTheme);
+        } else if (localStorageTheme) {
+          await storageManager.set("themePreference", localStorageTheme);
+        }
       }
+    } catch (error) {
+      console.error("Error initializing theme:", error);
+      await setTheme("light-green");
+      setPageTitleAndFavicon();
+      importFonts();
     }
   }
 
@@ -146,17 +155,21 @@
 
   let titleCheckTimeout;
 
-  const observer = new MutationObserver((mutations) => {
+  const observer = new MutationObserver(async (mutations) => {
     const currentTheme = document.documentElement.getAttribute("data-theme");
-    const savedTheme =
-      cookieManager.get("themePreference") ||
-      localStorage.getItem("themePreference");
+    
+    try {
+      const savedTheme = await storageManager.get("themePreference") ||
+        localStorage.getItem("themePreference");
 
-    if (
-      (!currentTheme && savedTheme) ||
-      (currentTheme !== savedTheme && savedTheme)
-    ) {
-      setTheme(savedTheme);
+      if (
+        (!currentTheme && savedTheme) ||
+        (currentTheme !== savedTheme && savedTheme)
+      ) {
+        await setTheme(savedTheme);
+      }
+    } catch (error) {
+      console.error("Error checking theme in observer:", error);
     }
 
     const titleChanged = mutations.some(

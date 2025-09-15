@@ -1,16 +1,15 @@
 const createTemplate = {
-  header() {
+  async header() {
     const data = {
       schoolInfo: {
-        name: cookieManager.get("schoolName") || "Iskola",
-        id: cookieManager.get("schoolCode") || "",
+        name: await storageManager.get("schoolName", "OM azonosító - Iskola neve"),
+        id: await storageManager.get("schoolCode", ""),
       },
       userData: {
-        name: cookieManager.get("userName") || "Felhasználó",
+        name: await storageManager.get("userName", "Felhasználónév"),
         time:
           document.querySelector(".usermenu_timer")?.textContent?.trim() ||
           "45:00",
-        email: cookieManager.get("userEmail") || "",
       },
     };
 

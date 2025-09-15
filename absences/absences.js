@@ -1,11 +1,11 @@
 async function collectAbsencesData() {
   const basicData = {
     schoolInfo: {
-      name: cookieManager.get("schoolName") || "Iskola",
-      id: cookieManager.get("schoolCode") || "",
+      name: await storageManager.get("schoolName", "OM azonosító - Iskola neve"),
+      id: await storageManager.get("schoolCode", ""),
     },
     userData: {
-      name: cookieManager.get("userName") || "Felhasználó",
+      name: await storageManager.get("userName", "Felhasználónév"),
       time:
         document.querySelector(".usermenu_timer")?.textContent?.trim() ||
         "45:00",
@@ -281,7 +281,7 @@ async function transformAbsencesPage() {
   container.className = 'kreta-container';
   const headerDiv = document.createElement('div');
   const parser = new DOMParser();
-  const doc = parser.parseFromString(createTemplate.header(), 'text/html');
+  const doc = parser.parseFromString(await createTemplate.header(), 'text/html');
   const tempDiv = doc.body;
   while (tempDiv.firstChild) {
     headerDiv.appendChild(tempDiv.firstChild);

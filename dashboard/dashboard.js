@@ -292,18 +292,22 @@ class DashboardDataManager {
 
 class DashboardRenderer {
   constructor(data) {
+    this.baseData = data;
+  }
+
+  async init() {
     this.data = {
-      ...data,
+      ...this.baseData,
       schoolInfo: {
         name:
-          cookieManager.get(COOKIE_KEYS.SCHOOL_NAME) || DEFAULT_VALUES.SCHOOL,
-        id: cookieManager.get(COOKIE_KEYS.SCHOOL_CODE) || "",
+          await storageManager.get("schoolName", "OM azonosító - Iskola neve"),
+        id: await storageManager.get("schoolCode", ""),
       },
       userData: {
-        name: cookieManager.get(COOKIE_KEYS.USER_NAME) || DEFAULT_VALUES.USER,
+        name: await storageManager.get("userName", "Felhasználónév"),
         time:
           document.querySelector(".usermenu_timer")?.textContent?.trim() ||
-          DEFAULT_VALUES.TIMER,
+          "45:00",
       },
     };
     this.schoolNameFull = `${this.data.schoolInfo.id} - ${this.data.schoolInfo.name}`;
@@ -475,14 +479,15 @@ class DashboardRenderer {
     `;
   }
 
-  render() {
+  async render() {
+    await this.init();
     document.body.innerHTML = '';
     
     const kretaContainer = document.createElement('div');
     kretaContainer.className = 'kreta-container';
     const headerDiv = document.createElement('div');
     const parser = new DOMParser();
-    const headerDoc = parser.parseFromString(createTemplate.header(), 'text/html');
+    const headerDoc = parser.parseFromString(await createTemplate.header(), 'text/html');
     const headerContent = headerDoc.body;
     while (headerContent.firstChild) {
       headerDiv.appendChild(headerContent.firstChild);
@@ -573,7 +578,7 @@ class DashboardApplication {
       const dashboardData = await dataManager.extractAllData();
       
       const renderer = new DashboardRenderer(dashboardData);
-      renderer.render();
+      await renderer.render();
     } catch (error) {
       console.error("Error initializing dashboard:", error);
     }

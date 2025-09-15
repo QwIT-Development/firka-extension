@@ -120,12 +120,12 @@
         userNameEl?.textContent.trim() || LanguageManager.t("common.username");
 
       if (schoolCode && fullSchoolName) {
-        cookieManager.set("schoolCode", schoolCode);
-        cookieManager.set("schoolName", fullSchoolName);
-        cookieManager.set("schoolSubdomain", schoolSubdomain);
+        await storageManager.set("schoolCode", schoolCode);
+        await storageManager.set("schoolName", fullSchoolName);
+        await storageManager.set("schoolSubdomain", schoolSubdomain);
       }
       if (userName) {
-        cookieManager.set("userName", userName);
+        await storageManager.set("userName", userName);
       }
       document.body.innerHTML = '';
       const parser = new DOMParser();

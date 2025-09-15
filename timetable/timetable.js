@@ -1,8 +1,8 @@
 (() => {
-  function getCompletedHomework() {
-    if (typeof cookieManager !== 'undefined') {
+  async function getCompletedHomework() {
+    if (typeof storageManager !== 'undefined') {
       try {
-        const value = cookieManager.get('completedHomework');
+        const value = await storageManager.get('completedHomework');
         if (value) {
           return JSON.parse(value);
         }
@@ -13,14 +13,14 @@
     return [];
   }
 
-  function saveCompletedHomework(completedList) {
-    if (typeof cookieManager !== 'undefined') {
-      cookieManager.set('completedHomework', JSON.stringify(completedList), 365);
+  async function saveCompletedHomework(completedList) {
+    if (typeof storageManager !== 'undefined') {
+      await storageManager.set('completedHomework', JSON.stringify(completedList));
     }
   }
 
-  function toggleHomeworkCompletion(lessonId) {
-    const completed = getCompletedHomework();
+  async function toggleHomeworkCompletion(lessonId) {
+    const completed = await getCompletedHomework();
     const index = completed.indexOf(lessonId);
     
     if (index > -1) {
@@ -29,19 +29,20 @@
       completed.push(lessonId);
     }
     
-    saveCompletedHomework(completed);
+    await saveCompletedHomework(completed);
     return index === -1;
   }
 
-  function isHomeworkCompleted(lessonId) {
-    return getCompletedHomework().includes(lessonId);
+  async function isHomeworkCompleted(lessonId) {
+    const completed = await getCompletedHomework();
+    return completed.includes(lessonId);
   }
 
   
-  function getCustomHomework() {
-    if (typeof cookieManager !== 'undefined') {
+  async function getCustomHomework() {
+    if (typeof storageManager !== 'undefined') {
       try {
-        const value = cookieManager.get('customHomework');
+        const value = await storageManager.get('customHomework');
         if (value) {
           return JSON.parse(value);
         }
@@ -52,16 +53,16 @@
     return {};
   }
 
-  function saveCustomHomework(customHomework) {
-    if (typeof cookieManager !== 'undefined') {
-      cookieManager.set('customHomework', JSON.stringify(customHomework), 365);
+  async function saveCustomHomework(customHomework) {
+    if (typeof storageManager !== 'undefined') {
+      await storageManager.set('customHomework', JSON.stringify(customHomework));
     }
   }
 
-  function getCustomTests() {
-    if (typeof cookieManager !== 'undefined') {
+  async function getCustomTests() {
+    if (typeof storageManager !== 'undefined') {
       try {
-        const value = cookieManager.get('customTests');
+        const value = await storageManager.get('customTests');
         if (value) {
           return JSON.parse(value);
         }
@@ -72,9 +73,9 @@
     return {};
   }
 
-  function saveCustomTests(customTests) {
-    if (typeof cookieManager !== 'undefined') {
-      cookieManager.set('customTests', JSON.stringify(customTests), 365);
+  async function saveCustomTests(customTests) {
+    if (typeof storageManager !== 'undefined') {
+      await storageManager.set('customTests', JSON.stringify(customTests));
     }
   }
 
@@ -162,8 +163,8 @@
     return `${lesson.subject}_${lesson.startTime}_${lesson.day}`;
   }
 
-  function updateHomeworkIconsFromCookie() {
-    const completedHomework = getCompletedHomework();
+  async function updateHomeworkIconsFromCookie() {
+    const completedHomework = await getCompletedHomework();
     completedHomework.forEach(lessonId => {
       const lessonCards = document.querySelectorAll(`[data-lesson-id="${lessonId}"]`);
       lessonCards.forEach(card => {
@@ -2206,11 +2207,11 @@
       const lessons = convertAPIDataToLessons(apiData, weekDates);
       const data = {
         schoolInfo: {
-          name: cookieManager.get("schoolName") || "Iskola",
-          id: cookieManager.get("schoolCode") || "",
+          name: await storageManager.get("schoolName", "OM azonosító - Iskola neve"),
+          id: await storageManager.get("schoolCode", ""),
         },
         userData: {
-          name: cookieManager.get("userName") || "Felhasználó",
+          name: await storageManager.get("userName", "Felhasználónév"),
           time: "45:00",
         },
         weekInfo: {
@@ -2232,7 +2233,7 @@
       const headerDiv = document.createElement('div');
   
       const parser2 = new DOMParser();
-      const headerDoc = parser2.parseFromString(createTemplate.header(), 'text/html');
+      const headerDoc = parser2.parseFromString(await createTemplate.header(), 'text/html');
       const headerContent = headerDoc.body;
       while (headerContent.firstChild) {
         headerDiv.appendChild(headerContent.firstChild);
@@ -2390,8 +2391,8 @@
       
       timetableContainer.appendChild(timetableGrid);
       
-      setTimeout(() => {
-        updateHomeworkIconsFromCookie();
+      setTimeout(async () => {
+        await updateHomeworkIconsFromCookie();
       }, 100);
   
       main.appendChild(weekControls);
@@ -2403,8 +2404,12 @@
       document.body.appendChild(kretaContainer);
 
       
-      setupUserDropdown();
-      setupMobileNavigation();
+      if (typeof setupUserDropdown === 'function') {
+        setupUserDropdown();
+      }
+      if (typeof setupMobileNavigation === 'function') {
+        setupMobileNavigation();
+      }
       setupEventListeners(data);
       initializeWeekSelector();
 
@@ -2549,8 +2554,8 @@
           }
           setupLessonCardListeners();
           
-          setTimeout(() => {
-            updateHomeworkIconsFromCookie();
+          setTimeout(async () => {
+            await updateHomeworkIconsFromCookie();
           }, 100);
         }
       })

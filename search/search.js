@@ -20,10 +20,10 @@ if (
   setTimeout(initializeTransformation, 1000);
 }
 
-function applyFirkaStyling() {
+async function applyFirkaStyling() {
   try {
     const theme =
-      cookieManager.get("themePreference") ||
+      await storageManager.get("themePreference") ||
       localStorage.getItem("themePreference") ||
       "light-green";
     document.documentElement.setAttribute("data-theme", theme);
