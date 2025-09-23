@@ -154,7 +154,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     generateThemeId() {
-      return 'custom-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+      const existingIds = this.customThemes.map(theme => theme.id);
+      let counter = 1;
+      let id;
+      
+      do {
+        id = 'custom-' + counter;
+        counter++;
+      } while (existingIds.includes(id));
+      
+      return id;
     }
 
     createTheme(name, colors) {
@@ -225,28 +234,53 @@ document.addEventListener("DOMContentLoaded", async () => {
       const theme = this.customThemes.find(t => t.id === themeId);
       if (!theme) return null;
 
-      const exportData = {
-        name: theme.name,
-        colors: theme.colors,
-        version: '1.0'
-      };
-      const jsonString = JSON.stringify(exportData);
-      const encoded = btoa(unescape(encodeURIComponent(jsonString)));
+      const colors = theme.colors;
+      const colorString = [
+        colors.background.substring(1),
+        colors.cardCard.substring(1),
+        colors.textPrimary.substring(1),
+        colors.textSecondary.substring(1),
+        colors.accentAccent.substring(1),
+        colors.accentSecondary.substring(1)
+      ].join('');
       
-      return encoded;
+      return theme.name + '|' + colorString;
     }
 
-    importTheme(encodedString) {
+    importTheme(themeString) {
       try {
-        const jsonString = decodeURIComponent(escape(atob(encodedString)));
-        const themeData = JSON.parse(jsonString);
-
-        if (!themeData.name || !themeData.colors) {
-          throw new Error('Invalid theme format');
+        const parts = themeString.split('|');
+        if (parts.length !== 2) {
+          throw new Error('Invalid theme format - expected name|colors');
         }
+        
+        const [themeName, colorString] = parts;
+        if (colorString.length !== 36) {
+          throw new Error('Invalid theme format - expected 36 hex characters');
+        }
+
+        const hexPattern = /^[0-9A-Fa-f]{36}$/;
+        if (!hexPattern.test(colorString)) {
+          throw new Error('Invalid hex color format');
+        }
+
+        const colors = [];
+        for (let i = 0; i < 36; i += 6) {
+          colors.push(colorString.substring(i, i + 6));
+        }
+        
+        const themeColors = {
+          background: '#' + colors[0],
+          cardCard: '#' + colors[1],
+          textPrimary: '#' + colors[2],
+          textSecondary: '#' + colors[3],
+          accentAccent: '#' + colors[4],
+          accentSecondary: '#' + colors[5]
+        };
+        
         const importedTheme = this.createTheme(
-          themeData.name + ' (Importált)',
-          themeData.colors
+          themeName + ' (Importált)',
+          themeColors
         );
 
         this.renderCustomThemes();
