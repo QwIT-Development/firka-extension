@@ -8,7 +8,9 @@
     "theme": "Téma",
     "language": "Nyelv",
     "themes": {
+      "light_blue": "Világos Kék",
       "light_green": "Világos Zöld",
+      "dark_blue": "Sötét Kék",
       "dark_green": "Sötét Zöld",
       "dark_red": "Sötét Piros",
       "dark_purple": "Sötét Lila",
@@ -382,7 +384,7 @@
     "description": "A Firka egy nyílt forráskódú projekt, amely a KRÉTA rendszerhez készít saját felhasználói felületet.",
     "support_title": "Támogatás",
     "support_description": "Ha tetszik a munkánk és szeretnéd támogatni a fejlesztést, az alábbi módon teheted meg:",
-    "version": "v1.1.0"
+    "version": "v1.3.0"
   },
   "app": {
     "title": "Firka - KRÉTA",
@@ -422,5 +424,43 @@
   "icons": {
     "cancel": "cancel",
     "pending": "pending"
+  },
+  "messages": {
+    "title": "Üzenetek",
+    "back": "Vissza",
+    "surveys": "Felmérések",
+    "loading": "Üzenetek betöltése...",
+    "error": {
+      "title": "Hiba történt",
+      "description": "Nem sikerült betölteni az üzeneteket.",
+      "retry": "Újrapróbálás"
+    },
+    "empty": {
+      "title": "Nincsenek üzenetek",
+      "description": "Jelenleg nincsenek beérkezett üzenetek."
+    },
+    "sender": "Feladó",
+    "subject": "Tárgy",
+    "date": "Dátum",
+    "unread": "Olvasatlan",
+    "read": "Olvasott",
+    "message_detail": {
+      "title": "Üzenet részletei",
+      "loading": "Üzenet betöltése...",
+      "error": "Hiba történt az üzenet betöltése során.",
+      "from": "Feladó",
+      "to": "Címzett",
+      "subject": "Tárgy",
+      "date": "Dátum",
+      "content": "Tartalom",
+      "attachments": "Mellékletek",
+      "no_attachments": "Nincsenek mellékletek",
+      "reply": "Válasz",
+      "forward": "Továbbítás",
+      "delete": "Törlés",
+      "mark_read": "Olvasottként jelöl",
+      "mark_unread": "Olvasatlanként jelöl",
+      "back_to_messages": "Vissza az üzenetekhez"
+    }
   }
 }

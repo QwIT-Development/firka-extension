@@ -224,6 +224,19 @@
         "search/search.css"
       ],
       "run_at": "document_end"
+    },
+    {
+      "matches": [
+        "https://eugyintezes.e-kreta.hu/uzenetek/",
+        "https://eugyintezes.e-kreta.hu/uzenetek"
+      ],
+      "js": [
+        "messages/messages.js"
+      ],
+      "css": [
+        "messages/messages.css"
+      ],
+      "run_at": "document_end"
     }
   ]
 }

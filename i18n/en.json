@@ -52,7 +52,7 @@
       "preview": "Preview",
       "save": "Save",
       "cancel": "Cancel",
-      "import_string": "Theme string",
+      "import_string": "Theme ID",
       "apply": "Apply",
       "edit": "Edit",
       "export": "Export",
@@ -100,6 +100,7 @@
     "teacher": "Teacher",
     "average": "Average",
     "chart_title": "Grades",
+    "semester_evaluation": "Semester evaluation",
     "semester_evaluations": "Semester evaluations",
     "year_end_evaluations": "End of year tickets",
     "semester_average": "Semester average",
@@ -361,10 +362,6 @@
     "november": "November",
     "december": "December"
   },
-  "search": {
-    "title": "Choose school",
-    "select_institution": "Please select an institution to continue!"
-  },
   "roleselect": {
     "student_book": "Student Book",
     "student_description": "View grades, absences, timetable and other information.",
@@ -385,7 +382,7 @@
     "description": "Firka is an open source project that creates a custom user interface for the KRÉTA system.",
     "support_title": "Support",
     "support_description": "If you like our work and want to support development, you can do so in the following way:",
-    "version": "v1.1.0"
+    "version": "v1.3.0"
   },
   "app": {
     "title": "Firka - KRÉTA",
@@ -416,15 +413,52 @@
     "cancel": "Cancel",
     "save": "Save"
   },
-  "grades": {
-    "semester_evaluation": "Semester evaluation"
-  },
   "search": {
+    "title": "Choose school",
+    "select_institution": "Please select an institution to continue!",
     "choose_school": "Choose school",
     "privacy_policy": "Privacy policy"
   },
   "icons": {
     "cancel": "cancel",
     "pending": "pending"
+  },
+  "messages": {
+    "title": "Messages",
+    "back": "Back",
+    "surveys": "Surveys",
+    "loading": "Loading messages...",
+    "error": {
+      "title": "Error occurred",
+      "description": "Failed to load messages.",
+      "retry": "Retry"
+    },
+    "empty": {
+      "title": "No messages",
+      "description": "There are currently no received messages."
+    },
+    "sender": "Sender",
+    "subject": "Subject",
+    "date": "Date",
+    "unread": "Unread",
+    "read": "Read",
+    "message_detail": {
+      "title": "Message Details",
+      "loading": "Loading message...",
+      "error": "Error loading message.",
+      "from": "From",
+      "to": "To",
+      "subject": "Subject",
+      "date": "Date",
+      "content": "Content",
+      "attachments": "Attachments",
+      "no_attachments": "No attachments",
+      "reply": "Reply",
+      "forward": "Forward",
+      "delete": "Delete",
+      "mark_read": "Mark as read",
+      "mark_unread": "Mark as unread",
+      "back_to_messages": "Back to messages"
+    }
   }
 }
