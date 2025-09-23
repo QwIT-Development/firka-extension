@@ -31,7 +31,7 @@
 ## 📱 Funkciók
 
 - **Modern Dizájn**: Teljesen újratervezett, modern felhasználói felület
-- **Személyre Szabható Témák**: Világos és sötét módok, kék és zöld színsémákkal
+- **Személyre Szabható Témák**: Világos és sötét mód vagy akár egyedi témáddal
 - **Továbbfejlesztett Felületek**:
   - Átdolgozott bejelentkezési képernyő
   - Átláthatóbb jegynapló
@@ -39,7 +39,6 @@
   - Fejlett hiányzás kezelés
   - Egyszerűsített szerepkör választó
   - Új kezdőlap elrendezés
-  - Továbbfejlesztett profilkezelő
 
 ## 🚀 Telepítés
 
@@ -47,10 +46,9 @@
 
 ## ⚙️ Beállítások
 
-A bővítmény beállításait a böngésző eszköztárán található Filx ikonra kattintva érheted el. Itt módosíthatod:
+A bővítmény beállításait a böngésző eszköztárán található Firka ikonra kattintva érheted el. Itt módosíthatod:
 
-- A felület színsémáját (Világos/Sötét)
-- Az fő színeket (Kék/Zöld)
+- A felület témáját, legyen az világos, sötét vagy akár egyedi témáddal.
 
 ## 💡 Támogatott Oldalak
 
@@ -65,11 +63,12 @@ A bővítmény jelenleg az alábbi e-KRÉTA oldalakat támogatja:
 - Házi feladatok
 - Jegyek
 - Intézménykereső
+- Üzenetek
+- Profil (Béta)
 
 ## 👥 Csapat
 
 - **[Zan1456](https://github.com/Zan1456)** - Vezető Fejlesztő
-- **[BalazsManus](https://github.com/olajcsere)** - Fejlesztő
 - **[Xou](https://yoursit.ee/xou)** - Designer
 
 ## 🤝 Közreműködés
