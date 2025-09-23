@@ -187,7 +187,7 @@ body {
 .logout-card:active {
   box-shadow:0px 0px var(--shadow-blur) 0px var(--error-shadow);
 }
-:root[data-theme="light-blue"] .role-card:hover,:root[data-theme="light-green"] .role-card:hover {
+:root[data-theme="light-green"] .role-card:hover {
   box-shadow:0px 1px var(--shadow-blur) 0px var(--accent-shadow);
 }
 ::-webkit-scrollbar {

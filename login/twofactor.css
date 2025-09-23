@@ -12,13 +12,6 @@
   --icon-hue-rotate:0deg;
   --icon-brightness:0.1;
 }
-:root[data-theme="dark-blue"] {
-  --icon-invert:0.9;
-  --icon-sepia:0.1;
-  --icon-saturate:0.1;
-  --icon-hue-rotate:0deg;
-  --icon-brightness:1;
-}
 :root[data-theme="dark-green"] {
   --icon-invert:0.9;
   --icon-sepia:0.1;

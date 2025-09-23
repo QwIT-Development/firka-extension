@@ -105,7 +105,7 @@ async function transformTwoFactorPage() {
 function applyTheme() {
   try {
     if (typeof getCookie === "function") {
-      const theme = getCookie("theme") || "light-blue";
+      const theme = getCookie("theme") || "light-green";
       document.documentElement.setAttribute("data-theme", theme);
     }
   } catch (error) {

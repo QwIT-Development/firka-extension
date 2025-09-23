@@ -1,18 +1,13 @@
 (() => {
   async function setTheme(theme) {
     try {
-      const actualTheme = theme === "default" ? "light-blue" : theme;
-
-      document.documentElement.setAttribute("data-theme", actualTheme);
-
-      await storageManager.set("themePreference", actualTheme);
-
-      localStorage.setItem("themePreference", actualTheme);
-
+      document.documentElement.setAttribute("data-theme", theme);
+      await storageManager.set("themePreference", theme);
+      localStorage.setItem("themePreference", theme);
       chrome.runtime
         .sendMessage({
           action: "themeChanged",
-          theme: actualTheme,
+          theme: theme,
         })
         .catch(() => {});
     } catch (error) {

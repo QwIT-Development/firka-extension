@@ -8,9 +8,7 @@
     "theme": "Téma",
     "language": "Nyelv",
     "themes": {
-      "light_blue": "Világos Kék",
       "light_green": "Világos Zöld",
-      "dark_blue": "Sötét Kék",
       "dark_green": "Sötét Zöld",
       "dark_red": "Sötét Piros",
       "dark_purple": "Sötét Lila",
@@ -34,6 +32,33 @@
       "title": "Támogatás",
       "description": "Ha tetszik a munkánk és szeretnéd támogatni a fejlesztést, az alábbi módon teheted meg:",
       "kofi": "Ko-Fi"
+    },
+    "custom_theme": {
+      "title": "Egyéni Téma",
+      "create": "Új Téma Létrehozása",
+      "import": "Téma Importálása",
+      "editor_title": "Téma Szerkesztő",
+      "import_title": "Téma Importálása",
+      "name": "Téma neve",
+      "background": "Háttér",
+      "text": "Szöveg",
+      "accent": "Kiemelő színek",
+      "main_background": "Fő háttér",
+      "card_background": "Kártya háttér",
+      "primary_text": "Elsődleges szöveg",
+      "secondary_text": "Másodlagos szöveg",
+      "primary_accent": "Elsődleges kiemelő",
+      "secondary_accent": "Másodlagos kiemelő",
+      "preview": "Előnézet",
+      "save": "Mentés",
+      "cancel": "Mégse",
+      "import_string": "Téma string",
+      "apply": "Alkalmaz",
+      "edit": "Szerkeszt",
+      "export": "Export",
+      "delete": "Töröl",
+      "no_themes": "Még nincsenek egyéni témák",
+      "delete_confirm": "Biztosan törölni szeretnéd a \"{name}\" témát?"
     }
   },
   "navigation": {
