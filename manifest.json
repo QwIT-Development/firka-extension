@@ -37,7 +37,6 @@
         "icons/*.svg",
         "grades/chart.js",
         "i18n/*.json",
-        "tools/cookieManager.js",
         "tools/storageManager.js",
         "tools/storageTest.js"
       ],
@@ -60,7 +59,8 @@
         "https://*.e-kreta.hu/Adminisztracio/Profil*",
         "https://*.e-kreta.hu/Tanulo/TanuloHaziFeladat*",
         "https://*.e-kreta.hu/Adminisztracio/ElfelejtettJelszo*",
-        "https://intezmenykereso.e-kreta.hu/*"
+        "https://intezmenykereso.e-kreta.hu/*",
+        "https://eugyintezes.e-kreta.hu/*"
       ],
       "js": [
         "global/language.js",
@@ -222,6 +222,35 @@
       ],
       "css": [
         "search/search.css"
+      ],
+      "run_at": "document_end"
+    },
+    {
+      "matches": [
+        "https://eugyintezes.e-kreta.hu/uzenetek/",
+        "https://eugyintezes.e-kreta.hu/uzenetek"
+      ],
+      "js": [
+        "messages/messages.js"
+      ],
+      "css": [
+        "messages/messages.css"
+      ],
+      "run_at": "document_end"
+    },
+    {
+      "matches": [
+        "https://eugyintezes.e-kreta.hu/uzenetek/*"
+      ],
+      "exclude_matches": [
+        "https://eugyintezes.e-kreta.hu/uzenetek/",
+        "https://eugyintezes.e-kreta.hu/uzenetek"
+      ],
+      "js": [
+        "messages/message-detail.js"
+      ],
+      "css": [
+        "messages/message-detail.css"
       ],
       "run_at": "document_end"
     }
