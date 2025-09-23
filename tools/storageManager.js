@@ -33,10 +33,8 @@ const storageManager = {
         localStorage.setItem(prefixedKey, JSON.stringify(value));
       }
     } catch (error) {
-      console.warn(`[StorageManager] Primary storage failed for ${key}, falling back to cookie:`, error);
-      if (typeof cookieManager !== 'undefined') {
-        cookieManager.set(prefixedKey, JSON.stringify(value));
-      }
+      console.warn(`[StorageManager] Storage failed for ${key}:`, error);
+      throw error;
     }
   },
 
@@ -72,17 +70,7 @@ const storageManager = {
         return defaultValue;
       }
     } catch (error) {
-      console.warn(`[StorageManager] Primary storage failed for ${key}, falling back to cookie:`, error);
-      if (typeof cookieManager !== 'undefined') {
-        const cookieValue = cookieManager.get(prefixedKey);
-        if (cookieValue) {
-          try {
-            return JSON.parse(cookieValue);
-          } catch (parseError) {
-            return cookieValue;
-          }
-        }
-      }
+      console.warn(`[StorageManager] Storage failed for ${key}:`, error);
       return defaultValue;
     }
   },
@@ -153,41 +141,4 @@ const storageManager = {
     }
   },
 
-  async migrateFromCookies() {
-    if (typeof cookieManager === 'undefined') {
-      return;
-    }
-
-    const knownSettings = [
-      'theme', 'language', 'notifications', 'autoRefresh', 
-      'compactMode', 'showGrades', 'showAbsences'
-    ];
-
-    let migratedCount = 0;
-    
-    for (const setting of knownSettings) {
-      try {
-        const cookieValue = cookieManager.get(`firka_${setting}`);
-        if (cookieValue !== null) {
-          let value;
-          try {
-            value = JSON.parse(cookieValue);
-          } catch {
-            value = cookieValue;
-          }
-          
-          await this.set(setting, value);
-          migratedCount++;
-        }
-      } catch (error) {
-        console.warn(`[StorageManager] Failed to migrate ${setting}:`, error);
-      }
-    }
-  }
 };
-
-if (typeof document !== 'undefined') {
-  document.addEventListener('DOMContentLoaded', () => {
-    storageManager.migrateFromCookies().catch(console.error);
-  });
-}

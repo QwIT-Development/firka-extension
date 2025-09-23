@@ -3,38 +3,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     await new Promise((resolve) => setTimeout(resolve, 10));
   }
 
-
-
-
-
-  function getCookie(name) {
-    const cookieName = `${name}=`;
-    const decodedCookie = decodeURIComponent(document.cookie);
-    const cookieArray = decodedCookie.split(";");
-
-    for (let i = 0; i < cookieArray.length; i++) {
-      let cookie = cookieArray[i];
-      while (cookie.charAt(0) === " ") {
-        cookie = cookie.substring(1);
-      }
-      if (cookie.indexOf(cookieName) === 0) {
-        return cookie.substring(cookieName.length, cookie.length);
-      }
-    }
-    return null;
-  }
-
-  function setCookie(name, value, days = 365) {
-    const date = new Date();
-    date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
-    const expires = `expires=${date.toUTCString()}`;
-    document.cookie = `${name}=${value}; ${expires}; path=/; domain=.e-kreta.hu`;
-  }
-
   function getCurrentTheme() {
     return (
       localStorage.getItem("themePreference") ||
-      getCookie("themePreference") ||
       "light-green"
     );
   }
@@ -50,7 +21,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   function getCurrentLanguage() {
     return (
       localStorage.getItem("languagePreference") ||
-      getCookie("languagePreference") ||
       "hu"
     );
   }
@@ -63,7 +33,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   async function applyLanguage(language) {
-    setCookie("languagePreference", language);
     localStorage.setItem("languagePreference", language);
 
     updateLanguageButtons(language);
@@ -80,7 +49,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   async function applyTheme(theme) {
-    setCookie("themePreference", theme);
     localStorage.setItem("themePreference", theme);
 
     document.documentElement.setAttribute("data-theme", theme);
@@ -141,8 +109,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   const manifest = chrome.runtime.getManifest();
   const versionElement = document.getElementById("version");
   versionElement.textContent = `v${manifest.version}`;
-
-
 
   themeButtons.forEach((button) => {
     button.addEventListener("mouseover", () => {
@@ -233,12 +199,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         const theme = this.customThemes.find(t => t.id === themeId);
         if (theme) {
           this.applyCustomThemeColors(theme.colors);
-          setCookie("themePreference", themeId);
           localStorage.setItem("themePreference", themeId);
         }
       } else {
         document.documentElement.setAttribute('data-theme', themeId);
-        setCookie("themePreference", themeId);
         localStorage.setItem("themePreference", themeId);
       }
       updateThemeButtons(themeId);

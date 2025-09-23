@@ -3,7 +3,6 @@
     try {
       document.documentElement.setAttribute("data-theme", theme);
       await storageManager.set("themePreference", theme);
-      localStorage.setItem("themePreference", theme);
       chrome.runtime
         .sendMessage({
           action: "themeChanged",
@@ -103,22 +102,11 @@
 
   async function initializeTheme() {
     try {
-      const storageTheme = await storageManager.get("themePreference");
-      const localStorageTheme = localStorage.getItem("themePreference");
-
-      const theme = storageTheme || localStorageTheme || "light-green";
+      const theme = await storageManager.get("themePreference", "light-green");
 
       await setTheme(theme);
       setPageTitleAndFavicon();
       importFonts();
-
-      if (storageTheme !== localStorageTheme) {
-        if (storageTheme) {
-          localStorage.setItem("themePreference", storageTheme);
-        } else if (localStorageTheme) {
-          await storageManager.set("themePreference", localStorageTheme);
-        }
-      }
     } catch (error) {
       console.error("Error initializing theme:", error);
       await setTheme("light-green");
@@ -154,8 +142,7 @@
     const currentTheme = document.documentElement.getAttribute("data-theme");
     
     try {
-      const savedTheme = await storageManager.get("themePreference") ||
-        localStorage.getItem("themePreference");
+      const savedTheme = await storageManager.get("themePreference");
 
       if (
         (!currentTheme && savedTheme) ||
