@@ -202,6 +202,19 @@
       const panelBody = doc.querySelector('.panel-body');
       const panelFooter = doc.querySelector('.panel-footer');
       const teacherInfo = doc.querySelector('.panel-heading');
+
+      const attachments = [];
+      const attachmentButtons = doc.querySelectorAll('button[id^="csatolmany"]');
+      attachmentButtons.forEach(button => {
+        const attachmentId = button.id.replace('csatolmany', '');
+        const fileName = button.textContent.trim();
+        if (attachmentId && fileName) {
+          attachments.push({
+            id: attachmentId,
+            fileName: fileName
+          });
+        }
+      });
       
       if (panelBody) {
         const homeworkText = panelBody.textContent.trim();
@@ -211,7 +224,8 @@
         return {
           content: homeworkText,
           deadline: deadline,
-          teacher: teacher
+          teacher: teacher,
+          attachments: attachments
         };
       }
       
@@ -219,6 +233,28 @@
     } catch (error) {
       console.error("Házi feladat részletek betöltési hiba:", error);
       return null;
+    }
+  }
+
+  function downloadAttachment(attachmentId) {
+    try {
+      const downloadUrl = `https://${window.location.hostname}/api/HaziFeladatCsatolmanyokApi/DownloadCsatolmanyFile`;
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = downloadUrl;
+      form.style.display = 'none';
+      
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = 'id';
+      input.value = attachmentId;
+      
+      form.appendChild(input);
+      document.body.appendChild(form);
+      form.submit();
+      document.body.removeChild(form);
+    } catch (error) {
+      console.error('Hiba a csatolmány letöltésekor:', error);
     }
   }
 
@@ -866,6 +902,65 @@
               const teacherP = document.createElement('p');
               teacherP.innerHTML = `<strong>Tanár:</strong> ${homeworkDetails.teacher}`;
               detailsDiv.appendChild(teacherP);
+            }
+
+            if (homeworkDetails.attachments && homeworkDetails.attachments.length > 0) {
+              const attachmentsDiv = document.createElement('div');
+              attachmentsDiv.className = 'homework-attachments';
+              attachmentsDiv.style.marginTop = '1rem';
+              
+              const attachmentsTitle = document.createElement('p');
+              attachmentsTitle.innerHTML = '<strong>Csatolmányok:</strong>';
+              attachmentsTitle.style.marginBottom = '0.5rem';
+              attachmentsDiv.appendChild(attachmentsTitle);
+              
+              const attachmentsList = document.createElement('div');
+              attachmentsList.className = 'attachments-list';
+              
+              homeworkDetails.attachments.forEach(attachment => {
+                const attachmentItem = document.createElement('div');
+                attachmentItem.className = 'attachment-item';
+                attachmentItem.style.display = 'flex';
+                attachmentItem.style.alignItems = 'center';
+                attachmentItem.style.justifyContent = 'center';
+                attachmentItem.style.marginBottom = '0.5rem';
+                attachmentItem.style.padding = '0.75rem';
+                attachmentItem.style.backgroundColor = 'var(--accent-15)';
+                attachmentItem.style.borderRadius = '6px';
+                attachmentItem.style.border = '1px solid var(--background-0)';
+                attachmentItem.style.cursor = 'pointer';
+                attachmentItem.style.transition = 'all 0.2s ease';
+                attachmentItem.title = 'Kattints a letöltéshez';
+                
+                const fileName = document.createElement('span');
+                fileName.textContent = attachment.fileName;
+                fileName.style.color = 'var(--text-primary)';
+                fileName.style.fontSize = '14px';
+                fileName.style.fontWeight = '500';
+                
+                attachmentItem.appendChild(fileName);
+                
+                attachmentItem.addEventListener('click', () => {
+                  downloadAttachment(attachment.id);
+                });
+                
+                attachmentItem.addEventListener('mouseenter', () => {
+                  attachmentItem.style.backgroundColor = 'var(--background-0)';
+                  attachmentItem.style.transform = 'translateY(-1px)';
+                  attachmentItem.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.1)';
+                });
+                
+                attachmentItem.addEventListener('mouseleave', () => {
+                  attachmentItem.style.backgroundColor = 'var(--accent-15)';
+                  attachmentItem.style.transform = 'translateY(0)';
+                  attachmentItem.style.boxShadow = 'none';
+                });
+                
+                attachmentsList.appendChild(attachmentItem);
+              });
+              
+              attachmentsDiv.appendChild(attachmentsList);
+              detailsDiv.appendChild(attachmentsDiv);
             }
             
             homeworkContent.appendChild(detailsDiv);

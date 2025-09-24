@@ -1221,6 +1221,43 @@ body {
   border-radius:8px;
   color:var(--text-primary);
 }
+
+.homework-attachments {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--background-0);
+}
+
+.attachments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.attachment-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem;
+  background-color: var(--accent-15);
+  border-radius: 6px;
+  border: 1px solid var(--background-0);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.attachment-item:hover {
+  background-color: var(--background-0);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.attachment-item:active {
+  transform: translateY(0);
+  background-color: var(--accent-accent);
+  opacity: 0.8;
+}
 .test-details-loading {
   color:var(--text-secondary);
   font-style:italic;
