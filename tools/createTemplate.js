@@ -53,9 +53,9 @@ const createTemplate = {
                 <img src="${chrome.runtime.getURL("icons/absences-" + (location.pathname == "/Hianyzas/Hianyzasok" ? "active" : "inactive") + ".svg")}" alt="${LanguageManager.t("navigation.absences")}">
                 ${LanguageManager.t("navigation.absences")}
                 </a>
-                <a href="${baseUrl}/Tanulo/TanuloHaziFeladat" data-page="other" class="nav-item ${location.pathname == "/Tanulo/TanuloHaziFeladat" ? "active" : ""}">
-                <img src="${chrome.runtime.getURL("icons/others.svg")}" alt="${LanguageManager.t("navigation.other")}">
-                ${LanguageManager.t("navigation.other")}
+                <a href="https://eugyintezes.e-kreta.hu/uzenetek" data-page="messages" class="nav-item ${location.pathname == "/uzenetek" ? "active" : ""}">
+                <img src="${chrome.runtime.getURL("icons/messages-" + (location.pathname == "/uzenetek" ? "active" : "inactive") + ".svg")}" alt="${LanguageManager.t("navigation.messages")}">
+                ${LanguageManager.t("navigation.messages")}
                 </a>
             </div>
             </nav>
@@ -68,10 +68,6 @@ const createTemplate = {
                 </div>
             </button>
             <div class="user-dropdown">
-                <a href="https://eugyintezes.e-kreta.hu/uzenetek" data-page="messages" class="dropdown-item">
-                <img src="${chrome.runtime.getURL("icons/messages.svg")}" alt="${LanguageManager.t("navigation.messages")}">
-                ${LanguageManager.t("navigation.messages")}
-                </a>
                 <a href="${baseUrl}/Adminisztracio/Profil" data-page="profile" class="dropdown-item">
                 <img src="${chrome.runtime.getURL("icons/profile.svg")}" alt="${LanguageManager.t("navigation.profile")}">
                 ${LanguageManager.t("navigation.profile")}
