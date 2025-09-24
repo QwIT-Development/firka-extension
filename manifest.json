@@ -191,18 +191,6 @@
     },
     {
       "matches": [
-        "https://*.e-kreta.hu/Tanulo/TanuloHaziFeladat*"
-      ],
-      "js": [
-        "homework/homework.js"
-      ],
-      "css": [
-        "homework/homework.css"
-      ],
-      "run_at": "document_end"
-    },
-    {
-      "matches": [
         "https://*.e-kreta.hu/Adminisztracio/ElfelejtettJelszo*"
       ],
       "js": [
