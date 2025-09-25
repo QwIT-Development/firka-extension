@@ -57,10 +57,9 @@ A bővítmény jelenleg az alábbi e-KRÉTA oldalakat támogatja:
 - Bejelentkezés
 - Kijelentkezés
 - Szerepkörválasztó
-- Órarend
+- Órarend (Házi feladatok, Számonkérések)
 - Faliújság
 - Hiányzások
-- Házi feladatok
 - Jegyek
 - Intézménykereső
 - Üzenetek
