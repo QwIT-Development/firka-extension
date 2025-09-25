@@ -769,10 +769,6 @@
       statusLabel.textContent = LanguageManager.t('timetable.status_label');
       const statusValue = document.createElement('span');
       statusValue.className = 'detail-value';
-      const statusIcon = document.createElement('span');
-      statusIcon.className = 'material-icons-round';
-      statusIcon.textContent = 'sync_alt';
-      statusValue.appendChild(statusIcon);
       statusValue.appendChild(document.createTextNode(' ' + LanguageManager.t('timetable.substitution')));
       statusItem.appendChild(statusLabel);
       statusItem.appendChild(statusValue);
