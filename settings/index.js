@@ -292,7 +292,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     renderCustomThemes() {
-      const container = document.getElementById('customThemesList');
+      /*const container = document.getElementById('customThemesList');
       container.innerHTML = '';
 
       if (this.customThemes.length === 0) {
@@ -304,7 +304,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       this.customThemes.forEach(theme => {
         const themeElement = this.createThemeElement(theme);
         container.appendChild(themeElement);
-      });
+      });*/
     }
 
     createThemeElement(theme) {
@@ -492,7 +492,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     initializeEventListeners() {
-      document.getElementById('createCustomTheme').addEventListener('click', () => {
+      /*document.getElementById('createCustomTheme').addEventListener('click', () => {
         this.openThemeEditor();
       });
 
@@ -541,7 +541,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (e.target.id === 'importModal') {
           this.closeImportModal();
         }
-      });
+      });*/
     }
   }
 
