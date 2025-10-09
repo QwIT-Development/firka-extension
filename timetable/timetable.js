@@ -261,7 +261,7 @@
   async function loadTestDetailsFromAPI(testId) {
     try {
       const timestamp = Date.now();
-      const apiUrl = `https://${window.location.hostname}/api/TanuloBejelentettSzamonkeresekApi/GetBejelentettSzamonkeresekGrid?sort=SzamonkeresDatuma-asc~Oraszam-asc&page=1&pageSize=100&group=&filter=&data=%7B%22RegiSzamonkeresekElrejtese%22%3Afalse%7D&_=${timestamp}`;
+      const apiUrl = `https://${window.location.hostname}/api/TanuloBejelentettSzamonkeresekApi/GetBejelentettSzamonkeresekGrid?sort=SzamonkeresDatuma-asc~Oraszam-asc&page=1&pageSize=1000&group=&filter=&data=%7B%22RegiSzamonkeresekElrejtese%22%3Afalse%7D&_=${timestamp}`;
 
       const response = await fetch(apiUrl, {
         credentials: "include",
@@ -315,7 +315,7 @@
   async function loadTestDetailsFromAPI(testId) {
     try {
       const timestamp = Date.now();
-      const apiUrl = `https://${window.location.hostname}/api/TanuloBejelentettSzamonkeresekApi/GetBejelentettSzamonkeresekGrid?sort=SzamonkeresDatuma-asc~Oraszam-asc&page=1&pageSize=100&group=&filter=&data=%7B%22RegiSzamonkeresekElrejtese%22%3Afalse%7D&_=${timestamp}`;
+      const apiUrl = `https://${window.location.hostname}/api/TanuloBejelentettSzamonkeresekApi/GetBejelentettSzamonkeresekGrid?sort=SzamonkeresDatuma-asc~Oraszam-asc&page=1&pageSize=1000&group=&filter=&data=%7B%22RegiSzamonkeresekElrejtese%22%3Afalse%7D&_=${timestamp}`;
 
       const response = await fetch(apiUrl, {
         credentials: "include",
