@@ -1,0 +1,827 @@
+* {
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+body {
+  margin:0;
+  padding:0;
+  color:var(--text-primary);
+  background-color:var(--background) !important;
+  font-family:"Montserrat",serif !important;
+  min-height:100vh;
+  font-size:16px;
+}
+.kreta-container {
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+}
+.grades-chart {
+  width:100%;
+  height:320px;
+  margin-bottom:1.5rem;
+  padding:1rem;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+}
+.overall-averages {
+  padding:1.5rem;
+  background:var(--card-card);
+  border-radius:24px;
+  box-shadow:0px 1px var(--shadow-blur) 0px var(--accent-shadow);
+  width:100%;
+}
+.average-details {
+  display:flex;
+  gap:2rem;
+  justify-content:center;
+}
+.average-item {
+  display:flex;
+  align-items:center;
+  gap:1rem;
+}
+.average-label {
+  color:var(--text-secondary);
+  font-size:1.1rem;
+  font-weight:500;
+}
+.average-value {
+  font-size:1.5rem;
+  font-weight:600;
+}
+.average-value.warning {
+  color:var(--error-accent);
+}
+.grades-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,400px),1fr));
+  gap:1.5rem;
+}
+.subject-card {
+  background:var(--card-card);
+  border-radius:24px;
+  padding:1.5rem;
+  box-shadow:0px 1px var(--shadow-blur) 0px var(--accent-shadow);
+}
+.subject-title {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:0.5rem;
+  width:100%;
+}
+.subject-header {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  width:100%;
+}
+.subject-title h3 {
+  padding:1rem;
+  margin-bottom:0px !important;
+  margin-top:0px !important;
+  color:var(--text-primary);
+  font-family:Montserrat;
+  font-size:16px;
+  font-style:normal;
+  font-weight:600;
+  line-height:normal;
+}
+.subject-averages .average-circle {
+  display:flex;
+  width:48px;
+  height:26px;
+  padding:6px 8px;
+  justify-content:center;
+  align-items:center;
+  gap:14px;
+  border-radius:16px;
+  background-color:var(--background-secondary);
+}
+.subject-averages .class-average[data-grade="1"] {
+  border:2px solid var(--grades-1);
+  color:var(--grades-1);
+}
+.subject-averages .class-average[data-grade="2"] {
+  border:2px solid var(--grades-2);
+  color:var(--grades-2);
+}
+.subject-averages .class-average[data-grade="3"] {
+  border:2px solid var(--grades-3);
+  color:var(--grades-3);
+}
+.subject-averages .class-average[data-grade="4"] {
+  border:2px solid var(--grades-4);
+  color:var(--grades-4);
+}
+.subject-averages .class-average[data-grade="5"] {
+  border:2px solid var(--grades-5);
+  color:var(--grades-5);
+}
+.subject-averages .average-label {
+  font-size:0.625rem;
+  color:var(--text-secondary);
+}
+.subject-averages .average-value {
+  font-size:0.875rem;
+  font-weight:600;
+}
+.subject-averages .my-average[data-grade] .average-value,.subject-averages .class-average[data-grade] .average-value {
+  color:inherit;
+}
+.subject-averages {
+  display:flex;
+  gap:0.75rem;
+  align-items:center;
+}
+.grades-list {
+  display:flex;
+  flex-direction:column;
+  gap:1rem;
+  overflow:hidden;
+  max-height:calc(71.5px* 5 - 10px);
+  position:relative;
+}
+.grades-list.scrollable {
+  overflow-y:auto;
+  scrollbar-width:none;
+  -ms-overflow-style:none;
+}
+.grades-list.scrollable::-webkit-scrollbar {
+  display:none;
+}
+.grades-list::after {
+  content:'';
+  position:absolute;
+  bottom:-10px;
+  left:50%;
+  transform:translateX(-50%);
+  width:30px;
+  height:6px;
+  background:radial-gradient(circle,var(--text-secondary) 1px,transparent 1px);
+  background-size:8px 6px;
+  background-repeat:repeat-x;
+  opacity:0;
+  transition:opacity 0.3s ease;
+}
+.grades-list.has-more::after {
+  opacity:1;
+}
+.grade-item {
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  gap:1rem;
+  padding:1rem;
+  border-radius:12px;
+  align-items:start;
+  position:relative;
+  background-color:var(--card-card);
+}
+.grade-value {
+  display:flex;
+  width:24px;
+  height:24px;
+  padding:7.5px 0px;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  border-radius:12px;
+  font-family:Montserrat;
+  font-size:18px;
+  font-style:normal;
+  font-weight:700;
+  line-height:normal;
+  text-align:center;
+}
+.grade-details {
+  display:flex;
+  flex-direction:column;
+  gap:0.25rem;
+}
+.grade-theme {
+  overflow:hidden;
+  color:var(--text-primary);
+  text-overflow:ellipsis;
+  font-family:Figtree;
+  font-size:16px;
+  font-style:normal;
+  font-weight:600;
+  line-height:130%;
+}
+.grade-meta,.grade-date {
+  overflow:hidden;
+  color:var(--text-secondary);
+  text-overflow:ellipsis;
+  font-family:Figtree;
+  font-size:14px;
+  font-style:normal;
+  font-weight:500;
+  line-height:130%;
+}
+.grade-date {
+  position:absolute;
+  top:1rem;
+  right:1rem;
+  text-align:center;
+}
+.grade-1 .grade-value {
+  background-color:var(--grades-background-1);
+  color:var(--grades-1);
+}
+.grade-2 .grade-value {
+  background-color:var(--grades-background-2);
+  color:var(--grades-2);
+}
+.grade-3 .grade-value {
+  background-color:var(--grades-background-3);
+  color:var(--grades-3);
+}
+.grade-4 .grade-value {
+  background-color:var(--grades-background-4);
+  color:var(--grades-4);
+}
+.grade-5 .grade-value {
+  background-color:var(--grades-background-5);
+  color:var(--grades-5);
+}
+.semester-grade {
+  background-color:var(--button-secondaryFill) !important;
+  border:2px solid var(--accent-accent) !important;
+  position:relative;
+  padding-top:1.5rem !important;
+  box-shadow:0px 1px var(--shadow-blur) 0px var(--accent-shadow);
+}
+.semester-grade::before {
+  content:"Félévi értékelés";
+  position:absolute;
+  top:0.25rem;
+  left:50%;
+  transform:translateX(-50%);
+  background:var(--accent-accent);
+  color:var(--button-secondaryFill);
+  padding:2px 12px;
+  border-radius:12px;
+  font-size:12px;
+  font-weight:500;
+  white-space:nowrap;
+  z-index:1;
+}
+.user-profile {
+  position:relative;
+  justify-self:flex-end;
+}
+.user-dropdown-btn {
+  display:flex;
+  align-items:center;
+  gap:1rem;
+  background:none;
+  border:none;
+  cursor:pointer;
+  padding:0.5rem;
+  border-radius:8px;
+  transition:background-color 0.2s;
+}
+.user-dropdown-btn:hover {
+  background:var(--card-card);
+}
+.user-info {
+  text-align:right;
+}
+.user-dropdown {
+  position:absolute;
+  top:100%;
+  right:0;
+  margin-top:0.5rem;
+  background:var(--card-card);
+  border-radius:12px;
+  box-shadow:0px 1px var(--shadow-blur) 0px var(--accent-shadow);
+  width:200px;
+  display:none;
+  z-index:1000;
+}
+.user-dropdown.show {
+  display:block;
+  animation:dropdownShow 0.2s ease;
+}
+.dropdown-item {
+  display:flex;
+  align-items:center;
+  gap:0.75rem;
+  padding:0.75rem 1rem;
+  color:var(--text-primary);
+  text-decoration:none;
+  transition:background-color 0.2s;
+}
+.dropdown-item:hover {
+  background:var(--button-secondaryFill);
+  text-decoration:none;
+}
+.kreta-main {
+  flex:1;
+  padding:clamp(1rem,3vw,2rem);
+  max-width:1400px;
+  margin:0 auto;
+  width:100%;
+}
+@keyframes dropdownShow {
+  from {
+  opacity:0;
+  transform:translateY(-10px);
+}
+to {
+  opacity:1;
+  transform:translateY(0);
+}
+}@media (max-width:768px) {
+  body {
+  font-size:14px;
+}
+.average-details {
+  flex-direction:column;
+  align-items:center;
+  gap:1rem;
+}
+}.material-icons-round {
+  font-size:20px;
+  vertical-align:middle;
+}
+::-webkit-scrollbar {
+  width:8px;
+  height:8px;
+}
+::-webkit-scrollbar-track {
+  background:var(--background);
+}
+::-webkit-scrollbar-thumb {
+  background:var(--text-secondary);
+  border-radius:4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background:var(--text-primary);
+}
+.chart-header {
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  padding:1rem;
+  position:relative;
+}
+.chart-title {
+  white-space:nowrap;
+  color:var(--text-primary);
+  font-family:Montserrat;
+  font-size:16px;
+  font-style:normal;
+  font-weight:600;
+  line-height:normal;
+}
+.chart-averages {
+  display:flex;
+  gap:1rem;
+  position:absolute;
+  top:1rem;
+  right:1rem;
+}
+.average-circle {
+  display:flex;
+  width:48px;
+  height:26px;
+  padding:6px 8px;
+  justify-content:center;
+  align-items:center;
+  gap:14px;
+  border-radius:16px;
+}
+.average-circle[data-grade="1"],.my-average[data-grade="1"] {
+  background-color:var(--grades-background-1);
+  color:var(--grades-1);
+}
+.class-average[data-grade="1"] {
+  background-color:transparent;
+  border:2px solid var(--grades-1);
+  color:var(--grades-1);
+}
+.average-circle[data-grade="2"],.my-average[data-grade="2"] {
+  background-color:var(--grades-background-2);
+  color:var(--grades-2);
+}
+.class-average[data-grade="2"] {
+  background-color:transparent;
+  border:2px solid var(--grades-2);
+  color:var(--grades-2);
+}
+.average-circle[data-grade="3"],.my-average[data-grade="3"] {
+  background-color:var(--grades-background-3);
+  color:var(--grades-3);
+}
+.class-average[data-grade="3"] {
+  background-color:transparent;
+  border:2px solid var(--grades-3);
+  color:var(--grades-3);
+}
+.average-circle[data-grade="4"],.my-average[data-grade="4"] {
+  background-color:var(--grades-background-4);
+  color:var(--grades-4);
+}
+.class-average[data-grade="4"] {
+  background-color:transparent;
+  border:2px solid var(--grades-4);
+  color:var(--grades-4);
+}
+.average-circle[data-grade="5"],.my-average[data-grade="5"] {
+  background-color:var(--grades-background-5);
+  color:var(--grades-5);
+}
+.class-average[data-grade="5"] {
+  background-color:transparent;
+  border:2px solid var(--grades-5);
+  color:var(--grades-5);
+}
+.average-circle .average-label {
+  font-size:0.75rem;
+  color:var(--text-secondary);
+}
+.average-circle .average-value {
+  text-align:center;
+  font-family:Figtree;
+  font-size:14px;
+  font-style:normal;
+  font-weight:500;
+  line-height:130%;
+}
+.grade-distribution {
+  display:flex;
+  gap:1rem;
+  padding:1rem;
+}
+.grade-count {
+  display:flex;
+  align-items:center;
+  gap:6px;
+  padding:4px 8px 4px 4px;
+  border-radius:16px;
+  border:1px solid var(--accent-15);
+}
+.grade-count .grade-value {
+  font-weight:700;
+  text-align:center;
+  font-family:Montserrat;
+  font-size:18px;
+  font-style:normal;
+  line-height:130%;
+}
+.grade-count .grade-amount {
+  color:var(--text-primary);
+  text-align:center;
+  font-family:Montserrat;
+  font-size:14px;
+  font-style:normal;
+  font-weight:500;
+  line-height:130%;
+}
+.grade-count.grade-1 {
+  color:var(--grades-1);
+}
+.grade-count.grade-2 {
+  color:var(--grades-2);
+}
+.grade-count.grade-3 {
+  color:var(--grades-3);
+}
+.grade-count.grade-4 {
+  color:var(--grades-4);
+}
+.grade-count.grade-5 {
+  color:var(--grades-5);
+}
+.grades-overview {
+  display:grid;
+  grid-template-columns:1fr auto;
+  margin-bottom:2rem;
+  align-items:stretch;
+  overflow-y:auto;
+}
+.semester-grades {
+  width:300px;
+  height:400px;
+  padding:1.5rem;
+  background:var(--card-card);
+  border-radius:24px;
+  box-shadow:0px 1px var(--shadow-blur) 0px var(--accent-shadow);
+  display:flex;
+  flex-direction:column;
+}
+.semester-grades h3 {
+  padding:1rem;
+  margin-bottom:0px !important;
+  margin-top:0px !important;
+  color:var(--text-primary);
+  font-family:Montserrat;
+  font-size:16px;
+  font-style:normal;
+  font-weight:600;
+  line-height:normal;
+}
+.semester-grade-item {
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  gap:1rem;
+  padding:1rem;
+  border-radius:12px;
+  align-items:center;
+}
+.semester-grade-item:hover {
+  background:var(--button-secondaryFill);
+}
+.semester-grades-list {
+  display:flex;
+  flex-direction:column;
+  gap:1rem;
+  overflow-y:auto;
+  padding-right:0.5rem;
+  flex:1;
+  margin:-0.5rem 0;
+}
+.semester-grade-subject {
+  overflow:hidden;
+  color:var(--text-primary);
+  text-overflow:ellipsis;
+  font-family:Figtree;
+  font-size:16px;
+  font-style:normal;
+  font-weight:600;
+  line-height:130%;
+}
+.semester-grade-value {
+  width:32px;
+  height:32px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:16px;
+  font-weight:700;
+  font-size:22px;
+}
+.semester-grade-item.grade-1 .semester-grade-value {
+  background-color:var(--grades-background-1);
+  color:var(--grades-1);
+}
+.semester-grade-item.grade-2 .semester-grade-value {
+  background-color:var(--grades-background-2);
+  color:var(--grades-2);
+}
+.semester-grade-item.grade-3 .semester-grade-value {
+  background-color:var(--grades-background-3);
+  color:var(--grades-3);
+}
+.semester-grade-item.grade-4 .semester-grade-value {
+  background-color:var(--grades-background-4);
+  color:var(--grades-4);
+}
+.semester-grade-item.grade-5 .semester-grade-value {
+  background-color:var(--grades-background-5);
+  color:var(--grades-5);
+}
+.year-end-grades {
+  width:300px;
+  height:400px;
+  padding:1.5rem;
+  background:var(--card-card);
+  border-radius:24px;
+  box-shadow:0px 1px var(--shadow-blur) 0px var(--accent-shadow);
+  display:flex;
+  flex-direction:column;
+}
+.year-end-grades h3 {
+  padding:1rem;
+  margin-bottom:0px !important;
+  margin-top:0px !important;
+  color:var(--text-primary);
+  font-family:Montserrat;
+  font-size:16px;
+  font-style:normal;
+  font-weight:600;
+  line-height:normal;
+}
+.year-end-grade-item {
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  gap:1rem;
+  padding:1rem;
+  border-radius:12px;
+  align-items:center;
+}
+.year-end-grade-item:hover {
+  background:var(--button-secondaryFill);
+}
+.year-end-grades-list {
+  display:flex;
+  flex-direction:column;
+  gap:1rem;
+  overflow-y:auto;
+  padding-right:0.5rem;
+  flex:1;
+  margin:-0.5rem 0;
+}
+.year-end-grade-subject {
+  overflow:hidden;
+  color:var(--text-primary);
+  text-overflow:ellipsis;
+  font-family:Figtree;
+  font-size:16px;
+  font-style:normal;
+  font-weight:600;
+  line-height:130%;
+}
+.year-end-grade-value {
+  width:32px;
+  height:32px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:16px;
+  font-weight:700;
+  font-size:22px;
+}
+.year-end-grade-item.grade-1 .year-end-grade-value {
+  background-color:var(--grades-background-1);
+  color:var(--grades-1);
+}
+.year-end-grade-item.grade-2 .year-end-grade-value {
+  background-color:var(--grades-background-2);
+  color:var(--grades-2);
+}
+.year-end-grade-item.grade-3 .year-end-grade-value {
+  background-color:var(--grades-background-3);
+  color:var(--grades-3);
+}
+.year-end-grade-item.grade-4 .year-end-grade-value {
+  background-color:var(--grades-background-4);
+  color:var(--grades-4);
+}
+.year-end-grade-item.grade-5 .year-end-grade-value {
+  background-color:var(--grades-background-5);
+  color:var(--grades-5);
+}
+.year-end-grade {
+  border:2px solid var(--accent-primary) !important;
+  box-shadow:0 0 0 2px rgba(var(--accent-primary-rgb),0.2) !important;
+}
+@media (max-width:1200px) {
+  .chart-header {
+  flex-direction:column;
+  align-items:flex-start;
+  gap:1rem;
+}
+.chart-averages {
+  position:static;
+  align-self:flex-end;
+}
+.grade-distribution {
+  flex-wrap:wrap;
+  justify-content:center;
+}
+.grades-chart {
+  overflow-x:auto;
+}
+}@media (max-width:1024px) {
+  .grades-overview {
+  grid-template-columns:1fr;
+}
+.semester-grades {
+  width:100%;
+  height:auto;
+  max-height:400px;
+}
+.year-end-grades {
+  width:100%;
+  height:auto;
+  max-height:400px;
+}
+.overall-averages {
+  width:100%;
+}
+}@media (max-width:768px) {
+  .grades-chart {
+  height:250px;
+  padding:0.75rem;
+  margin-bottom:1rem;
+}
+.chart-header {
+  padding:0.75rem;
+}
+.chart-averages {
+  gap:0.5rem;
+}
+.average-circle {
+  width:40px;
+  height:22px;
+  padding:4px 6px;
+}
+.average-circle .average-value {
+  font-size:12px;
+}
+.grade-distribution {
+  gap:0.5rem;
+  padding:0.75rem;
+  overflow-x:auto;
+  flex-wrap:nowrap;
+}
+.grade-count {
+  padding:3px 6px 3px 3px;
+  flex-shrink:0;
+}
+.grade-count .grade-value {
+  font-size:16px;
+}
+.grade-count .grade-amount {
+  font-size:12px;
+}
+.semester-grades {
+  padding:1rem;
+  width:100%;
+  min-width:0;
+}
+.semester-grades h3 {
+  padding:0.5rem;
+  font-size:14px;
+}
+.semester-grade-item {
+  padding:0.75rem;
+  gap:0.75rem;
+}
+.semester-grade-value {
+  width:28px;
+  height:28px;
+  font-size:18px;
+}
+.semester-grade-subject {
+  font-size:14px;
+}
+.year-end-grades {
+  padding:1rem;
+  width:100%;
+  min-width:0;
+}
+.year-end-grades h3 {
+  padding:0.5rem;
+  font-size:14px;
+}
+.year-end-grade-item {
+  padding:0.75rem;
+  gap:0.75rem;
+}
+.year-end-grade-value {
+  width:28px;
+  height:28px;
+  font-size:18px;
+}
+.year-end-grade-subject {
+  font-size:14px;
+}
+.overall-averages {
+  padding:1rem;
+  overflow-x:auto;
+}
+}@media (max-width:480px) {
+  .grades-chart {
+  height:180px;
+  padding:0.5rem;
+}
+.chart-header {
+  padding:0.5rem;
+  flex-direction:column;
+  align-items:stretch;
+}
+.chart-averages {
+  gap:0.25rem;
+}
+.average-circle {
+  width:36px;
+  height:20px;
+  padding:2px 4px;
+}
+.average-circle .average-value {
+  font-size:11px;
+}
+.grade-distribution {
+  padding:0.5rem;
+  gap:0.25rem;
+}
+.semester-grades {
+  padding:0.75rem;
+}
+.year-end-grades {
+  padding:0.75rem;
+}
+.overall-averages {
+  padding:0.75rem;
+}
+.grades-overview {
+  gap:1rem;
+  margin-bottom:1rem;
+}
+}

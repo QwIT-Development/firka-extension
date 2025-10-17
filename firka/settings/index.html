@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Firxa - Beállítások</title>
+  <link rel="icon" type="image/png" href="../images/firka_logo_128.png">
+  <link rel="shortcut icon" type="image/png" href="../images/firka_logo_128.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+  <link rel="stylesheet" href="index.css">
+  <link rel="stylesheet" href="../global/theme.css">
+</head>
+<body>
+  <div class="popup-container">
+    <header class="popup-header">
+      <p class="logo-text">
+        <img src="../images/firka_logo.png" alt="Firka" class="logo">
+        Firxa
+      </p>
+    </header>
+
+    <div class="settings-card">
+      <h2 data-i18n="settings.title">Beállítások</h2>
+      <div class="settings-group">
+        <div class="setting-section">
+          <div class="setting-header">
+            <span class="material-icons-round">palette</span>
+            <span data-i18n="settings.theme">Téma</span>
+          </div>
+          <div class="theme-grid">
+            <button class="theme-option" data-theme="light-green">
+              <div class="theme-preview light-green">
+                <div class="preview-header"></div>
+                <div class="preview-content">
+                  <div class="preview-card"></div>
+                </div>
+              </div>
+              <span class="theme-name" data-i18n="settings.themes.light_green">Világos Zöld</span>
+            </button>
+
+            <button class="theme-option" data-theme="dark-green">
+              <div class="theme-preview dark-green">
+                <div class="preview-header"></div>
+                <div class="preview-content">
+                  <div class="preview-card"></div>
+                </div>
+              </div>
+              <span class="theme-name" data-i18n="settings.themes.dark_green">Sötét Zöld</span>
+            </button>
+          </div>
+        </div>
+        <!--
+        <div class="setting-section">
+          <div class="setting-header">
+            <div>
+              <span class="material-icons-round">brush</span>
+              <span data-i18n="settings.custom_theme.title">Egyéni Téma</span>
+            </div>
+            <div class="theme-editor-controls">
+              <button class="icon-btn" id="createCustomTheme" title="Új Téma Létrehozása">
+                <span class="material-icons-round">add</span>
+              </button>
+              <button class="icon-btn" id="importTheme" title="Téma Importálása">
+                <span class="material-icons-round">file_download</span>
+              </button>
+            </div>
+          </div>
+          <div class="custom-theme-editor">
+            
+            <div class="custom-themes-list" id="customThemesList">
+            </div>
+
+            <div class="theme-editor-modal" id="themeEditorModal" style="display: none;">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h3 data-i18n="settings.custom_theme.editor_title">Téma Szerkesztő</h3>
+                  <button class="close-modal" id="closeThemeEditor">
+                    <span class="material-icons-round">close</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                  <div class="theme-name-input">
+                    <label for="themeName" data-i18n="settings.custom_theme.name">Téma neve:</label>
+                    <input type="text" id="themeName" placeholder="Saját téma" maxlength="30">
+                  </div>
+                  
+                  <div class="color-groups">
+                    <div class="color-group">
+                      <h4 data-i18n="settings.custom_theme.background">Háttér</h4>
+                      <div class="color-inputs">
+                        <div class="color-input-group">
+                          <label for="background" data-i18n="settings.custom_theme.main_background">Fő háttér:</label>
+                          <input type="color" id="background" value="#DAE4F7">
+                        </div>
+                        <div class="color-input-group">
+                          <label for="cardCard" data-i18n="settings.custom_theme.card_background">Kártya háttér:</label>
+                          <input type="color" id="cardCard" value="#EDF3FF">
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="color-group">
+                      <h4 data-i18n="settings.custom_theme.text">Szöveg</h4>
+                      <div class="color-inputs">
+                        <div class="color-input-group">
+                          <label for="textPrimary" data-i18n="settings.custom_theme.primary_text">Elsődleges szöveg:</label>
+                          <input type="color" id="textPrimary" value="#050B15">
+                        </div>
+                        <div class="color-input-group">
+                          <label for="textSecondary" data-i18n="settings.custom_theme.secondary_text">Másodlagos szöveg:</label>
+                          <input type="color" id="textSecondary" value="#050B15">
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="color-group">
+                      <h4 data-i18n="settings.custom_theme.accent">Kiemelő színek</h4>
+                      <div class="color-inputs">
+                        <div class="color-input-group">
+                          <label for="accentAccent" data-i18n="settings.custom_theme.primary_accent">Elsődleges kiemelő:</label>
+                          <input type="color" id="accentAccent" value="#3673EE">
+                        </div>
+                        <div class="color-input-group">
+                          <label for="accentSecondary" data-i18n="settings.custom_theme.secondary_accent">Másodlagos kiemelő:</label>
+                          <input type="color" id="accentSecondary" value="#1C469A">
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="theme-preview-container">
+                    <h4 data-i18n="settings.custom_theme.preview">Előnézet</h4>
+                    <div class="custom-theme-preview" id="customThemePreview">
+                      <div class="preview-content">
+                        <div class="preview-card">
+                          <div class="preview-text-primary">Elsődleges szöveg</div>
+                          <div class="preview-text-secondary">Másodlagos szöveg</div>
+                          <div class="preview-accent">Kiemelő szín</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button class="btn-secondary" id="cancelThemeEdit" data-i18n="settings.custom_theme.cancel">Mégse</button>
+                  <button class="btn-primary" id="saveTheme" data-i18n="settings.custom_theme.save">Mentés</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="import-modal" id="importModal" style="display: none;">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h3 data-i18n="settings.custom_theme.import_title">Téma Importálása</h3>
+                  <button class="close-modal" id="closeImportModal">
+                    <span class="material-icons-round">close</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                  <div class="import-input">
+                    <label for="themeImportString" data-i18n="settings.custom_theme.import_string">Téma azonosítója:</label>
+                    <textarea id="themeImportString" placeholder="Illeszd be ide a téma azonosítóját..." rows="4"></textarea>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button class="btn-secondary" id="cancelImport" data-i18n="settings.custom_theme.cancel">Mégse</button>
+                  <button class="btn-primary" id="confirmImport" data-i18n="settings.custom_theme.import">Importálás</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        -->
+        <div class="setting-section">
+          <div class="setting-header">
+            <span class="material-icons-round">language</span>
+            <span data-i18n="settings.language">Nyelv</span>
+          </div>
+          <div class="language-grid">
+            <button class="language-option" data-language="hu">
+              <span class="language-name" data-i18n="settings.languages.hu">Magyar</span>
+            </button>
+            <button class="language-option" data-language="en">
+              <span class="language-name" data-i18n="settings.languages.en">English</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="about-card">
+      <h2 data-i18n="settings.about.title">Névjegy</h2>
+      <div class="about-content">
+        <p data-i18n="settings.about.description">A Firka egy nyílt forráskódú projekt, amely a KRÉTA rendszerhez készít saját felhasználói felületet.</p>
+        <div class="about-links">
+          <a href="https://firka.app" target="_blank" class="about-link">
+            <span class="material-icons-round">language</span>
+            <span>Weboldal</span>
+          </a>
+          <a href="https://github.com/QwIT-Development/" target="_blank" class="about-link">
+            <span class="material-icons-round">code</span>
+            <span data-i18n="settings.about.github">GitHub</span>
+          </a>
+          <a href="https://discord.gg/firka-1111649116020285532" target="_blank" class="about-link">
+            <span class="material-icons-round">forum</span>
+            <span>Discord</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="support-card">
+      <h2 data-i18n="settings.support.title">Támogatás</h2>
+      <div class="support-content">
+        <p data-i18n="settings.support.description">Ha tetszik a munkánk és szeretnéd támogatni a fejlesztést, az alábbi módon teheted meg:</p>
+        <div class="support-buttons">
+          <a href="https://ko-fi.com/zan1456" target="_blank" class="support-button">
+            <span class="material-icons-round">coffee</span>
+            <span data-i18n="settings.support.kofi">Ko-Fi</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <footer class="popup-footer">
+      <div class="version-info" id="version">v1.3.0</div>
+    </footer>
+  </div>
+  <script src="../tools/storageManager.js"></script>
+    <script src="../global/language.js"></script>
+    <script src="index.js"></script>
+</body>
+</html>

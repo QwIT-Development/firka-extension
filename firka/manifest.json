@@ -1,0 +1,230 @@
+{
+  "manifest_version": 3,
+  "name": "Firxa",
+  "version": "1.3.5",
+  "description": "KRÉTA webes verziójának újraírása",
+  "icons": {
+    "128": "images/firka_logo_128.png"
+  },
+  "action": {
+    "default_popup": "settings/index.html",
+    "default_icon": {
+      "128": "images/firka_logo_128.png"
+    }
+  },
+  "permissions": [
+    "storage"
+  ],
+  "background": {
+    "service_worker": "tools/background.js"
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "firxa@zan1456.hu",
+      "strict_min_version": "109.0",
+      "data_collection_permissions": {
+        "required": ["none"]
+      }
+    }
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "settings/*",
+        "global/language.js",
+        "images/*",
+        "fonts/*.woff2",
+        "icons/*.svg",
+        "grades/chart.js",
+        "i18n/*.json",
+        "tools/storageManager.js",
+        "tools/storageTest.js"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
+    }
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://idp.e-kreta.hu/Account/Login*",
+        "https://idp.e-kreta.hu/Account/Logout*",
+        "https://idp.e-kreta.hu/Account/LoginWithTwoFactor*",
+        "https://*.e-kreta.hu/Hianyzas/Hianyzasok*",
+        "https://*.e-kreta.hu/Adminisztracio/BelepesKezelo*",
+        "https://*.e-kreta.hu/Intezmeny/Faliujsag*",
+        "https://*.e-kreta.hu/TanuloErtekeles/Osztalyzatok*",
+        "https://*.e-kreta.hu/Orarend/InformaciokOrarend*",
+        "https://*.e-kreta.hu/Adminisztracio/Profil*",
+        "https://*.e-kreta.hu/Tanulo/TanuloHaziFeladat*",
+        "https://*.e-kreta.hu/Adminisztracio/ElfelejtettJelszo*",
+        "https://intezmenykereso.e-kreta.hu/*",
+        "https://eugyintezes.e-kreta.hu/*"
+      ],
+      "js": [
+        "global/language.js",
+        "global/theme.js",
+        "tools/loadingScreen.js",
+        "tools/storageManager.js",
+        "tools/helper.js",
+        "tools/createTemplate.js",
+        "global/maintenance.js",
+        "global/navigation.js"
+      ],
+      "css": [
+        "tools/loadingScreen.css",
+        "global/theme.css",
+        "global/navigation.css",
+        "global/maintenance.css"
+      ],
+      "run_at": "document_start"
+    },
+    {
+      "matches": [
+        "https://idp.e-kreta.hu/Account/Login*"
+      ],
+      "js": [
+        "login/login.js"
+      ],
+      "css": [
+        "login/login.css"
+      ],
+      "run_at": "document_start"
+    },
+    {
+      "matches": [
+        "https://idp.e-kreta.hu/account/loginwithtwofactor*"
+      ],
+      "js": [
+        "login/twofactor.js"
+      ],
+      "css": [
+        "login/twofactor.css"
+      ],
+      "run_at": "document_start"
+    },
+    {
+      "matches": [
+        "https://*.e-kreta.hu/Hianyzas/Hianyzasok*"
+      ],
+      "js": [
+        "absences/absences.js"
+      ],
+      "css": [
+        "absences/absences.css"
+      ],
+      "run_at": "document_end"
+    },
+    {
+      "matches": [
+        "https://idp.e-kreta.hu/Account/Logout*"
+      ],
+      "js": [
+        "logout/logout.js"
+      ],
+      "css": [
+        "logout/logout.css"
+      ],
+      "run_at": "document_start"
+    },
+    {
+      "matches": [
+        "https://*.e-kreta.hu/Adminisztracio/BelepesKezelo*"
+      ],
+      "js": [
+        "roleselect/roleselect.js"
+      ],
+      "css": [
+        "roleselect/roleselect.css"
+      ],
+      "run_at": "document_start"
+    },
+    {
+      "matches": [
+        "https://*.e-kreta.hu/Intezmeny/Faliujsag*"
+      ],
+      "js": [
+        "dashboard/dashboard.js"
+      ],
+      "css": [
+        "dashboard/dashboard.css"
+      ],
+      "run_at": "document_end"
+    },
+    {
+      "matches": [
+        "https://*.e-kreta.hu/TanuloErtekeles/Osztalyzatok*"
+      ],
+      "js": [
+        "grades/grades.js",
+        "grades/chart.js"
+      ],
+      "css": [
+        "grades/grades.css"
+      ],
+      "run_at": "document_end"
+    },
+    {
+      "matches": [
+        "https://*.e-kreta.hu/Orarend/InformaciokOrarend*"
+      ],
+      "js": [
+        "timetable/timetable.js"
+      ],
+      "css": [
+        "timetable/timetable.css"
+      ],
+      "run_at": "document_end"
+    },
+    {
+      "matches": [
+        "https://*.e-kreta.hu/Adminisztracio/Profil*"
+      ],
+      "js": [
+        "profile/profile.js"
+      ],
+      "css": [
+        "profile/profile.css"
+      ],
+      "run_at": "document_end"
+    },
+    {
+      "matches": [
+        "https://*.e-kreta.hu/Adminisztracio/ElfelejtettJelszo*"
+      ],
+      "js": [
+        "forgotpassword/forgotpassword.js"
+      ],
+      "css": [
+        "forgotpassword/forgotpassword.css"
+      ],
+      "run_at": "document_end"
+    },
+    {
+      "matches": [
+        "https://intezmenykereso.e-kreta.hu/"
+      ],
+      "js": [
+        "search/search.js"
+      ],
+      "css": [
+        "search/search.css"
+      ],
+      "run_at": "document_end"
+    },
+    {
+      "matches": [
+        "https://eugyintezes.e-kreta.hu/uzenetek/",
+        "https://eugyintezes.e-kreta.hu/uzenetek"
+      ],
+      "js": [
+        "messages/messages.js"
+      ],
+      "css": [
+        "messages/messages.css"
+      ],
+      "run_at": "document_end"
+    }
+  ]
+}
