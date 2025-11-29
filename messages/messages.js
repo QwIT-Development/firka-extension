@@ -76,7 +76,7 @@
     }
   }
 
-  async function openMessageModal(messageId) {
+  async function openMessageModal(messageId, isRead = true) {
     document.body.classList.add('modal-open');
     try {
       const modalOverlay = document.createElement('div');
@@ -103,6 +103,19 @@
       `;
       modalOverlay.appendChild(modalContent);
       document.body.appendChild(modalOverlay);
+
+      if (!isRead) {
+        try {
+          await markMessageAsRead(messageId);
+          const cardEl = document.querySelector(`.message-card[data-id="${messageId}"]`);
+          if (cardEl) {
+            cardEl.classList.remove('unread');
+            const indicator = cardEl.querySelector('.unread-indicator');
+            if (indicator) indicator.remove();
+          }
+        } catch (e) {
+        }
+      }
 
       const response = await fetch(`https://eugyintezes.e-kreta.hu/api/v1/kommunikacio/postaladaelemek/${messageId}`, {
         method: 'GET',
@@ -233,8 +246,9 @@
   function createMessageCard(message) {
     const card = document.createElement('div');
     card.className = `message-card ${message.isElolvasva ? '' : 'unread'}`;
+    card.dataset.id = String(message.azonosito);
     card.onclick = () => {
-      openMessageModal(message.azonosito);
+      openMessageModal(message.azonosito, !!message.isElolvasva);
     };
     
     const senderName = message.uzenetFeladoNev || 'Ismeretlen feladó';
@@ -255,6 +269,31 @@
     `;
     
     return card;
+  }
+
+  async function markMessageAsRead(messageId) {
+    const payload = {
+      isOlvasott: true,
+      postaladaElemAzonositoLista: [Number(messageId)]
+    };
+    const response = await fetch('https://eugyintezes.e-kreta.hu/api/v1/kommunikacio/postaladaelemek/olvasott', {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'x-csrf': '1',
+        'x-uzenet-json-formatum': 'CamelCase'
+      },
+      body: JSON.stringify(payload)
+    });
+    if (!response.ok) {
+      if (response.status === 401 && window.location.href.startsWith('https://eugyintezes.e-kreta.hu/uzenetek')) {
+        window.location.reload();
+        throw new Error('401');
+      }
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
   }
 
   function createMessagesGrid(messages) {
