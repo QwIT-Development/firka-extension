@@ -1,4 +1,15 @@
 (() => {
+  async function waitForTranslations() {
+    let attempts = 0;
+    const maxAttempts = 200;
+    while (
+      (typeof window.LanguageManager === 'undefined') ||
+      (window.LanguageManager && window.LanguageManager.t('navigation.dashboard') === 'navigation.dashboard')
+    ) {
+      if (attempts++ > maxAttempts) break;
+      await new Promise(resolve => setTimeout(resolve, 50));
+    }
+  }
   function formatDate(dateString) {
     if (!dateString) {
       return 'Ismeretlen dátum';
@@ -264,6 +275,7 @@
 
   async function transformMessagesPage() {
     try {
+      await waitForTranslations();
       document.body.innerHTML = '';
       const kretaContainer = document.createElement('div');
       kretaContainer.className = 'kreta-container';
