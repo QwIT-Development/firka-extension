@@ -53,7 +53,7 @@ const createTemplate = {
                 <img src="${chrome.runtime.getURL("icons/absences-" + (location.pathname == "/Hianyzas/Hianyzasok" ? "active" : "inactive") + ".svg")}" alt="${LanguageManager.t("navigation.absences")}">
                 ${LanguageManager.t("navigation.absences")}
                 </a>
-                <a href="https://eugyintezes.e-kreta.hu/uzenetek" data-page="messages" class="nav-item ${location.pathname == "/uzenetek" ? "active" : ""}">
+                <a href="https://eugyintezes.e-kreta.hu/api/bff/login" data-page="messages" class="nav-item ${location.pathname == "/uzenetek" ? "active" : ""}">
                 <img src="${chrome.runtime.getURL("icons/messages-" + (location.pathname == "/uzenetek" ? "active" : "inactive") + ".svg")}" alt="${LanguageManager.t("navigation.messages")}">
                 ${LanguageManager.t("navigation.messages")}
                 </a>
