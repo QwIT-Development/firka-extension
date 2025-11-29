@@ -49,6 +49,10 @@
         });
         
         if (!response.ok) {
+          if (response.status === 401 && window.location.href.startsWith('https://eugyintezes.e-kreta.hu/uzenetek')) {
+            window.location.reload();
+            throw new Error('401');
+          }
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         

@@ -215,8 +215,8 @@
     },
     {
       "matches": [
-        "https://eugyintezes.e-kreta.hu/uzenetek/",
-        "https://eugyintezes.e-kreta.hu/uzenetek"
+        "https://eugyintezes.e-kreta.hu/*",
+        "https://eugyintezes.e-kreta.hu/"
       ],
       "js": [
         "messages/messages.js"
@@ -224,7 +224,7 @@
       "css": [
         "messages/messages.css"
       ],
-      "run_at": "document_end"
+      "run_at": "document_start"
     }
   ]
 }
