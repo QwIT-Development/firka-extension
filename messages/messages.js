@@ -74,6 +74,76 @@
         throw error;
       }
     }
+
+    static async fetchDeletedMessages() {
+      const response = await fetch('https://eugyintezes.e-kreta.hu/api/v1/kommunikacio/postaladaelemek/torolt', {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'x-csrf': '1',
+          'x-uzenet-json-formatum': 'CamelCase'
+        }
+      });
+      if (!response.ok) {
+        if (response.status === 401 && window.location.href.startsWith('https://eugyintezes.e-kreta.hu/uzenetek')) {
+          window.location.reload();
+          throw new Error('401');
+        }
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return await response.json();
+    }
+
+    static async markMessagesRead(isRead, ids) {
+      const payload = {
+        isOlvasott: !!isRead,
+        postaladaElemAzonositoLista: ids.map(Number)
+      };
+      const response = await fetch('https://eugyintezes.e-kreta.hu/api/v1/kommunikacio/postaladaelemek/olvasott', {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'x-csrf': '1',
+          'x-uzenet-json-formatum': 'CamelCase'
+        },
+        body: JSON.stringify(payload)
+      });
+      if (!response.ok) {
+        if (response.status === 401 && window.location.href.startsWith('https://eugyintezes.e-kreta.hu/uzenetek')) {
+          window.location.reload();
+          throw new Error('401');
+        }
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+    }
+
+    static async moveToTrash(ids, toTrash = true) {
+      const payload = {
+        isKuka: !!toTrash,
+        postaladaElemAzonositoLista: ids.map(Number)
+      };
+      const response = await fetch('https://eugyintezes.e-kreta.hu/api/v1/kommunikacio/postaladaelemek/kuka', {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'x-csrf': '1',
+          'x-uzenet-json-formatum': 'CamelCase'
+        },
+        body: JSON.stringify(payload)
+      });
+      if (!response.ok) {
+        if (response.status === 401 && window.location.href.startsWith('https://eugyintezes.e-kreta.hu/uzenetek')) {
+          window.location.reload();
+          throw new Error('401');
+        }
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+    }
   }
 
   async function openMessageModal(messageId, isRead = true) {
@@ -248,6 +318,10 @@
     card.className = `message-card ${message.isElolvasva ? '' : 'unread'}`;
     card.dataset.id = String(message.azonosito);
     card.onclick = () => {
+      if (selectionMode) {
+        toggleSelect(message.azonosito, card);
+        return;
+      }
       openMessageModal(message.azonosito, !!message.isElolvasva);
     };
     
@@ -267,6 +341,7 @@
       <div class="message-subject">${sanitizeHTML(subject)}</div>
       ${hasAttachment ? '<div class="attachment-indicator">📎</div>' : ''}
     `;
+    
     
     return card;
   }
@@ -312,6 +387,181 @@
     return gridContainer;
   }
 
+  let currentView = 'inbox';
+  let selectionMode = false;
+  const selection = new Set();
+
+  function renderBulkActions(container) {
+    const bulk = document.createElement('div');
+    bulk.className = 'bulk-actions-card';
+    bulk.innerHTML = `
+      <div class="bulk-actions-left">
+        <div class="view-toggle">
+          <button id="viewInboxBtn" class="${currentView==='inbox'?'active':''}" title="Beérkezett">
+            <img src="${chrome.runtime.getURL('icons/messages-active.svg')}" alt="Beérkezett">
+          </button>
+          <button id="viewTrashBtn" class="${currentView==='trash'?'active':''}" title="Törölt">
+            <img src="${chrome.runtime.getURL('icons/delete.svg')}" alt="Törölt">
+          </button>
+        </div>
+        <button id="toggleSelectionModeBtn" class="bulk-btn" title="Kijelölés mód">
+          <img src="${chrome.runtime.getURL('icons/select.svg')}" alt="Kijelölés mód">
+        </button>
+        <button id="selectAllBtn" class="bulk-btn" title="Mind kijelöl">
+          <img src="${chrome.runtime.getURL('icons/select-all.svg')}" alt="Mind kijelöl">
+        </button>
+        <button id="clearSelectionBtn" class="bulk-btn" title="Kijelölés törlése">
+          <img src="${chrome.runtime.getURL('icons/select-none.svg')}" alt="Kijelölés törlése">
+        </button>
+      </div>
+      <div class="bulk-actions-right">
+        <button id="markReadBtn" class="bulk-btn" title="Olvasott">
+          <img src="${chrome.runtime.getURL('icons/eye-on.svg')}" alt="Olvasott">
+        </button>
+        <button id="markUnreadBtn" class="bulk-btn" title="Olvasatlan">
+          <img src="${chrome.runtime.getURL('icons/eye-off.svg')}" alt="Olvasatlan">
+        </button>
+        <button id="deleteBtn" class="bulk-btn" title="Törlés">
+          <img src="${chrome.runtime.getURL('icons/trash.svg')}" alt="Törlés">
+        </button>
+        <button id="restoreBtn" class="bulk-btn" title="Visszaállítás">
+          <img src="${chrome.runtime.getURL('icons/undo.svg')}" alt="Visszaállítás">
+        </button>
+      </div>
+    `;
+    container.appendChild(bulk);
+
+    bulk.querySelector('#viewInboxBtn').addEventListener('click', () => switchView('inbox'));
+    bulk.querySelector('#viewTrashBtn').addEventListener('click', () => switchView('trash'));
+    bulk.querySelector('#toggleSelectionModeBtn').addEventListener('click', toggleSelectionMode);
+    bulk.querySelector('#selectAllBtn').addEventListener('click', selectAllVisible);
+    bulk.querySelector('#clearSelectionBtn').addEventListener('click', clearSelection);
+    bulk.querySelector('#markReadBtn').addEventListener('click', () => bulkMark(true));
+    bulk.querySelector('#markUnreadBtn').addEventListener('click', () => bulkMark(false));
+    bulk.querySelector('#deleteBtn').addEventListener('click', bulkDelete);
+    bulk.querySelector('#restoreBtn').addEventListener('click', bulkRestore);
+    updateBulkActionsState();
+  }
+
+  function updateBulkActionsState() {
+    const ids = Array.from(selection);
+    const bulk = document.querySelector('.bulk-actions-card');
+    if (!bulk) return;
+    const disableAll = ids.length === 0;
+    bulk.querySelector('#markReadBtn').disabled = disableAll || currentView !== 'inbox';
+    bulk.querySelector('#markUnreadBtn').disabled = disableAll || currentView !== 'inbox';
+    bulk.querySelector('#deleteBtn').disabled = disableAll || currentView !== 'inbox';
+    bulk.querySelector('#restoreBtn').disabled = disableAll || currentView !== 'trash';
+  }
+
+  function selectAllVisible() {
+    const cards = document.querySelectorAll('.messages-grid .message-card');
+    cards.forEach(card => {
+      const id = parseInt(card.dataset.id);
+      selection.add(id);
+      card.classList.add('selected');
+    });
+    updateBulkActionsState();
+  }
+
+  function clearSelection() {
+    selection.clear();
+    document.querySelectorAll('.messages-grid .message-card.selected').forEach(card => card.classList.remove('selected'));
+    updateBulkActionsState();
+  }
+
+  function toggleSelect(id, card) {
+    if (selection.has(id)) {
+      selection.delete(id);
+      card.classList.remove('selected');
+    } else {
+      selection.add(id);
+      card.classList.add('selected');
+    }
+    updateBulkActionsState();
+  }
+
+  function toggleSelectionMode() {
+    selectionMode = !selectionMode;
+    const btn = document.getElementById('toggleSelectionModeBtn');
+    if (btn) {
+      btn.classList.toggle('active', selectionMode);
+      btn.title = selectionMode ? 'Kilépés kijelölésből' : 'Kijelölés mód';
+    }
+    if (!selectionMode) {
+      clearSelection();
+    }
+  }
+
+  async function bulkMark(isRead) {
+    const ids = Array.from(selection);
+    if (ids.length === 0) return;
+    await APIManager.markMessagesRead(isRead, ids);
+    ids.forEach(id => {
+      const card = document.querySelector(`.message-card[data-id="${id}"]`);
+      if (!card) return;
+      if (isRead) {
+        card.classList.remove('unread');
+        const ind = card.querySelector('.unread-indicator');
+        if (ind) ind.remove();
+      } else {
+        card.classList.add('unread');
+        if (!card.querySelector('.unread-indicator')) {
+          const senderInfo = card.querySelector('.sender-info');
+          const span = document.createElement('span');
+          span.className = 'unread-indicator';
+          senderInfo.appendChild(span);
+        }
+      }
+    });
+    clearSelection();
+  }
+
+  async function bulkDelete() {
+    const ids = Array.from(selection);
+    if (ids.length === 0) return;
+    await APIManager.moveToTrash(ids, true);
+    ids.forEach(id => {
+      const card = document.querySelector(`.message-card[data-id="${id}"]`);
+      if (card) card.remove();
+    });
+    clearSelection();
+  }
+
+  async function bulkRestore() {
+    const ids = Array.from(selection);
+    if (ids.length === 0) return;
+    await APIManager.moveToTrash(ids, false);
+    ids.forEach(id => {
+      const card = document.querySelector(`.message-card[data-id="${id}"]`);
+      if (card) card.remove();
+    });
+    clearSelection();
+  }
+
+async function switchView(view) {
+  if (currentView === view) return;
+  currentView = view;
+  if (selectionMode) toggleSelectionMode();
+  clearSelection();
+    const container = document.querySelector('.messages-container');
+    const grid = container.querySelector('.messages-grid') || container.querySelector('.empty-state') || container.querySelector('.error-state');
+    if (grid) grid.remove();
+    const toggleInbox = document.getElementById('viewInboxBtn');
+    const toggleTrash = document.getElementById('viewTrashBtn');
+    if (toggleInbox && toggleTrash) {
+      toggleInbox.classList.toggle('active', currentView==='inbox');
+      toggleTrash.classList.toggle('active', currentView==='trash');
+    }
+    const loadingState = createLoadingState();
+    container.appendChild(loadingState);
+    if (view === 'inbox') {
+      await loadMessages(container);
+    } else {
+      await loadDeleted(container);
+    }
+  }
+
   async function transformMessagesPage() {
     try {
       await waitForTranslations();
@@ -333,6 +583,7 @@
       const messagesContainer = document.createElement('div');
       messagesContainer.className = 'messages-container';
 
+      renderBulkActions(main);
       const loadingState = createLoadingState();
       messagesContainer.appendChild(loadingState);
       
@@ -384,6 +635,30 @@
       }
 
       const errorState = createErrorState(() => loadMessages(container));
+      container.appendChild(errorState);
+    }
+  }
+
+  async function loadDeleted(container) {
+    try {
+      const messages = await APIManager.fetchDeletedMessages();
+      messages.sort((a, b) => {
+        const dateA = new Date(a.uzenetKuldesDatum);
+        const dateB = new Date(b.uzenetKuldesDatum);
+        return dateB - dateA;
+      });
+      const loadingState = container.querySelector('.loading-state');
+      if (loadingState) {
+        loadingState.remove();
+      }
+      const messagesGrid = createMessagesGrid(messages);
+      container.appendChild(messagesGrid);
+    } catch (error) {
+      const loadingState = container.querySelector('.loading-state');
+      if (loadingState) {
+        loadingState.remove();
+      }
+      const errorState = createErrorState(() => loadDeleted(container));
       container.appendChild(errorState);
     }
   }
