@@ -47,6 +47,7 @@ async function collectAbsencesData() {
 
         absences.push({
           date: formattedDate,
+          rawDate: date,
           lesson: item.Oraszam?.toString() || "",
           subject: item.Targy || "",
           topic: item.Tema || "",
@@ -59,12 +60,19 @@ async function collectAbsencesData() {
       });
     }
 
-    const groupedAbsences = {};
-    absences.forEach((absence) => {
-      if (!groupedAbsences[absence.date]) {
-        groupedAbsences[absence.date] = [];
+    
+    const groupedAbsences = absences.reduce((groups, absence) => {
+      const date = absence.date;
+      if (!groups[date]) {
+        groups[date] = [];
       }
-      groupedAbsences[absence.date].push(absence);
+      groups[date].push(absence);
+      return groups;
+    }, {});
+
+    
+    Object.keys(groupedAbsences).forEach(date => {
+      groupedAbsences[date].sort((a, b) => parseInt(a.lesson) - parseInt(b.lesson));
     });
 
     return { basicData, absences, groupedAbsences };
@@ -86,20 +94,87 @@ function createFilterCard(absences) {
   
   const filterContent = document.createElement('div');
   filterContent.className = 'filter-content';
+
+  const dateGroup = document.createElement('div');
+  dateGroup.className = 'filter-group';
   
-  const dateGroup = createFilterGroup(
-    'Calendar.svg',
-    'Dátum',
-    LanguageManager.t('absences.date'),
-    'input',
-    { type: 'date', id: 'dateFilter', className: 'filter-input' }
-  );
+  const dateLabel = document.createElement('label');
+  const dateImg = document.createElement('img');
+  dateImg.src = chrome.runtime.getURL('icons/Calendar.svg');
+  dateImg.alt = 'Dátum';
+  dateLabel.appendChild(dateImg);
+  dateLabel.appendChild(document.createTextNode(' ' + LanguageManager.t('absences.date')));
+  
+  const dateInput = document.createElement('input');
+  dateInput.type = 'date';
+  dateInput.id = 'dateFilter';
+  dateInput.className = 'filter-input';
+  
+  dateGroup.appendChild(dateLabel);
+  dateGroup.appendChild(dateInput);
   filterContent.appendChild(dateGroup);
 
-  const subjectGroup = createSubjectFilterGroup(absences);
+  const subjectGroup = document.createElement('div');
+  subjectGroup.className = 'filter-group';
+  
+  const subjectLabel = document.createElement('label');
+  const subjectImg = document.createElement('img');
+  subjectImg.src = chrome.runtime.getURL('icons/Subject.svg');
+  subjectImg.alt = 'Tantárgy';
+  subjectLabel.appendChild(subjectImg);
+  subjectLabel.appendChild(document.createTextNode(' ' + LanguageManager.t('absences.subject')));
+  
+  const subjectSelect = document.createElement('select');
+  subjectSelect.id = 'subjectFilter';
+  subjectSelect.className = 'filter-input';
+  
+  const defaultSubjectOption = document.createElement('option');
+  defaultSubjectOption.value = '';
+  defaultSubjectOption.textContent = LanguageManager.t('absences.all_subjects');
+  subjectSelect.appendChild(defaultSubjectOption);
+  
+  const subjects = [...new Set(absences.map(a => a.subject))].sort();
+  subjects.forEach(subject => {
+    const option = document.createElement('option');
+    option.value = subject;
+    option.textContent = subject;
+    subjectSelect.appendChild(option);
+  });
+  
+  subjectGroup.appendChild(subjectLabel);
+  subjectGroup.appendChild(subjectSelect);
   filterContent.appendChild(subjectGroup);
 
-  const justificationGroup = createJustificationFilterGroup();
+  const justificationGroup = document.createElement('div');
+  justificationGroup.className = 'filter-group';
+  
+  const justificationLabel = document.createElement('label');
+  const justificationImg = document.createElement('img');
+  justificationImg.src = chrome.runtime.getURL('icons/BadgeCheck.svg');
+  justificationImg.alt = 'Igazolás';
+  justificationLabel.appendChild(justificationImg);
+  justificationLabel.appendChild(document.createTextNode(' ' + LanguageManager.t('absences.justification')));
+  
+  const justificationSelect = document.createElement('select');
+  justificationSelect.id = 'justificationFilter';
+  justificationSelect.className = 'filter-input';
+  
+  const justificationOptions = [
+    { value: '', text: LanguageManager.t('absences.all_types') },
+    { value: 'justified', text: LanguageManager.t('absences.justified') },
+    { value: 'unjustified', text: LanguageManager.t('absences.unjustified') },
+    { value: 'pending', text: LanguageManager.t('absences.pending') }
+  ];
+  
+  justificationOptions.forEach(optionData => {
+    const option = document.createElement('option');
+    option.value = optionData.value;
+    option.textContent = optionData.text;
+    justificationSelect.appendChild(option);
+  });
+  
+  justificationGroup.appendChild(justificationLabel);
+  justificationGroup.appendChild(justificationSelect);
   filterContent.appendChild(justificationGroup);
   
   filterCard.appendChild(filterHeader);
@@ -108,118 +183,40 @@ function createFilterCard(absences) {
   return filterCard;
 }
 
-function createFilterGroup(iconName, altText, labelText, elementType, attributes) {
-  const group = document.createElement('div');
-  group.className = 'filter-group';
+function createStatsSection(absences) {
+  const statsSection = document.createElement('div');
+  statsSection.className = 'stats-section';
   
-  const label = document.createElement('label');
-  const img = document.createElement('img');
-  img.src = chrome.runtime.getURL(`icons/${iconName}`);
-  img.alt = altText;
-  img.style.width = '24px';
-  img.style.height = '24px';
-  
-  label.appendChild(img);
-  label.appendChild(document.createTextNode(' ' + labelText));
-  
-  const element = document.createElement(elementType);
-  Object.assign(element, attributes);
-  
-  group.appendChild(label);
-  group.appendChild(element);
-  
-  return group;
-}
-
-function createSubjectFilterGroup(absences) {
-  const group = document.createElement('div');
-  group.className = 'filter-group';
-  
-  const label = document.createElement('label');
-  const img = document.createElement('img');
-  img.src = chrome.runtime.getURL('icons/Subject.svg');
-  img.alt = 'Tantárgy';
-  img.style.width = '24px';
-  img.style.height = '24px';
-  
-  label.appendChild(img);
-  label.appendChild(document.createTextNode(' ' + LanguageManager.t('absences.subject')));
-  
-  const select = document.createElement('select');
-  select.id = 'subjectFilter';
-  select.className = 'filter-input';
-  
-  const defaultOption = document.createElement('option');
-  defaultOption.value = '';
-  defaultOption.textContent = LanguageManager.t('absences.all_subjects');
-  select.appendChild(defaultOption);
-  
-  const subjects = [...new Set(absences.map(a => a.subject))].sort();
-  subjects.forEach(subject => {
-    const option = document.createElement('option');
-    option.value = subject;
-    option.textContent = subject;
-    select.appendChild(option);
-  });
-  
-  group.appendChild(label);
-  group.appendChild(select);
-  
-  return group;
-}
-
-function createJustificationFilterGroup() {
-  const group = document.createElement('div');
-  group.className = 'filter-group';
-  
-  const label = document.createElement('label');
-  const img = document.createElement('img');
-  img.src = chrome.runtime.getURL('icons/BadgeCheck.svg');
-  img.alt = 'Igazolás';
-  img.style.width = '24px';
-  img.style.height = '24px';
-  
-  label.appendChild(img);
-  label.appendChild(document.createTextNode(' ' + LanguageManager.t('absences.justification')));
-  
-  const select = document.createElement('select');
-  select.id = 'justificationFilter';
-  select.className = 'filter-input';
-  
-  const options = [
-    { value: '', text: LanguageManager.t('absences.all_types') },
-    { value: 'justified', text: LanguageManager.t('absences.justified') },
-    { value: 'unjustified', text: LanguageManager.t('absences.unjustified') },
-    { value: 'pending', text: LanguageManager.t('absences.pending') }
-  ];
-  
-  options.forEach(optionData => {
-    const option = document.createElement('option');
-    option.value = optionData.value;
-    option.textContent = optionData.text;
-    select.appendChild(option);
-  });
-  
-  group.appendChild(label);
-  group.appendChild(select);
-  
-  return group;
-}
-
-function createStatsOverview(absences) {
-  const statsOverview = document.createElement('div');
-  statsOverview.className = 'stats-overview';
+  const statsGrid = document.createElement('div');
+  statsGrid.className = 'stats-grid';
   
   const stats = [
-    { number: absences.length, label: LanguageManager.t('absences.total_absences') },
-    { number: absences.filter(a => a.justificationStatus === 'justified').length, label: LanguageManager.t('absences.justified') },
-    { number: absences.filter(a => a.justificationStatus === 'unjustified').length, label: LanguageManager.t('absences.unjustified') },
-    { number: absences.filter(a => a.justificationStatus === 'pending').length, label: LanguageManager.t('absences.pending') }
+    { 
+      type: 'total',
+      number: absences.length, 
+      label: LanguageManager.t('absences.total_absences')
+    },
+    { 
+      type: 'justified',
+      number: absences.filter(a => a.justificationStatus === 'justified').length, 
+      label: LanguageManager.t('absences.justified')
+    },
+    { 
+      type: 'unjustified',
+      number: absences.filter(a => a.justificationStatus === 'unjustified').length, 
+      label: LanguageManager.t('absences.unjustified')
+    },
+    { 
+      type: 'pending',
+      number: absences.filter(a => a.justificationStatus === 'pending').length, 
+      label: LanguageManager.t('absences.pending')
+    }
   ];
   
   stats.forEach(stat => {
     const statCard = document.createElement('div');
-    statCard.className = 'stat-card';
+    statCard.className = `stat-card ${stat.type}`;
+    statCard.dataset.type = stat.type;
     
     const statNumber = document.createElement('div');
     statNumber.className = 'stat-number';
@@ -231,54 +228,179 @@ function createStatsOverview(absences) {
     
     statCard.appendChild(statNumber);
     statCard.appendChild(statLabel);
-    statsOverview.appendChild(statCard);
+    statsGrid.appendChild(statCard);
   });
   
-  return statsOverview;
+  statsSection.appendChild(statsGrid);
+  return statsSection;
 }
 
-function createAbsencesContainer(absences) {
-  const container = document.createElement('div');
-  container.className = 'absences-container';
+function createDayGroup(date, dayAbsences) {
+  const dayGroup = document.createElement('div');
+  dayGroup.className = 'day-group';
+  dayGroup.dataset.date = date;
   
-  const table = document.createElement('table');
-  table.className = 'absences-table';
   
-  const thead = document.createElement('thead');
-  thead.className = 'table-header';
+  const dayHeader = document.createElement('div');
+  dayHeader.className = 'day-header';
   
-  const headerRow = document.createElement('tr');
-  const headers = [
-    LanguageManager.t('absences.date'),
-    LanguageManager.t('absences.lesson'),
-    LanguageManager.t('absences.subject'),
-    LanguageManager.t('absences.topic'),
-    LanguageManager.t('absences.status')
-  ];
+  const dayDate = document.createElement('div');
+  dayDate.className = 'day-date';
   
-  headers.forEach(headerText => {
-    const th = document.createElement('th');
-    th.textContent = headerText;
-    headerRow.appendChild(th);
+  const calendarIcon = document.createElement('img');
+  calendarIcon.src = chrome.runtime.getURL('icons/Calendar.svg');
+  calendarIcon.alt = 'Dátum';
+  
+  const dateText = document.createElement('span');
+  dateText.textContent = formatDateWithDay(date);
+  
+  dayDate.appendChild(calendarIcon);
+  dayDate.appendChild(dateText);
+  
+  const dayCount = document.createElement('div');
+  dayCount.className = 'day-count';
+  dayCount.textContent = `${dayAbsences.length} ${LanguageManager.t('absences.hours')}`;
+  
+  dayHeader.appendChild(dayDate);
+  dayHeader.appendChild(dayCount);
+  
+  const dayAbsencesContainer = document.createElement('div');
+  dayAbsencesContainer.className = 'day-absences';
+  
+  dayAbsences.forEach(absence => {
+    const absenceCard = createAbsenceCard(absence);
+    dayAbsencesContainer.appendChild(absenceCard);
   });
   
-  thead.appendChild(headerRow);
+  dayGroup.appendChild(dayHeader);
+  dayGroup.appendChild(dayAbsencesContainer);
   
-  const tbody = document.createElement('tbody');
-  generateAbsencesRows(absences, tbody);
+  return dayGroup;
+}
+
+function formatDateWithDay(dateStr) {
+  const parts = dateStr.split('.');
+  const year = parseInt(parts[0]);
+  const month = parseInt(parts[1]) - 1;
+  const day = parseInt(parts[2]);
   
-  table.appendChild(thead);
-  table.appendChild(tbody);
-  container.appendChild(table);
+  const date = new Date(year, month, day);
+  const days = [
+    LanguageManager.t('common.sunday'),
+    LanguageManager.t('common.monday'),
+    LanguageManager.t('common.tuesday'),
+    LanguageManager.t('common.wednesday'),
+    LanguageManager.t('common.thursday'),
+    LanguageManager.t('common.friday'),
+    LanguageManager.t('common.saturday')
+  ];
   
-  return container;
+  const dayName = days[date.getDay()];
+  return `${dateStr} - ${dayName.charAt(0).toUpperCase() + dayName.slice(1)}`;
+}
+
+function createAbsenceCard(absence) {
+  const card = document.createElement('div');
+  card.className = 'absence-card';
+  card.dataset.subject = absence.subject;
+  card.dataset.status = absence.justificationStatus;
+  card.dataset.date = absence.date;
+
+  const lessonDiv = document.createElement('div');
+  lessonDiv.className = 'absence-lesson';
+  lessonDiv.textContent = absence.lesson + '.';
+
+  const subjectDiv = document.createElement('div');
+  subjectDiv.className = 'absence-subject';
+  subjectDiv.textContent = absence.subject;
+
+  const topicDiv = document.createElement('div');
+  topicDiv.className = 'absence-topic';
+  topicDiv.textContent = absence.topic || '-';
+  topicDiv.title = absence.topic;
+
+  const statusDiv = document.createElement('div');
+  statusDiv.className = 'absence-status';
+  
+  const statusBadge = document.createElement('span');
+  statusBadge.className = `status-badge ${absence.justificationStatus}`;
+  
+  if (absence.justificationStatus === 'justified') {
+    const img = document.createElement('img');
+    img.src = chrome.runtime.getURL('icons/BadgeCheck.svg');
+    img.alt = 'Igazolt';
+    statusBadge.appendChild(img);
+    statusBadge.appendChild(document.createTextNode(' ' + LanguageManager.t('absences.justified')));
+  } else if (absence.justificationStatus === 'unjustified') {
+    const span = document.createElement('span');
+    span.className = 'material-icons-round';
+    span.textContent = 'cancel';
+    statusBadge.appendChild(span);
+    statusBadge.appendChild(document.createTextNode(' ' + LanguageManager.t('absences.unjustified')));
+  } else {
+    const img = document.createElement('img');
+    img.src = chrome.runtime.getURL('icons/pending.svg');
+    img.alt = 'Függőben';
+    statusBadge.appendChild(img);
+    statusBadge.appendChild(document.createTextNode(' ' + LanguageManager.t('absences.pending')));
+  }
+  
+  statusDiv.appendChild(statusBadge);
+  
+  card.appendChild(lessonDiv);
+  card.appendChild(subjectDiv);
+  card.appendChild(topicDiv);
+  card.appendChild(statusDiv);
+  
+  return card;
+}
+
+function createAbsencesContent(groupedAbsences) {
+  const content = document.createElement('div');
+  content.className = 'absences-content';
+
+  const sortedDates = Object.keys(groupedAbsences).sort((a, b) => {
+    const dateA = new Date(a.replace(/\./g, '-').slice(0, -1));
+    const dateB = new Date(b.replace(/\./g, '-').slice(0, -1));
+    return dateB - dateA;
+  });
+  
+  if (sortedDates.length === 0) {
+    const emptyState = document.createElement('div');
+    emptyState.className = 'empty-state';
+    
+    const emptyIcon = document.createElement('img');
+    emptyIcon.src = chrome.runtime.getURL('icons/BadgeCheck.svg');
+    emptyIcon.alt = 'Nincs hiányzás';
+    
+    const emptyTitle = document.createElement('h3');
+    emptyTitle.textContent = LanguageManager.t('absences.title');
+    
+    const emptyText = document.createElement('p');
+    emptyText.textContent = LanguageManager.t('dashboard.not_supported');
+    
+    emptyState.appendChild(emptyIcon);
+    emptyState.appendChild(emptyTitle);
+    emptyState.appendChild(emptyText);
+    content.appendChild(emptyState);
+  } else {
+    sortedDates.forEach(date => {
+      const dayGroup = createDayGroup(date, groupedAbsences[date]);
+      content.appendChild(dayGroup);
+    });
+  }
+  
+  return content;
 }
 
 async function transformAbsencesPage() {
   const { basicData, absences, groupedAbsences } = await collectAbsencesData();
+  
   document.body.textContent = '';
+  
   const container = document.createElement('div');
   container.className = 'kreta-container';
+
   const headerDiv = document.createElement('div');
   const parser = new DOMParser();
   const doc = parser.parseFromString(await createTemplate.header(), 'text/html');
@@ -287,244 +409,60 @@ async function transformAbsencesPage() {
     headerDiv.appendChild(tempDiv.firstChild);
   }
   container.appendChild(headerDiv);
+  
   const main = document.createElement('main');
   main.className = 'kreta-main';
-  const filterCard = createFilterCard(absences);
-  main.appendChild(filterCard);
-  const statsOverview = createStatsOverview(absences);
-  main.appendChild(statsOverview);
-  const absencesContainer = createAbsencesContainer(absences);
-  main.appendChild(absencesContainer);
   
+  const pageGrid = document.createElement('div');
+  pageGrid.className = 'absences-page';
+  
+  const sidebar = document.createElement('div');
+  sidebar.className = 'absences-sidebar';
+  const filterCard = createFilterCard(absences);
+  sidebar.appendChild(filterCard);
+  
+  const statsSection = createStatsSection(absences);
+  sidebar.appendChild(statsSection);
+  
+  const absencesContent = createAbsencesContent(groupedAbsences);
+  
+  pageGrid.appendChild(sidebar);
+  pageGrid.appendChild(absencesContent);
+  
+  main.appendChild(pageGrid);
   container.appendChild(main);
   document.body.appendChild(container);
 
-  
   setupUserDropdown();
   setupMobileNavigation();
-
-  setupEventListeners();
-  setupFilters();
+  setupFilters(groupedAbsences);
 
   loadingScreen.hide();
 }
 
-function generateAbsencesRows(absences, tbody) {
-  const groupedByDate = absences.reduce((groups, absence) => {
-    const date = absence.date;
-    if (!groups[date]) {
-      groups[date] = [];
-    }
-    groups[date].push(absence);
-    return groups;
-  }, {});
-
-  const sortedDates = Object.keys(groupedByDate).sort(
-    (a, b) => new Date(b) - new Date(a),
-  );
-
-  sortedDates.forEach((date) => {
-    const dateAbsences = groupedByDate[date];
-    const divider = document.createElement('tr');
-    divider.className = 'date-group-divider';
-    divider.style.display = 'none';
-    tbody.appendChild(divider);
-
-    dateAbsences.forEach((absence) => {
-      const row = document.createElement('tr');
-      row.className = 'table-row';
-      row.dataset.subject = absence.subject;
-      row.dataset.justified = absence.justified;
-      row.dataset.date = absence.date;
-      row.dataset.dateGroup = date;
-
-      const dateCell = document.createElement('td');
-      dateCell.className = 'table-cell date-cell';
-      dateCell.dataset.label = LanguageManager.t('absences.date');
-      dateCell.textContent = absence.date;
-      row.appendChild(dateCell);
-
-      const lessonCell = document.createElement('td');
-      lessonCell.className = 'table-cell lesson-cell';
-      lessonCell.dataset.label = LanguageManager.t('absences.lesson');
-      lessonCell.textContent = absence.lesson + '.';
-      row.appendChild(lessonCell);
-
-      const subjectCell = document.createElement('td');
-      subjectCell.className = 'table-cell subject-cell';
-      subjectCell.dataset.label = LanguageManager.t('absences.subject');
-      subjectCell.textContent = absence.subject;
-      row.appendChild(subjectCell);
-
-      const topicCell = document.createElement('td');
-      topicCell.className = 'table-cell topic-cell';
-      topicCell.dataset.label = LanguageManager.t('absences.topic');
-      topicCell.title = absence.topic;
-      topicCell.textContent = absence.topic;
-      row.appendChild(topicCell);
-
-      const statusCell = document.createElement('td');
-      statusCell.className = 'table-cell status-cell';
-      statusCell.dataset.label = LanguageManager.t('absences.status');
-      
-      const statusBadge = document.createElement('span');
-      statusBadge.className = `status-badge ${absence.justificationStatus}`;
-      
-      if (absence.justificationStatus === 'justified') {
-        const img = document.createElement('img');
-        img.src = chrome.runtime.getURL('icons/BadgeCheck.svg');
-        img.alt = 'Igazolt';
-        img.style.width = '16px';
-        img.style.height = '16px';
-        statusBadge.appendChild(img);
-        statusBadge.appendChild(document.createTextNode(' ' + LanguageManager.t('absences.justified')));
-      } else if (absence.justificationStatus === 'unjustified') {
-        const span = document.createElement('span');
-        span.className = 'material-icons-round';
-        span.textContent = 'cancel';
-        statusBadge.appendChild(span);
-        statusBadge.appendChild(document.createTextNode(' ' + LanguageManager.t('absences.unjustified')));
-      } else {
-        const span = document.createElement('span');
-        span.className = 'material-icons-round';
-        span.textContent = 'pending';
-        statusBadge.appendChild(span);
-        statusBadge.appendChild(document.createTextNode(' ' + LanguageManager.t('absences.pending')));
-      }
-      
-      statusCell.appendChild(statusBadge);
-      row.appendChild(statusCell);
-      
-      tbody.appendChild(row);
-    });
-  });
-}
-
-function setupEventListeners() {
-  function setupMobileGrouping() {
-    if (window.innerWidth <= 480) {
-      createMobileGroups();
-    } else {
-      removeMobileGroups();
-    }
-  }
-
-  window.addEventListener("resize", setupMobileGrouping);
-
-  setupMobileGrouping();
-}
-
-function createMobileGroups() {
-  const tbody = document.querySelector(".absences-table tbody");
-  if (!tbody) return;
-
-  removeMobileGroups();
-
-  const rows = Array.from(tbody.querySelectorAll(".table-row"));
-  const groupedRows = {};
-
-  rows.forEach((row) => {
-    const date = row.dataset.date;
-    if (!groupedRows[date]) {
-      groupedRows[date] = [];
-    }
-    groupedRows[date].push(row);
-  });
-
-  const sortedDates = Object.keys(groupedRows).sort(
-    (a, b) => new Date(b) - new Date(a),
-  );
-
-  while (tbody.firstChild) {
-    tbody.removeChild(tbody.firstChild);
-  }
-
-  sortedDates.forEach((date) => {
-    const dateRows = groupedRows[date];
-
-    const dateGroup = document.createElement("div");
-    dateGroup.className = "date-group";
-
-    const dateHeader = document.createElement("div");
-    dateHeader.className = "date-group-header";
-    dateHeader.textContent = date;
-
-    const dateContent = document.createElement("div");
-    dateContent.className = "date-group-content";
-
-    dateRows.forEach((row) => {
-      dateContent.appendChild(row);
-    });
-
-    dateGroup.appendChild(dateHeader);
-    dateGroup.appendChild(dateContent);
-    tbody.appendChild(dateGroup);
-  });
-}
-
-function removeMobileGroups() {
-  const tbody = document.querySelector(".absences-table tbody");
-  if (!tbody) return;
-
-  const dateGroups = tbody.querySelectorAll(".date-group");
-  if (dateGroups.length === 0) return;
-
-  const allRows = [];
-  dateGroups.forEach((group) => {
-    const rows = group.querySelectorAll(".table-row");
-    rows.forEach((row) => allRows.push(row));
-  });
-
-  while (tbody.firstChild) {
-    tbody.removeChild(tbody.firstChild);
-  }
-  allRows.forEach((row) => tbody.appendChild(row));
-}
-
-function updateDateGroupsVisibility() {
-  if (window.innerWidth > 480) return;
-
-  const dateGroups = document.querySelectorAll(".date-group");
-
-  dateGroups.forEach((group) => {
-    const visibleRows = group.querySelectorAll(
-      '.table-row[style=""], .table-row:not([style])',
-    );
-
-    if (visibleRows.length > 0) {
-      group.style.display = "";
-    } else {
-      group.style.display = "none";
-    }
-  });
-}
-
-function setupFilters() {
+function setupFilters(originalGroupedAbsences) {
   try {
-    const filters = {
-      dateFilter: document.getElementById("dateFilter"),
-      subject: document.getElementById("subjectFilter"),
-      justified: document.getElementById("justificationFilter"),
-    };
+    const dateFilter = document.getElementById("dateFilter");
+    const subjectFilter = document.getElementById("subjectFilter");
+    const justificationFilter = document.getElementById("justificationFilter");
 
-    if (!filters.dateFilter || !filters.subject || !filters.justified) {
+    if (!dateFilter || !subjectFilter || !justificationFilter) {
       console.warn("Some filter elements were not found in the DOM");
       return;
     }
 
     const filterAbsences = () => {
       try {
-        const dateFilterValue = filters.dateFilter.value;
-        const subject = filters.subject.value;
-        const justified = filters.justified.value;
+        const dateFilterValue = dateFilter.value;
+        const subject = subjectFilter.value;
+        const justified = justificationFilter.value;
         const selectedDate = dateFilterValue ? new Date(dateFilterValue) : null;
 
-        document.querySelectorAll(".table-row").forEach((row) => {
-          const dateStr = row.dataset.date;
+        document.querySelectorAll(".absence-card").forEach((card) => {
+          const dateStr = card.dataset.date;
           const dateParts = dateStr.split(".");
 
           if (dateParts.length < 3) {
-            console.error(`Invalid date format: ${dateStr}`);
             return;
           }
 
@@ -532,100 +470,101 @@ function setupFilters() {
           const parsedMonth = parseInt(dateParts[1].trim(), 10) - 1;
           const parsedDay = parseInt(dateParts[2].trim(), 10);
 
-          if (isNaN(parsedDay) || isNaN(parsedMonth) || isNaN(parsedYear)) {
-            console.error(`Invalid date components: ${dateStr}`);
-            return;
-          }
+          const cardDate = new Date(parsedYear, parsedMonth, parsedDay);
 
-          const rowDate = new Date(parsedYear, parsedMonth, parsedDay);
-
-          let showRow = true;
+          let showCard = true;
 
           if (selectedDate) {
             if (
-              rowDate.getFullYear() !== selectedDate.getFullYear() ||
-              rowDate.getMonth() !== selectedDate.getMonth() ||
-              rowDate.getDate() !== selectedDate.getDate()
+              cardDate.getFullYear() !== selectedDate.getFullYear() ||
+              cardDate.getMonth() !== selectedDate.getMonth() ||
+              cardDate.getDate() !== selectedDate.getDate()
             ) {
-              showRow = false;
+              showCard = false;
             }
           }
 
-          if (subject && row.dataset.subject !== subject) {
-            showRow = false;
+          if (subject && card.dataset.subject !== subject) {
+            showCard = false;
           }
 
-          if (justified) {
-            const statusElement = row.querySelector(".status-badge");
-            const hasStatus = statusElement.classList.contains(justified);
-            if (!hasStatus) showRow = false;
+          if (justified && card.dataset.status !== justified) {
+            showCard = false;
           }
 
-          row.style.display = showRow ? "" : "none";
+          card.style.display = showCard ? "" : "none";
         });
 
-        updateDateGroupsVisibility();
+        updateDayGroupsVisibility();
+
         updateStatistics();
       } catch (err) {
         console.error("Error during filtering absences:", err);
       }
     };
 
-    Object.values(filters).forEach((filter) => {
-      try {
-        if (filter) {
-          filter.addEventListener("change", filterAbsences);
-        }
-      } catch (err) {
-        if (
-          err.message &&
-          err.message.includes("Extension context invalidated")
-        ) {
-          console.warn(
-            "Extension context invalidated during event listener setup",
-          );
-        } else {
-          console.error("Error setting up filter event listener:", err);
-        }
+    [dateFilter, subjectFilter, justificationFilter].forEach((filter) => {
+      if (filter) {
+        filter.addEventListener("change", filterAbsences);
       }
     });
 
-    filterAbsences();
   } catch (err) {
-    if (err.message && err.message.includes("Extension context invalidated")) {
-      console.warn("Extension context invalidated during filter setup");
-    } else {
-      console.error("Error setting up filters:", err);
-    }
+    console.error("Error setting up filters:", err);
   }
+}
+
+function updateDayGroupsVisibility() {
+  document.querySelectorAll(".day-group").forEach((group) => {
+    const visibleCards = group.querySelectorAll('.absence-card:not([style*="display: none"])');
+    const dayCount = group.querySelector('.day-count');
+    
+    if (visibleCards.length > 0) {
+      group.style.display = "";
+      if (dayCount) {
+        dayCount.textContent = `${visibleCards.length} ${LanguageManager.t('absences.hours')}`;
+      }
+    } else {
+      group.style.display = "none";
+    }
+  });
 }
 
 function updateStatistics() {
   try {
-    const visibleRows = document.querySelectorAll(
-      '.table-row:not([style*="display: none"])',
-    );
-    const totalVisible = visibleRows.length;
-    const justifiedVisible = Array.from(visibleRows).filter((row) =>
-      row.querySelector(".status-badge.justified"),
+    const visibleCards = document.querySelectorAll('.absence-card:not([style*="display: none"])');
+    const totalVisible = visibleCards.length;
+    const justifiedVisible = Array.from(visibleCards).filter(
+      card => card.dataset.status === 'justified'
     ).length;
-    const unjustifiedVisible = Array.from(visibleRows).filter((row) =>
-      row.querySelector(".status-badge.unjustified"),
+    const unjustifiedVisible = Array.from(visibleCards).filter(
+      card => card.dataset.status === 'unjustified'
     ).length;
-    const pendingVisible = Array.from(visibleRows).filter((row) =>
-      row.querySelector(".status-badge.pending"),
+    const pendingVisible = Array.from(visibleCards).filter(
+      card => card.dataset.status === 'pending'
     ).length;
 
     const statCards = document.querySelectorAll(".stat-card");
-    if (statCards[0])
-      statCards[0].querySelector(".stat-number").textContent = totalVisible;
-    if (statCards[1])
-      statCards[1].querySelector(".stat-number").textContent = justifiedVisible;
-    if (statCards[2])
-      statCards[2].querySelector(".stat-number").textContent =
-        unjustifiedVisible;
-    if (statCards[3])
-      statCards[3].querySelector(".stat-number").textContent = pendingVisible;
+    statCards.forEach(card => {
+      const type = card.dataset.type;
+      const numberEl = card.querySelector('.stat-number');
+      if (numberEl) {
+        switch(type) {
+          case 'total':
+            numberEl.textContent = totalVisible;
+            break;
+          case 'justified':
+            numberEl.textContent = justifiedVisible;
+            break;
+          case 'unjustified':
+            numberEl.textContent = unjustifiedVisible;
+            break;
+          case 'pending':
+            numberEl.textContent = pendingVisible;
+            break;
+        }
+      }
+    });
   } catch (err) {
     console.error("Error updating statistics:", err);
   }
