@@ -13,6 +13,7 @@
   --accent-secondary:#6E8F1B;
   --accent-shadow:#647e2226;
   --accent-15:#a7dc2226;
+  --icon-filter:brightness(0) saturate(100%) invert(76%) sepia(65%) saturate(482%) hue-rotate(35deg) brightness(98%) contrast(89%);
   --warning-accent:var(--grades-2);
   --warning-text:#8F531B;
   --warning-15:#ffa04626;
@@ -47,6 +48,7 @@
   --accent-secondary:#6E8F1B;
   --accent-shadow:#647e2226;
   --accent-15:#a7dc2226;
+  --icon-filter:brightness(0) saturate(100%) invert(76%) sepia(65%) saturate(482%) hue-rotate(35deg) brightness(98%) contrast(89%);
   --warning-accent:var(--grades-2);
   --warning-text:#8F531B;
   --warning-15:#ffa04626;
@@ -81,6 +83,7 @@
   --accent-secondary:#CBEE71;
   --accent-shadow:#0000;
   --accent-15:#a7dc2226;
+  --icon-filter:brightness(0) saturate(100%) invert(76%) sepia(65%) saturate(482%) hue-rotate(35deg) brightness(98%) contrast(89%);
   --warning-accent:var(--grades-2);
   --warning-text:#f0b37a;
   --warning-15:#ffa04626;
@@ -126,4 +129,42 @@ body {
 }
 ::-webkit-scrollbar-thumb:hover {
   background:var(--text-primary);
+}
+
+/* SVG ikonok színezése a kiemelő színnel */
+.icon-accent,
+svg.icon-accent,
+img.icon-accent {
+  filter: var(--icon-filter);
+}
+
+/* Minden SVG-re alkalmazható osztály */
+.themed-icon {
+  filter: var(--icon-filter);
+  transition: filter 0.2s ease;
+}
+
+/* Automatikus ikon színezés - minden icons/ mappából származó kép */
+img[src*="icons/"],
+img[src*="icons%2F"],
+img[src$=".svg"] {
+  filter: var(--icon-filter);
+  transition: filter 0.2s ease;
+}
+
+/* Warning színű ikonok (narancssárga) */
+img[src*="icons/dkt.svg"],
+img[src*="icons%2Fdkt.svg"],
+img[src*="icons/assigment.svg"],
+img[src*="icons%2Fassigment.svg"],
+img[src$="dkt.svg"],
+img[src$="assigment.svg"] {
+  filter: brightness(0) saturate(100%) invert(67%) sepia(44%) saturate(1057%) hue-rotate(349deg) brightness(101%) contrast(101%) !important;
+}
+
+/* Error színű ikonok (piros/rózsaszín) */
+img[src*="icons/logout.svg"],
+img[src*="icons%2Flogout.svg"],
+img[src$="logout.svg"] {
+  filter: brightness(0) saturate(100%) invert(52%) sepia(75%) saturate(1637%) hue-rotate(306deg) brightness(101%) contrast(101%) !important;
 }

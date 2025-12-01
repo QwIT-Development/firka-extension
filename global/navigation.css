@@ -84,6 +84,7 @@
 .nav-item img,.nav-item svg {
   width:24px;
   height:24px;
+  filter: var(--icon-filter);
 }
 .nav-item.active svg path {
   fill:var(--accent-accent);

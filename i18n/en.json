@@ -19,6 +19,29 @@
       "dark_lime": "Dark Lime",
       "dark_indigo": "Dark Indigo"
     },
+    "custom_themes": {
+      "title": "Custom themes",
+      "no_themes": "No custom themes yet",
+      "create": "Create new theme",
+      "edit": "Edit theme",
+      "name": "Theme name",
+      "mode": "Mode",
+      "dark_mode": "Dark",
+      "light_mode": "Light",
+      "colors": "Colors",
+      "accent_color": "Accent color",
+      "background_color": "Background color",
+      "card_color": "Card color",
+      "text_color": "Text color",
+      "preview": "Preview",
+      "share": "Share theme",
+      "share_description": "Copy the code and share it with others:",
+      "import": "Import theme",
+      "import_description": "Paste the theme code:",
+      "import_error_empty": "Please paste the theme code!",
+      "import_error_invalid": "Invalid theme code!",
+      "delete_confirm": "Are you sure you want to delete this theme?"
+    },
     "languages": {
       "hu": "Magyar",
       "en": "English"

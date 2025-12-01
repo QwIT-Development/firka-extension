@@ -21,6 +21,29 @@
       "dark_lime": "Sötét Lime",
       "dark_indigo": "Sötét Indigó"
     },
+    "custom_themes": {
+      "title": "Egyéni témák",
+      "no_themes": "Még nincsenek egyéni témák",
+      "create": "Új téma létrehozása",
+      "edit": "Téma szerkesztése",
+      "name": "Téma neve",
+      "mode": "Mód",
+      "dark_mode": "Sötét",
+      "light_mode": "Világos",
+      "colors": "Színek",
+      "accent_color": "Kiemelő szín",
+      "background_color": "Háttér szín",
+      "card_color": "Kártya szín",
+      "text_color": "Szöveg szín",
+      "preview": "Előnézet",
+      "share": "Téma megosztása",
+      "share_description": "Másold ki a kódot és oszd meg másokkal:",
+      "import": "Téma importálása",
+      "import_description": "Illeszd be a téma kódot:",
+      "import_error_empty": "Kérlek illeszd be a téma kódot!",
+      "import_error_invalid": "Érvénytelen téma kód!",
+      "delete_confirm": "Biztosan törölni szeretnéd ezt a témát?"
+    },
     "languages": {
       "hu": "Magyar",
       "en": "English"

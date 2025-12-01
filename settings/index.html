@@ -51,6 +51,17 @@
               <span class="theme-name" data-i18n="settings.themes.dark_green">Sötét Zöld</span>
             </button>
           </div>
+          
+          <div class="custom-themes-section">
+            <div class="custom-themes-header">
+              <span data-i18n="settings.custom_themes.title">Egyéni témák</span>
+              <button class="add-theme-btn" id="addCustomTheme">
+                <span class="material-icons-round">add</span>
+              </button>
+            </div>
+            <div class="theme-grid custom-themes-grid" id="customThemesGrid">
+            </div>
+          </div>
         </div>
         <div class="setting-section">
           <div class="setting-header">
@@ -107,6 +118,123 @@
       <div class="version-info" id="version">v1.3.0</div>
     </footer>
   </div>
+
+  <div class="modal-overlay" id="themeEditorModal">
+    <div class="modal-content theme-editor-modal">
+      <div class="modal-header">
+        <h3 id="themeEditorTitle" data-i18n="settings.custom_themes.create">Új téma létrehozása</h3>
+        <button class="modal-close" id="closeThemeEditor">
+          <span class="material-icons-round">close</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="theme-form">
+          <div class="form-group">
+            <label for="themeName" data-i18n="settings.custom_themes.name">Téma neve</label>
+            <input type="text" id="themeName" placeholder="Pl. Kék éjszaka">
+          </div>
+          
+          <div class="form-group">
+            <label data-i18n="settings.custom_themes.mode">Mód</label>
+            <div class="mode-selector">
+              <button class="mode-option active" data-mode="dark">
+                <span class="material-icons-round">dark_mode</span>
+                <span data-i18n="settings.custom_themes.dark_mode">Sötét</span>
+              </button>
+              <button class="mode-option" data-mode="light">
+                <span class="material-icons-round">light_mode</span>
+                <span data-i18n="settings.custom_themes.light_mode">Világos</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="color-section">
+            <h4 data-i18n="settings.custom_themes.colors">Színek</h4>
+            
+            <div class="color-group">
+              <label data-i18n="settings.custom_themes.accent_color">Kiemelő szín</label>
+              <div class="color-input-wrapper">
+                <input type="color" id="accentColor" value="#A7DC22">
+                <input type="text" class="color-hex" id="accentColorHex" value="#A7DC22">
+              </div>
+            </div>
+
+            <div class="color-group">
+              <label data-i18n="settings.custom_themes.background_color">Háttér szín</label>
+              <div class="color-input-wrapper">
+                <input type="color" id="backgroundColor" value="#0D1202">
+                <input type="text" class="color-hex" id="backgroundColorHex" value="#0D1202">
+              </div>
+            </div>
+
+            <div class="color-group">
+              <label data-i18n="settings.custom_themes.card_color">Kártya szín</label>
+              <div class="color-input-wrapper">
+                <input type="color" id="cardColor" value="#141905">
+                <input type="text" class="color-hex" id="cardColorHex" value="#141905">
+              </div>
+            </div>
+
+            <div class="color-group">
+              <label data-i18n="settings.custom_themes.text_color">Szöveg szín</label>
+              <div class="color-input-wrapper">
+                <input type="color" id="textColor" value="#EAF7CC">
+                <input type="text" class="color-hex" id="textColorHex" value="#EAF7CC">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" id="cancelThemeEditor" data-i18n="common.cancel">Mégse</button>
+        <button class="btn-primary" id="saveTheme" data-i18n="common.save">Mentés</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="shareThemeModal">
+    <div class="modal-content share-modal">
+      <div class="modal-header">
+        <h3 data-i18n="settings.custom_themes.share">Téma megosztása</h3>
+        <button class="modal-close" id="closeShareModal">
+          <span class="material-icons-round">close</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p data-i18n="settings.custom_themes.share_description">Másold ki a kódot és oszd meg másokkal:</p>
+        <div class="share-code-wrapper">
+          <textarea id="shareCode" readonly></textarea>
+          <button class="copy-btn" id="copyShareCode">
+            <span class="material-icons-round">content_copy</span>
+          </button>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-primary" id="closeShareModalBtn" data-i18n="common.close">Bezárás</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="importThemeModal">
+    <div class="modal-content import-modal">
+      <div class="modal-header">
+        <h3 data-i18n="settings.custom_themes.import">Téma importálása</h3>
+        <button class="modal-close" id="closeImportModal">
+          <span class="material-icons-round">close</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p data-i18n="settings.custom_themes.import_description">Illeszd be a téma kódot:</p>
+        <textarea id="importCode" placeholder="Illessze be a téma kódot ide..."></textarea>
+        <p class="error-message" id="importError"></p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" id="cancelImport" data-i18n="common.cancel">Mégse</button>
+        <button class="btn-primary" id="confirmImport" data-i18n="settings.custom_themes.import">Importálás</button>
+      </div>
+    </div>
+  </div>
+
   <script src="../tools/storageManager.js"></script>
     <script src="../global/language.js"></script>
     <script src="index.js"></script>

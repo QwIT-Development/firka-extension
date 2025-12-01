@@ -136,7 +136,7 @@ body {
   height:20px;
   opacity:0.6;
   transition:opacity 0.2s ease;
-  filter:invert(var(--icon-invert)) sepia(var(--icon-sepia)) saturate(var(--icon-saturate)) hue-rotate(var(--icon-hue-rotate)) brightness(var(--icon-brightness));
+  filter: var(--icon-filter);
 }
 .show-password:hover .icon-eye {
   opacity:1;
