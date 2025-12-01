@@ -523,7 +523,7 @@ h2 {
 }
 
 .theme-form input[type="text"] {
-  width: 100%;
+  width: 150px;
   padding: 10px 12px;
   border: 1px solid var(--border-border, var(--text-teritary));
   border-radius: 8px;
@@ -587,12 +587,15 @@ h2 {
   align-items: center;
   justify-content: space-between;
   margin-bottom: 12px;
+  gap: 12px;
 }
 
 .color-group label {
-  font-size: 13px;
+  font-size: 12px;
   color: var(--text-secondary);
   margin: 0;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .color-input-wrapper {
@@ -602,13 +605,15 @@ h2 {
 }
 
 .color-input-wrapper input[type="color"] {
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   border: none;
   border-radius: 6px;
   cursor: pointer;
   padding: 0;
   background: transparent;
+  flex-shrink: 0;
+  border: 1px solid var(--border-border, var(--text-teritary));
 }
 
 .color-input-wrapper input[type="color"]::-webkit-color-swatch-wrapper {
@@ -621,15 +626,16 @@ h2 {
 }
 
 .color-hex {
-  width: 80px;
+  width: 72px;
   padding: 6px 8px;
   border: 1px solid var(--border-border, var(--text-teritary));
   border-radius: 6px;
   background: var(--button-secondaryFill);
   color: var(--text-primary);
-  font-size: 12px;
+  font-size: 11px;
   font-family: monospace;
   text-transform: uppercase;
+  flex-shrink: 0;
 }
 
 .theme-preview-section {
