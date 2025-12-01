@@ -32,33 +32,6 @@
       "title": "Support",
       "description": "If you like our work and would like to support the development, you can do so in the following way:",
       "kofi": "Ko-Fi"
-    },
-    "custom_theme": {
-      "title": "Custom Theme",
-      "create": "Create New Theme",
-      "import": "Import Theme",
-      "editor_title": "Theme Editor",
-      "import_title": "Import Theme",
-      "name": "Theme name",
-      "background": "Background",
-      "text": "Text",
-      "accent": "Accent colors",
-      "main_background": "Main background",
-      "card_background": "Card background",
-      "primary_text": "Primary text",
-      "secondary_text": "Secondary text",
-      "primary_accent": "Primary accent",
-      "secondary_accent": "Secondary accent",
-      "preview": "Preview",
-      "save": "Save",
-      "cancel": "Cancel",
-      "import_string": "Theme ID",
-      "apply": "Apply",
-      "edit": "Edit",
-      "export": "Export",
-      "delete": "Delete",
-      "no_themes": "No custom themes yet",
-      "delete_confirm": "Are you sure you want to delete the \"{name}\" theme?"
     }
   },
   "navigation": {
