@@ -503,6 +503,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("cancelThemeEditor")?.addEventListener("click", closeThemeEditor);
   document.getElementById("saveTheme")?.addEventListener("click", saveThemeFromEditor);
   
+  document.getElementById("importCustomTheme")?.addEventListener("click", () => {
+    document.getElementById("importThemeModal").classList.add("active");
+  });
+  
   document.querySelectorAll(".mode-option").forEach(btn => {
     btn.addEventListener("click", () => {
       document.querySelectorAll(".mode-option").forEach(b => b.classList.remove("active"));
@@ -549,16 +553,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("closeShareModal")?.addEventListener("click", closeShareModal);
   document.getElementById("closeShareModalBtn")?.addEventListener("click", closeShareModal);
   document.getElementById("copyShareCode")?.addEventListener("click", copyShareCode);
-
-  let pressTimer;
-  const addBtn = document.getElementById("addCustomTheme");
-  addBtn?.addEventListener("mousedown", () => {
-    pressTimer = setTimeout(() => {
-      document.getElementById("importThemeModal").classList.add("active");
-    }, 500);
-  });
-  addBtn?.addEventListener("mouseup", () => clearTimeout(pressTimer));
-  addBtn?.addEventListener("mouseleave", () => clearTimeout(pressTimer));
 
   document.getElementById("closeImportModal")?.addEventListener("click", closeImportModal);
   document.getElementById("cancelImport")?.addEventListener("click", closeImportModal);

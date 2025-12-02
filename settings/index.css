@@ -248,8 +248,6 @@ h2 {
 
 .custom-themes-section {
   margin-top: 16px;
-  padding-top: 16px;
-  border-top: 1px solid var(--border-border, var(--text-teritary));
 }
 
 .custom-themes-header {
@@ -262,7 +260,13 @@ h2 {
   color: var(--text-primary);
 }
 
-.add-theme-btn {
+.custom-themes-buttons {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.theme-btn {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -276,7 +280,7 @@ h2 {
   transition: all 0.2s ease;
 }
 
-.add-theme-btn:hover {
+.theme-btn:hover {
   background: var(--accent-accent);
   color: var(--button-secondaryFill);
 }

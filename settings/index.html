@@ -55,9 +55,14 @@
           <div class="custom-themes-section">
             <div class="custom-themes-header">
               <span data-i18n="settings.custom_themes.title">Egyéni témák</span>
-              <button class="add-theme-btn" id="addCustomTheme">
-                <span class="material-icons-round">add</span>
-              </button>
+              <div class="custom-themes-buttons">
+                <button class="theme-btn" id="addCustomTheme" title="Új téma">
+                  <span class="material-icons-round">add</span>
+                </button>
+                <button class="theme-btn" id="importCustomTheme" title="Téma importálása">
+                  <span class="material-icons-round">download</span>
+                </button>
+              </div>
             </div>
             <div class="theme-grid custom-themes-grid" id="customThemesGrid">
             </div>
@@ -225,7 +230,7 @@
       </div>
       <div class="modal-body">
         <p data-i18n="settings.custom_themes.import_description">Illeszd be a téma kódot:</p>
-        <textarea id="importCode" placeholder="Illessze be a téma kódot ide..."></textarea>
+        <textarea id="importCode" placeholder="Illeszd be a téma kódját ide..."></textarea>
         <p class="error-message" id="importError"></p>
       </div>
       <div class="modal-footer">

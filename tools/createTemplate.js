@@ -41,7 +41,6 @@ const createTemplate = {
     const userAvatarSvg = `<svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>`;
 
     const element = `
-      <!-- Desktop Header -->
       <header class="kreta-header">
         <div class="school-info">
           <p class="logo-text">
@@ -86,7 +85,6 @@ const createTemplate = {
         </div>
       </header>
 
-      <!-- Mobile Header (Top) -->
       <header class="mobile-header">
         <div class="school-info">
           <p class="logo-text">
@@ -99,7 +97,6 @@ const createTemplate = {
         </div>
       </header>
 
-      <!-- Mobile Bottom Navigation -->
       <nav class="mobile-bottom-nav">
         ${mobileNavItems}
         <button class="mobile-user-btn" id="mobileUserBtn">
@@ -110,7 +107,6 @@ const createTemplate = {
         </button>
       </nav>
 
-      <!-- Mobile User Dropdown -->
       <div class="mobile-user-dropdown" id="mobileUserDropdown">
         <div class="mobile-dropdown-header">
           <span class="user-name">${data.userData.name}</span>
