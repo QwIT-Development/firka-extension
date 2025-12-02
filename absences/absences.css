@@ -147,22 +147,6 @@ body {
   transform: translateY(-2px);
 }
 
-.stat-card.total {
-  border-left: 4px solid var(--accent-accent);
-}
-
-.stat-card.justified {
-  border-left: 4px solid var(--grades-4);
-}
-
-.stat-card.unjustified {
-  border-left: 4px solid var(--grades-1);
-}
-
-.stat-card.pending {
-  border-left: 4px solid var(--grades-3);
-}
-
 .stat-icon {
   width: 24px;
   height: 24px;
