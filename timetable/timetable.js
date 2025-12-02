@@ -1982,8 +1982,10 @@
 
       dayNavigationState.currentDayIndex = currentDayIndex;
     } else {
-      const preservedDayIndex = dayNavigationState.currentDayIndex;
-      dayNavigationState.currentDayIndex = preservedDayIndex;
+      if (dayNavigationState.currentDayIndex >= 0 && dayNavigationState.currentDayIndex < 5) {
+      } else {
+        dayNavigationState.currentDayIndex = 0;
+      }
     }
 
     function updateDayDisplay() {
@@ -2643,6 +2645,7 @@
         timetableContainer.appendChild(tempDiv.firstChild);
       }
       setupLessonCardListeners();
+      setupDayNavigation(weekDates);
       
       setTimeout(async () => {
         await updateHomeworkIconsFromCookie();

@@ -128,16 +128,23 @@ body {
     padding: 10px 12px;
     max-width: 100%;
   }
-  .bulk-actions-left,
+  .bulk-actions-left {
+    justify-content: space-between;
+    flex-wrap: nowrap;
+    gap: 6px;
+    order: 1;
+  }
   .bulk-actions-right {
-    justify-content: center;
+    justify-content: space-between;
     flex-wrap: wrap;
     gap: 6px;
+    order: 2;
   }
   .bulk-btn,
   .view-toggle button {
     width: 32px;
     height: 32px;
+    flex: 1;
   }
   .bulk-btn img,
   .view-toggle button img {
@@ -151,11 +158,18 @@ body {
   .view-toggle button {
     width: 28px;
     height: 28px;
+    flex: 1;
   }
   .bulk-btn img,
   .view-toggle button img {
     width: 16px;
     height: 16px;
+  }
+  .bulk-actions-left {
+    order: 1;
+  }
+  .bulk-actions-right {
+    order: 2;
   }
 }
 
