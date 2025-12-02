@@ -711,19 +711,21 @@
     const lessonDetails = document.createElement('div');
     lessonDetails.className = 'lesson-details';
 
-    const teacherItem = document.createElement('div');
-    teacherItem.className = 'detail-item';
-    const teacherLabel = document.createElement('span');
-    teacherLabel.className = 'detail-label';
-    teacherLabel.textContent = LanguageManager.t('timetable.teacher_label');
-    const teacherValue = document.createElement('span');
-    teacherValue.className = `detail-value ${lesson.originalTeacher != '' ? 'line-through' : ''}`;
-    teacherValue.textContent = lesson.originalTeacher != '' ? lesson.originalTeacher : lesson.teacher;
-    teacherItem.appendChild(teacherLabel);
-    teacherItem.appendChild(teacherValue);
-    lessonDetails.appendChild(teacherItem);
+    if (!lesson.isSubstituted) {
+      const teacherItem = document.createElement('div');
+      teacherItem.className = 'detail-item';
+      const teacherLabel = document.createElement('span');
+      teacherLabel.className = 'detail-label';
+      teacherLabel.textContent = LanguageManager.t('timetable.teacher_label');
+      const teacherValue = document.createElement('span');
+      teacherValue.className = 'detail-value';
+      teacherValue.textContent = lesson.teacher;
+      teacherItem.appendChild(teacherLabel);
+      teacherItem.appendChild(teacherValue);
+      lessonDetails.appendChild(teacherItem);
+    }
     
-    if (lesson.originalTeacher != '') {
+    if (lesson.isSubstituted) {
       const substituteItem = document.createElement('div');
       substituteItem.className = 'detail-item';
       const substituteLabel = document.createElement('span');
@@ -1700,7 +1702,7 @@
       const timetableGrid = document.querySelector(".timetable-grid");
       if (timetableGrid) {
     
-        const newContent = await generateTimeGrid(lessons, weekDates);
+        const newContent = await generateTimeGrid(allLessons, weekDates);
         timetableGrid.innerHTML = '';
     
         const parser1 = new DOMParser();
