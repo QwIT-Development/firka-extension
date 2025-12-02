@@ -162,7 +162,7 @@
       modalContent.innerHTML = `
         <div class="modal-header">
           <h2>Üzenet részletei</h2>
-          <button class="modal-close" onclick="closeMessageModal()">×</button>
+          <button class="modal-close">×</button>
         </div>
         <div class="modal-body">
           <div class="loading-content">
@@ -173,6 +173,9 @@
       `;
       modalOverlay.appendChild(modalContent);
       document.body.appendChild(modalOverlay);
+      
+      const closeBtn = modalContent.querySelector('.modal-close');
+      closeBtn.addEventListener('click', closeMessageModal);
 
       if (!isRead) {
         try {
