@@ -431,8 +431,8 @@ body {
   flex-direction:column;
   align-items:center;
   justify-content:center;
-  width:60px;
-  height:50px;
+  width:40px;
+  height:40px;
   border:2px solid var(--button-secondaryFill);
   border-radius:8px;
   background:var(--button-secondaryFill);
@@ -513,7 +513,7 @@ body {
 .week-modal-content {
   background:var(--card-card);
   border-radius:16px;
-  max-width:1000px;
+  max-width:700px;
   max-height:70vh;
   width:100%;
   overflow:hidden;
@@ -531,12 +531,11 @@ body {
   grid-template-columns:repeat(13,1fr);
   gap:8px;
   padding:20px;
-  max-height:calc(70vh - 80px);
   overflow-y:auto;
 }
 .modal-week-cell {
-  width:40px;
-  height:40px;
+  width:60px;
+  height:60px;
   font-size:12px;
 }
 @media (max-width:768px) {
@@ -583,29 +582,26 @@ body {
 }
 .week-modal-grid {
   display:grid;
-  grid-template-columns:repeat(13,1fr);
-  gap:8px;
+  grid-template-columns:repeat(auto-fill, 60px);
+  gap:4px;
   padding:24px;
   max-height:70vh;
   overflow-y:auto;
+  justify-content:center;
 }
 .week-modal-grid .week-cell {
   width:60px;
-  height:50px;
+  height:60px;
   font-size:14px;
 }
-@media (max-width:1200px) {
+@media (max-width:768px) {
   .week-modal-grid {
-  grid-template-columns:repeat(10,1fr);
-}
-}@media (max-width:768px) {
-  .week-modal-grid {
-  grid-template-columns:repeat(7,1fr);
-  gap:6px;
+  grid-template-columns:repeat(auto-fill, 40px);
+  gap:4px;
 }
 .week-modal-grid .week-cell {
-  width:50px;
-  height:45px;
+  width:40px;
+  height:40px;
   font-size:12px;
 }
 .week-modal-content {
@@ -615,7 +611,7 @@ body {
   padding:16px 20px;
 }
 .week-modal-grid {
-  padding:20px;
+  padding:16px;
 }
 }@media (max-width:768px) {
   .week-grid {
