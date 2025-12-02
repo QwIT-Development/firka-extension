@@ -219,6 +219,7 @@ to {
 }
 }@media (max-width:900px) {
   .role-grid {
+  gap:0.5rem;
   grid-template-columns:1fr;
 }
 .side-roles {
