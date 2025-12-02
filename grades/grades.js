@@ -532,6 +532,9 @@
     if (!ctx) return;
 
     const gradePoints = calculateGradePoints(subjects);
+    const accentColor = getComputedStyle(document.documentElement)
+      .getPropertyValue("--accent-accent")
+      .trim();
 
     new Chart(ctx, {
       type: "line",
@@ -542,28 +545,8 @@
             label: "Átlag",
             data: gradePoints.map((p) => p.average),
             borderWidth: 5,
+            borderColor: accentColor,
             tension: 0.5,
-            segment: {
-              borderColor: (ctx) => {
-                const curr = ctx.p1.parsed.y;
-                if (!curr) return "transparent";
-                const color =
-                  getComputedStyle(document.documentElement)
-                    .getPropertyValue(
-                      curr < 2
-                        ? "--grades-1"
-                        : curr < 2.5
-                          ? "--grades-2"
-                          : curr < 3.5
-                            ? "--grades-3"
-                            : curr < 4.5
-                              ? "--grades-4"
-                              : "--grades-5",
-                    )
-                    .trim() + "80";
-                return color;
-              },
-            },
             fill: true,
             backgroundColor: function (context) {
               const chart = context.chart;
@@ -577,55 +560,12 @@
                 chartArea.top,
               );
 
-              gradientBg.addColorStop(
-                0,
-                getComputedStyle(document.documentElement)
-                  .getPropertyValue("--grades-1")
-                  .trim() + "30",
-              );
-              gradientBg.addColorStop(
-                0.2,
-                getComputedStyle(document.documentElement)
-                  .getPropertyValue("--grades-2")
-                  .trim() + "30",
-              );
-              gradientBg.addColorStop(
-                0.4,
-                getComputedStyle(document.documentElement)
-                  .getPropertyValue("--grades-3")
-                  .trim() + "30",
-              );
-              gradientBg.addColorStop(
-                0.6,
-                getComputedStyle(document.documentElement)
-                  .getPropertyValue("--grades-4")
-                  .trim() + "30",
-              );
-              gradientBg.addColorStop(
-                0.8,
-                getComputedStyle(document.documentElement)
-                  .getPropertyValue("--grades-5")
-                  .trim() + "30",
-              );
+              gradientBg.addColorStop(0, accentColor + "30");
+              gradientBg.addColorStop(1, accentColor + "10");
 
               return gradientBg;
             },
-            pointBackgroundColor: (context) => {
-              const value = context.raw;
-              return getComputedStyle(document.documentElement)
-                .getPropertyValue(
-                  value < 2
-                    ? "--grades-1"
-                    : value < 2.5
-                      ? "--grades-2"
-                      : value < 3.5
-                        ? "--grades-3"
-                        : value < 4.5
-                          ? "--grades-4"
-                          : "--grades-5",
-                )
-                .trim();
-            },
+            pointBackgroundColor: accentColor,
             pointRadius: 0,
             pointHoverRadius: 0,
           },
@@ -640,15 +580,10 @@
             max: 5,
             ticks: {
               stepSize: 1,
-              color: getComputedStyle(
-                document.documentElement,
-              ).getPropertyValue("--text-secondary"),
+              color: accentColor,
             },
             grid: {
-              color:
-                getComputedStyle(document.documentElement).getPropertyValue(
-                  "--text-teritary",
-                ) + "20",
+              color: accentColor + "20",
               lineWidth: 1,
               borderDash: [5, 5],
             },
