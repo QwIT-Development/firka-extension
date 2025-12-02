@@ -434,7 +434,6 @@ async function transformAbsencesPage() {
   document.body.appendChild(container);
 
   setupUserDropdown();
-  setupMobileNavigation();
   setupFilters(groupedAbsences);
 
   loadingScreen.hide();

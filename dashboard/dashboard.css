@@ -354,13 +354,15 @@ h2 {
 }
 
 .user-dropdown-btn {
-  background: none;
+  background: var(--button-secondaryFill);
   border: none;
   cursor: pointer;
-  padding: 8px;
+  padding: 8px 12px;
   display: flex;
   align-items: center;
   color: var(--text-primary);
+  border-radius: 12px;
+  box-shadow: 0px 1px var(--shadow-blur, 2px) 0px var(--accent-shadow);
 }
 
 .user-dropdown {

@@ -2501,9 +2501,6 @@
       if (typeof setupUserDropdown === 'function') {
         setupUserDropdown();
       }
-      if (typeof setupMobileNavigation === 'function') {
-        setupMobileNavigation();
-      }
       setupEventListeners(data);
       initializeWeekSelector();
 

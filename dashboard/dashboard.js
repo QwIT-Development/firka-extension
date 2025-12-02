@@ -505,7 +505,6 @@ class DashboardRenderer {
     document.body.appendChild(kretaContainer);
     
     setupUserDropdown();
-    setupMobileNavigation();
   }
 }
 

@@ -597,9 +597,6 @@ async function switchView(view) {
       if (typeof setupUserDropdown === 'function') {
         setupUserDropdown();
       }
-      if (typeof setupMobileNavigation === 'function') {
-        setupMobileNavigation();
-      }
 
       await loadMessages(messagesContainer);
       

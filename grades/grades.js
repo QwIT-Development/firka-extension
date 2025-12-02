@@ -23,7 +23,6 @@
 
       
       setupUserDropdown();
-      setupMobileNavigation();
 
       const script = document.createElement("script");
       script.src = chrome.runtime.getURL("grades/chart.js");

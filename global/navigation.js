@@ -42,12 +42,17 @@ async function updateHeaderInfo() {
 function startLogoutTimer(timeString) {
   const startTime = parseInt(timeString?.match(/\d+/)?.[0] || "45");
   let timeLeft = startTime * 60;
-  const timerElement = document.querySelector(".nav-logout-timer");
-
+  
   const updateTimer = () => {
     const minutes = Math.floor(timeLeft / 60);
     const seconds = timeLeft % 60;
-    timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, "0")}`;
+    const timeText = `${minutes}:${seconds.toString().padStart(2, "0")}`;
+
+    const desktopTimer = document.querySelector("#logoutTimer");
+    const mobileTimer = document.querySelector("#mobileLogoutTimer");
+    
+    if (desktopTimer) desktopTimer.textContent = timeText;
+    if (mobileTimer) mobileTimer.textContent = timeText;
 
     if (timeLeft <= 0) {
       window.location.href = "/Home/Logout";
@@ -59,10 +64,6 @@ function startLogoutTimer(timeString) {
   setInterval(updateTimer, 1000);
 }
 
-document.addEventListener("DOMContentLoaded", async () => {
-  await updateHeaderInfo();
-});
-
 function setupUserDropdown() {
   const userBtn = document.querySelector(".user-dropdown-btn");
   const userDropdown = document.querySelector(".user-dropdown");
@@ -70,10 +71,36 @@ function setupUserDropdown() {
   userBtn?.addEventListener("click", (e) => {
     e.stopPropagation();
     userDropdown?.classList.toggle("show");
+    userBtn?.classList.toggle("open");
   });
 
-  document.addEventListener("click", () => {
-    userDropdown?.classList.remove("show");
+  const mobileUserBtn = document.querySelector("#mobileUserBtn");
+  const mobileUserDropdown = document.querySelector("#mobileUserDropdown");
+
+  mobileUserBtn?.addEventListener("click", (e) => {
+    e.stopPropagation();
+    mobileUserDropdown?.classList.toggle("show");
+    mobileUserBtn?.classList.toggle("active");
+  });
+
+  document.addEventListener("click", (e) => {
+    if (!userBtn?.contains(e.target) && !userDropdown?.contains(e.target)) {
+      userDropdown?.classList.remove("show");
+      userBtn?.classList.remove("open");
+    }
+
+    if (!mobileUserBtn?.contains(e.target) && !mobileUserDropdown?.contains(e.target)) {
+      mobileUserDropdown?.classList.remove("show");
+      mobileUserBtn?.classList.remove("active");
+    }
+  });
+
+  const mobileDropdownItems = document.querySelectorAll(".mobile-dropdown-item");
+  mobileDropdownItems.forEach(item => {
+    item.addEventListener("click", () => {
+      mobileUserDropdown?.classList.remove("show");
+      mobileUserBtn?.classList.remove("active");
+    });
   });
 }
 
@@ -84,94 +111,17 @@ function setupSettingsButton() {
     const url = chrome.runtime.getURL("settings/index.html");
     window.open(url, "_blank", "width=400,height=600");
   });
-}
 
-function setupMobileNavigation() {
-  setTimeout(() => {
-    const navToggle = document.querySelector(".nav-toggle");
-    const nav = document.querySelector(".kreta-nav");
-
-    if (!navToggle || !nav) {
-      return;
-    }
-
-    const isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
-    
-    if (isFirefox) {
-      let isNavOpen = false;
-      
-      navToggle.addEventListener("click", (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        
-        if (isNavOpen) {
-          nav.style.display = "none";
-          nav.classList.remove("show");
-          isNavOpen = false;
-        } else {
-          nav.style.display = "flex";
-          nav.classList.add("show");
-          isNavOpen = true;
-        }
-      });
-      
-      navToggle.addEventListener("touchend", (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        
-        if (isNavOpen) {
-          nav.style.display = "none";
-          nav.classList.remove("show");
-          isNavOpen = false;
-        } else {
-          nav.style.display = "flex";
-          nav.classList.add("show");
-          isNavOpen = true;
-        }
-      });
-      
-      document.addEventListener("click", (e) => {
-        if (!nav.contains(e.target) && !navToggle.contains(e.target) && isNavOpen) {
-          nav.style.display = "none";
-          nav.classList.remove("show");
-          isNavOpen = false;
-        }
-      });
-      
-      const navItems = document.querySelectorAll(".nav-item");
-      navItems.forEach((item) => {
-        item.addEventListener("click", () => {
-          nav.style.display = "none";
-          nav.classList.remove("show");
-          isNavOpen = false;
-        });
-      });
-    } else {
-      navToggle.addEventListener("click", (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        nav.classList.toggle("show");
-      });
-
-      document.addEventListener("click", (e) => {
-        if (!nav.contains(e.target) && !navToggle.contains(e.target)) {
-          nav.classList.remove("show");
-        }
-      });
-
-      const navItems = document.querySelectorAll(".nav-item");
-      navItems.forEach((item) => {
-        item.addEventListener("click", () => {
-          nav.classList.remove("show");
-        });
-      });
-    }
-  }, 100);
+  document.getElementById("mobileSettingsBtn")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const url = chrome.runtime.getURL("settings/index.html");
+    window.open(url, "_blank", "width=400,height=600");
+  });
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
   await updateHeaderInfo();
   setupUserDropdown();
   setupSettingsButton();
-  setupMobileNavigation();
 });
