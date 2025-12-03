@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (customThemes.length === 0) {
       grid.innerHTML = `<div class="no-custom-themes" data-i18n="settings.custom_themes.no_themes">Még nincsenek egyéni témák</div>`;
       if (window.LanguageManager) {
-        window.LanguageManager.updatePageTranslations();
+        window.LanguageManager.loadTranslationsForPage();
       }
       return;
     }
