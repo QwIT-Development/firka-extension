@@ -1,7 +1,8 @@
 <p align="center">
-  <img src="https://i.imgur.com/WugwlzI.png" width="150">
+  <img width="1150" height="150" alt="firka_logo_128" src="https://github.com/user-attachments/assets/f33b4649-84a3-48a5-b60f-b363235831b7" />
   <h1 align="center">Firka extension</h1>
 </p>
+
 
 <p align="center">
   Modern, testre szabható felhasználói felület az e-KRÉTA rendszerhez
