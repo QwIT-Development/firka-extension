@@ -25,7 +25,7 @@
     <img src="https://github.com/QwIT-Development/firka-extension/blob/main/images/chrome.png?raw=true" alt="Elérhető a Chrome Web Store-on" width="200">
   </a>
   <a href="https://github.com/QwIT-Development/firka-extension/releases">
-    <img src="https://github.com/QwIT-Development/firka-extension/blob/main/images/firefox.png?raw=true" alt="Elérhető a Firefox add-ons oldalon" width="200">
+    <img src="https://github.com/QwIT-Development/firka-extension/blob/main/images/firefoxact.png?raw=true" alt="Elérhető a Firefox add-ons oldalon" width="200">
   </a>
 </p>
 
