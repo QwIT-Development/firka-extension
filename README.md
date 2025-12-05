@@ -24,7 +24,7 @@
   <a href="https://chromewebstore.google.com/detail/firxa/emafoaifbfppcccgfmpcoheonhjnpldj?hl=hu">
     <img src="https://github.com/QwIT-Development/firka-extension/blob/main/images/chrome.png?raw=true" alt="Elérhető a Chrome Web Store-on" width="200">
   </a>
-  <a href="https://addons.mozilla.org/hu/firefox/addon/firxa/">
+  <a href="https://github.com/QwIT-Development/firka-extension/releases">
     <img src="https://github.com/QwIT-Development/firka-extension/blob/main/images/firefox.png?raw=true" alt="Elérhető a Firefox add-ons oldalon" width="200">
   </a>
 </p>
