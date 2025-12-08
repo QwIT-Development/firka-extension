@@ -458,6 +458,9 @@ to {
   gap:1rem;
   padding:1rem;
 }
+.grade-distribution.centered {
+  justify-content:center;
+}
 .grade-count {
   display:flex;
   align-items:center;

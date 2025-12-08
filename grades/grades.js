@@ -1,6 +1,25 @@
 (() => {
+  let gradesSettings = {
+    hideChart: false,
+    hideClassAverage: false
+  };
+
+  async function loadGradesSettings() {
+    try {
+      const settings = await storageManager.get("pageSettings_grades", {});
+      gradesSettings = {
+        hideChart: settings.hideChart || false,
+        hideClassAverage: settings.hideClassAverage || false
+      };
+    } catch (error) {
+      console.error("Error loading grades settings:", error);
+    }
+  }
+
   async function transformGradesPage() {
     try {
+      await loadGradesSettings();
+      
       const tanuloIdElement = document.querySelector("#TanuloId");
       const tanuloId = tanuloIdElement ? tanuloIdElement.value : "772481";
 
@@ -24,13 +43,15 @@
       
       setupUserDropdown();
 
-      const script = document.createElement("script");
-      script.src = chrome.runtime.getURL("grades/chart.js");
-      document.head.appendChild(script);
+      if (!gradesSettings.hideChart) {
+        const script = document.createElement("script");
+        script.src = chrome.runtime.getURL("grades/chart.js");
+        document.head.appendChild(script);
 
-      script.onload = () => {
-        setupGradesChart(gradesData.subjects);
-      };
+        script.onload = () => {
+          setupGradesChart(gradesData.subjects);
+        };
+      }
 
       setupEventListeners();
       setupGradesListScrolling();
@@ -390,12 +411,16 @@
     schoolNameFull = `${data.schoolInfo.id} - ${data.schoolInfo.name}`;
     shortenedSchoolName = helper.shortenSchoolName(schoolNameFull);
 
+    const showClassAverage = !gradesSettings.hideClassAverage && classAverage > 0;
+    const showChart = !gradesSettings.hideChart;
+
     return `
       <div class="kreta-container">
         ${await createTemplate.header()}
 
         <main class="kreta-main">
           <div class="grades-overview">
+            ${showChart ? `
             <div class="overall-averages card">
               <div class="chart-header">
                 <div class="chart-title">${LanguageManager.t("grades.chart_title")} (${totalGrades}db)</div>
@@ -404,7 +429,7 @@
                     <span class="average-value ${studentAverage < 2 && studentAverage > 0 ? "warning" : ""}">${studentAverage > 0 ? studentAverage.toFixed(2) : "-"}</span>
                   </div>
                   ${
-                    classAverage > 0
+                    showClassAverage
                       ? `
                   <div class="average-circle class-average" data-grade="${classGradeLevel}">
                     <span class="average-value">${classAverage.toFixed(2)}</span>
@@ -430,6 +455,39 @@
                   .join("")}
               </div>
             </div>
+            ` : `
+            <div class="overall-averages card">
+              <div class="chart-header">
+                <div class="chart-title">${LanguageManager.t("grades.chart_title")} (${totalGrades}db)</div>
+                <div class="chart-averages">
+                  <div class="average-circle my-average" data-grade="${studentGradeLevel}">
+                    <span class="average-value ${studentAverage < 2 && studentAverage > 0 ? "warning" : ""}">${studentAverage > 0 ? studentAverage.toFixed(2) : "-"}</span>
+                  </div>
+                  ${
+                    showClassAverage
+                      ? `
+                  <div class="average-circle class-average" data-grade="${classGradeLevel}">
+                    <span class="average-value">${classAverage.toFixed(2)}</span>
+                  </div>
+                  `
+                      : ""
+                  }
+                </div>
+              </div>
+              <div class="grade-distribution centered">
+                ${Object.entries(gradeDistribution)
+                  .map(
+                    ([grade, count]) => `
+                    <div class="grade-count grade-${grade}">
+                      <span class="grade-value">${grade}</span>
+                      <span class="grade-amount">${count}</span>
+                    </div>
+                  `,
+                  )
+                  .join("")}
+              </div>
+            </div>
+            `}
             ${
               yearEndGrades.length > 0
                 ? `
@@ -635,6 +693,7 @@
           .reverse();
         const myGrade = Math.floor(subject.average) || 0;
         const classGrade = Math.floor(subject.classAverage) || 0;
+        const showClassAvg = !gradesSettings.hideClassAverage && subject.classAverage > 0;
 
         return `
         <div class="subject-card card">
@@ -647,7 +706,7 @@
                 <span class="average-value">${subject.average > 0 ? subject.average.toFixed(2) : "-"}</span>
               </div>
               ${
-                subject.classAverage > 0
+                showClassAvg
                   ? `
               <div class="average-circle class-average" data-grade="${classGrade}">
                 <span class="average-value">${subject.classAverage.toFixed(2)}</span>

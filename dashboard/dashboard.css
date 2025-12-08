@@ -37,6 +37,8 @@ h2 {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
   gap: 20px;
+  justify-content: center;
+  justify-items: center;
 }
 
 .widget-card {
@@ -50,6 +52,7 @@ h2 {
   height: 100%;
   border: none;
   min-height: 400px;
+  width: 100%;
 }
 
 .widget-header {
@@ -222,7 +225,6 @@ h2 {
   max-width: 200px;
 }
 
-/* Mobile view: author below content */
 @media (max-width: 768px) {
   .news-item .widget-row {
     flex-direction: column;
@@ -257,7 +259,6 @@ h2 {
   }
 }
 
-/* Desktop view: limit author width and wrap text */
 @media (min-width: 769px) {
   .news-author {
     max-width: 180px;

@@ -24,7 +24,7 @@ body {
 }
 .popup-header {
   text-align:center;
-  margin-bottom:16px;
+  margin-bottom:12px;
 }
 .logo-text {
   color:var(--text-primary);
@@ -40,6 +40,58 @@ body {
   border-radius:6px;
   margin-right:8px;
 }
+
+.tab-navigation {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding: 4px;
+  background: var(--card-card);
+  border-radius: 12px;
+  box-shadow: 0px 1px var(--shadow-blur) 0px var(--accent-shadow);
+}
+
+.tab-button {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: "Montserrat", serif;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tab-button:hover {
+  background: var(--accent-15);
+  color: var(--text-primary);
+}
+
+.tab-button.active {
+  background: var(--accent-accent);
+  color: #000;
+}
+
+.tab-button .material-icons-round {
+  font-size: 16px;
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+  animation: fadeIn 0.2s ease;
+}
+
 .settings-card,.about-card,.support-card {
   background:var(--card-card);
   border-radius:16px;
@@ -122,14 +174,13 @@ h2 {
   border-radius:8px;
 }
 .language-option {
-  background:var(--card-card);
+  background:var(--button-secondaryFill);
   border:1px solid var(--border-border);
   border-radius:8px;
   padding:12px;
   transition:all 0.2s ease;
 }
 .language-option:hover {
-  background:var(--card-hover);
   border-color:var(--accent-accent);
 }
 .language-option.active {
@@ -747,4 +798,149 @@ h2 {
 
 #importCode {
   margin-top: 8px;
+}
+
+.page-settings-info {
+  margin-bottom: 16px;
+}
+
+.current-page-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  background: var(--button-secondaryFill);
+  border-radius: 10px;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.current-page-indicator .material-icons-round {
+  color: var(--accent-accent);
+}
+
+.page-badge {
+  margin-left: auto;
+  padding: 4px 10px;
+  background: var(--accent-15);
+  color: var(--accent-accent);
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.page-specific-settings {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.no-settings-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 16px;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.no-settings-placeholder .material-icons-round {
+  font-size: 48px;
+  margin-bottom: 12px;
+  opacity: 0.5;
+}
+
+.no-settings-placeholder p {
+  font-size: 13px;
+  margin: 0;
+}
+
+.setting-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px;
+  background: var(--button-secondaryFill);
+  border-radius: 10px;
+  gap: 12px;
+}
+
+.setting-item-info {
+  flex: 1;
+}
+
+.setting-item-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.setting-item-description {
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.toggle-switch {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--text-teritary);
+  border-radius: 24px;
+  transition: 0.3s;
+}
+
+.toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background: white;
+  border-radius: 50%;
+  transition: 0.3s;
+}
+
+.toggle-switch input:checked + .toggle-slider {
+  background: var(--accent-accent);
+}
+
+.toggle-switch input:checked + .toggle-slider:before {
+  transform: translateX(20px);
+}
+
+.setting-select {
+  padding: 8px 12px;
+  border: 1px solid var(--border-border, var(--text-teritary));
+  border-radius: 8px;
+  background: var(--button-secondaryFill);
+  color: var(--text-primary);
+  font-family: "Montserrat", serif;
+  font-size: 12px;
+  cursor: pointer;
+  outline: none;
+  min-width: 100px;
+}
+
+.setting-select:focus {
+  border-color: var(--accent-accent);
 }

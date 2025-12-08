@@ -291,8 +291,9 @@ class DashboardDataManager {
 }
 
 class DashboardRenderer {
-  constructor(data) {
+  constructor(data, settings = {}) {
     this.baseData = data;
+    this.settings = settings;
   }
 
   async init() {
@@ -315,14 +316,31 @@ class DashboardRenderer {
   }
 
   generateMainContent() {
+    const cards = [];
+    
+    if (!this.settings.hideGrades) {
+      cards.push(this.createGradeCard());
+    }
+    if (!this.settings.hideAbsences) {
+      cards.push(this.createAbsenceCard());
+    }
+    if (!this.settings.hideNotes) {
+      cards.push(this.createNoteCard());
+    }
+    if (!this.settings.hideExams) {
+      cards.push(this.createExamCard());
+    }
+
+    cards.push(this.createNewsCard());
+
+    if (cards.length === 1) {
+      cards.unshift(this.createGradeCard());
+    }
+    
     return `
       <main class="kreta-main">
         <div class="grid-container">
-          ${this.createGradeCard()}
-          ${this.createAbsenceCard()}
-          ${this.createNoteCard()}
-          ${this.createExamCard()}
-          ${this.createNewsCard()}
+          ${cards.join('')}
         </div>
       </main>
     `;
@@ -513,6 +531,26 @@ class DashboardApplication {
     this.init();
   }
 
+  async loadBulletinSettings() {
+    try {
+      const settings = await storageManager.get("pageSettings_bulletin", {});
+      return {
+        hideGrades: settings.hideGrades || false,
+        hideAbsences: settings.hideAbsences || false,
+        hideNotes: settings.hideNotes || false,
+        hideExams: settings.hideExams || false
+      };
+    } catch (error) {
+      console.error("Error loading bulletin settings:", error);
+      return {
+        hideGrades: false,
+        hideAbsences: false,
+        hideNotes: false,
+        hideExams: false
+      };
+    }
+  }
+
   async init() {
     if (!window.location.href.includes("/Intezmeny/Faliujsag")) {
       return;
@@ -575,8 +613,9 @@ class DashboardApplication {
     try {
       const dataManager = new DashboardDataManager();
       const dashboardData = await dataManager.extractAllData();
+      const bulletinSettings = await this.loadBulletinSettings();
       
-      const renderer = new DashboardRenderer(dashboardData);
+      const renderer = new DashboardRenderer(dashboardData, bulletinSettings);
       await renderer.render();
     } catch (error) {
       console.error("Error initializing dashboard:", error);

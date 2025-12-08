@@ -5,8 +5,47 @@
   },
   "settings": {
     "title": "Beállítások",
+    "appearance": "Megjelenés",
     "theme": "Téma",
     "language": "Nyelv",
+    "tabs": {
+      "home": "Főoldal",
+      "settings": "Beállítások",
+      "about": "Névjegy"
+    },
+    "page_settings": {
+      "title": "Oldal beállítások",
+      "current_page": "Aktuális oldal",
+      "no_settings": "Ehhez az oldalhoz nincsenek egyéni beállítások.",
+      "login": {
+        "hide_system_message": "Rendszerüzenet elrejtése",
+        "hide_system_message_desc": "A bejelentkezési oldalon megjelenő rendszerüzenet elrejtése",
+        "hide_school_info": "Iskola nevének és azonosítójának elrejtése",
+        "hide_school_info_desc": "Az iskola neve és KRÉTA azonosítója nem jelenik meg"
+      },
+      "roleselect": {
+        "auto_redirect": "Automatikus továbblépés",
+        "auto_redirect_desc": "Automatikusan átirányít az ellenőrzőkönyvre",
+        "hide_school_info": "Iskola és név elrejtése",
+        "hide_school_info_desc": "Az iskola neve és a felhasználó neve nem jelenik meg"
+      },
+      "bulletin": {
+        "hide_grades": "Értékelések elrejtése",
+        "hide_grades_desc": "Az értékeléseid kártya elrejtése",
+        "hide_absences": "Mulasztások elrejtése",
+        "hide_absences_desc": "A mulasztások kártya elrejtése",
+        "hide_notes": "Feljegyzések elrejtése",
+        "hide_notes_desc": "A feljegyzések kártya elrejtése",
+        "hide_exams": "Bejelentett dolgozatok elrejtése",
+        "hide_exams_desc": "A bejelentett dolgozatok kártya elrejtése"
+      },
+      "grades": {
+        "hide_chart": "Grafikon elrejtése",
+        "hide_chart_desc": "A jegyek grafikonjának elrejtése",
+        "hide_class_average": "Osztályátlag elrejtése",
+        "hide_class_average_desc": "Az osztályátlag értékek elrejtése"
+      }
+    },
     "themes": {
       "light_blue": "Világos Kék",
       "light_green": "Világos Zöld",

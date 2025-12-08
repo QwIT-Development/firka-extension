@@ -5,6 +5,338 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   let customThemes = [];
   let editingThemeId = null;
+  let currentPageType = null;
+
+  async function initTabs() {
+    const tabButtons = document.querySelectorAll(".tab-button");
+    const tabContents = document.querySelectorAll(".tab-content");
+
+    const lastTab = localStorage.getItem("settingsLastTab") || "home";
+    switchTab(lastTab);
+    
+    tabButtons.forEach(button => {
+      button.addEventListener("click", () => {
+        const tabId = button.dataset.tab;
+        switchTab(tabId);
+        localStorage.setItem("settingsLastTab", tabId);
+      });
+    });
+  }
+
+  function switchTab(tabId) {
+    const tabButtons = document.querySelectorAll(".tab-button");
+    const tabContents = document.querySelectorAll(".tab-content");
+    
+    tabButtons.forEach(btn => {
+      btn.classList.toggle("active", btn.dataset.tab === tabId);
+    });
+    
+    tabContents.forEach(content => {
+      content.classList.toggle("active", content.id === `tab-${tabId}`);
+    });
+
+    if (tabId === "settings") {
+      detectCurrentPage();
+    }
+  }
+
+  async function detectCurrentPage() {
+    try {
+      const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+      if (tabs.length > 0) {
+        const url = tabs[0].url || "";
+        currentPageType = getPageTypeFromUrl(url);
+        updateCurrentPageIndicator(currentPageType);
+        await loadPageSpecificSettings(currentPageType);
+      }
+    } catch (error) {
+      console.error("Error detecting current page:", error);
+      currentPageType = "unknown";
+      updateCurrentPageIndicator(currentPageType);
+      await loadPageSpecificSettings(currentPageType);
+    }
+  }
+
+  function getPageTypeFromUrl(url) {
+    if (url.includes("/Orarend/InformaciokOrarend")) return "timetable";
+    if (url.includes("/TanuloErtekeles/Osztalyzatok")) return "grades";
+    if (url.includes("/Hianyzas/Hianyzasok")) return "absences";
+    if (url.includes("/uzenetek")) return "messages";
+    if (url.includes("/Adminisztracio/Profil")) return "profile";
+    if (url.includes("intezmenykereso.e-kreta.hu/")) return "search";
+    if (url.includes("/Intezmeny/Faliujsag")) return "dashboard";
+    if (url.includes("/Adminisztracio/BelepesKezelo")) return "roleselect";
+    if (url.includes("/ElfelejtettJelszo")) return "forgotpassword";
+    if (url.includes("idp.e-kreta.hu/Account/Login")) return "login";
+    if (url.includes("/Login") || url.includes("/Belepes")) return "login";
+    return "unknown";
+  }
+
+  function getPageDisplayName(pageType) {
+    const pageNames = {
+      "timetable": "Órarend",
+      "grades": "Jegyek",
+      "absences": "Mulasztások",
+      "messages": "Üzenetek",
+      "profile": "Profil",
+      "search": "Intézménykereső",
+      "dashboard": "Faliújság",
+      "roleselect": "Szerepkörválasztó",
+      "login": "Bejelentkezés",
+      "forgotpassword": "Elfelejtett jelszó",
+      "unknown": "Ismeretlen"
+    };
+    return pageNames[pageType] || pageType;
+  }
+
+  function updateCurrentPageIndicator(pageType) {
+    const pageValueEl = document.getElementById("currentPageValue");
+    if (pageValueEl) {
+      pageValueEl.textContent = getPageDisplayName(pageType);
+    }
+  }
+
+  async function getLoginPageSettings() {
+    const settingsKey = "pageSettings_login";
+    const savedSettings = await storageManager.get(settingsKey, {});
+    
+    return [
+      {
+        key: "hideSystemMessage",
+        type: "toggle",
+        label: "Rendszerüzenet elrejtése",
+        labelKey: "settings.page_settings.login.hide_system_message",
+        description: "A bejelentkezési oldalon megjelenő rendszerüzenet elrejtése",
+        descriptionKey: "settings.page_settings.login.hide_system_message_desc",
+        value: savedSettings.hideSystemMessage || false
+      },
+      {
+        key: "hideSchoolInfo",
+        type: "toggle",
+        label: "Iskola nevének és azonosítójának elrejtése",
+        labelKey: "settings.page_settings.login.hide_school_info",
+        description: "Az iskola neve és KRÉTA azonosítója nem jelenik meg",
+        descriptionKey: "settings.page_settings.login.hide_school_info_desc",
+        value: savedSettings.hideSchoolInfo || false
+      }
+    ];
+  }
+
+  async function getRoleselectPageSettings() {
+    const settingsKey = "pageSettings_roleselect";
+    const savedSettings = await storageManager.get(settingsKey, {
+      autoRedirect: false,
+      hideSchoolInfo: true
+    });
+    
+    return [
+      {
+        key: "autoRedirect",
+        type: "toggle",
+        label: "Automatikus továbblépés",
+        labelKey: "settings.page_settings.roleselect.auto_redirect",
+        description: "Automatikusan átirányít az ellenőrzőkönyvre",
+        descriptionKey: "settings.page_settings.roleselect.auto_redirect_desc",
+        value: savedSettings.autoRedirect || false
+      },
+      {
+        key: "hideSchoolInfo",
+        type: "toggle",
+        label: "Iskola és név elrejtése",
+        labelKey: "settings.page_settings.roleselect.hide_school_info",
+        description: "Az iskola neve és a felhasználó neve nem jelenik meg",
+        descriptionKey: "settings.page_settings.roleselect.hide_school_info_desc",
+        value: savedSettings.hideSchoolInfo !== undefined ? savedSettings.hideSchoolInfo : true
+      }
+    ];
+  }
+
+  async function getBulletinPageSettings() {
+    const settingsKey = "pageSettings_bulletin";
+    const savedSettings = await storageManager.get(settingsKey, {});
+    
+    return [
+      {
+        key: "hideGrades",
+        type: "toggle",
+        label: "Értékelések elrejtése",
+        labelKey: "settings.page_settings.bulletin.hide_grades",
+        description: "Az értékeléseid kártya elrejtése",
+        descriptionKey: "settings.page_settings.bulletin.hide_grades_desc",
+        value: savedSettings.hideGrades || false
+      },
+      {
+        key: "hideAbsences",
+        type: "toggle",
+        label: "Mulasztások elrejtése",
+        labelKey: "settings.page_settings.bulletin.hide_absences",
+        description: "A mulasztások kártya elrejtése",
+        descriptionKey: "settings.page_settings.bulletin.hide_absences_desc",
+        value: savedSettings.hideAbsences || false
+      },
+      {
+        key: "hideNotes",
+        type: "toggle",
+        label: "Feljegyzések elrejtése",
+        labelKey: "settings.page_settings.bulletin.hide_notes",
+        description: "A feljegyzések kártya elrejtése",
+        descriptionKey: "settings.page_settings.bulletin.hide_notes_desc",
+        value: savedSettings.hideNotes || false
+      },
+      {
+        key: "hideExams",
+        type: "toggle",
+        label: "Bejelentett dolgozatok elrejtése",
+        labelKey: "settings.page_settings.bulletin.hide_exams",
+        description: "A bejelentett dolgozatok kártya elrejtése",
+        descriptionKey: "settings.page_settings.bulletin.hide_exams_desc",
+        value: savedSettings.hideExams || false
+      }
+    ];
+  }
+
+  async function getGradesPageSettings() {
+    const settingsKey = "pageSettings_grades";
+    const savedSettings = await storageManager.get(settingsKey, {});
+    
+    return [
+      {
+        key: "hideChart",
+        type: "toggle",
+        label: "Grafikon elrejtése",
+        labelKey: "settings.page_settings.grades.hide_chart",
+        description: "A jegyek grafikonjának elrejtése",
+        descriptionKey: "settings.page_settings.grades.hide_chart_desc",
+        value: savedSettings.hideChart || false
+      },
+      {
+        key: "hideClassAverage",
+        type: "toggle",
+        label: "Osztályátlag elrejtése",
+        labelKey: "settings.page_settings.grades.hide_class_average",
+        description: "Az osztályátlag értékek elrejtése",
+        descriptionKey: "settings.page_settings.grades.hide_class_average_desc",
+        value: savedSettings.hideClassAverage || false
+      }
+    ];
+  }
+
+  async function loadPageSpecificSettings(pageType) {
+    const container = document.getElementById("pageSpecificSettings");
+    if (!container) return;
+
+    const pageSettings = {
+      "timetable": [],
+      "grades": await getGradesPageSettings(),
+      "absences": [],
+      "messages": [],
+      "profile": [],
+      "search": [],
+      "dashboard": await getBulletinPageSettings(),
+      "roleselect": await getRoleselectPageSettings(),
+      "login": await getLoginPageSettings(),
+      "forgotpassword": [],
+      "unknown": []
+    };
+
+    const settings = pageSettings[pageType] || [];
+
+    if (settings.length === 0) {
+      container.innerHTML = `
+        <div class="no-settings-placeholder">
+          <span class="material-icons-round">settings_suggest</span>
+          <p data-i18n="settings.page_settings.no_settings">Ehhez az oldalhoz nincsenek egyéni beállítások.</p>
+        </div>
+      `;
+      if (window.LanguageManager) {
+        window.LanguageManager.loadTranslationsForPage();
+      }
+      return;
+    }
+
+    container.innerHTML = settings.map(setting => renderSettingItem(setting)).join("");
+    initSettingItems(container);
+    
+    if (window.LanguageManager) {
+      window.LanguageManager.loadTranslationsForPage();
+    }
+  }
+
+  function renderSettingItem(setting) {
+    let control = "";
+    
+    switch (setting.type) {
+      case "toggle":
+        control = `
+          <label class="toggle-switch">
+            <input type="checkbox" data-setting="${setting.key}" ${setting.value ? "checked" : ""}>
+            <span class="toggle-slider"></span>
+          </label>
+        `;
+        break;
+      case "select":
+        control = `
+          <select class="setting-select" data-setting="${setting.key}">
+            ${setting.options.map(opt => 
+              `<option value="${opt.value}" ${opt.value === setting.value ? "selected" : ""}>${opt.label}</option>`
+            ).join("")}
+          </select>
+        `;
+        break;
+      default:
+        control = "";
+    }
+
+    return `
+      <div class="setting-item" data-setting-key="${setting.key}">
+        <div class="setting-item-info">
+          <div class="setting-item-label" data-i18n="${setting.labelKey || ""}">${setting.label}</div>
+          ${setting.description ? `<div class="setting-item-description" data-i18n="${setting.descriptionKey || ""}">${setting.description}</div>` : ""}
+        </div>
+        ${control}
+      </div>
+    `;
+  }
+
+  function initSettingItems(container) {
+    container.querySelectorAll('input[type="checkbox"]').forEach(input => {
+      input.addEventListener("change", async () => {
+        const key = input.dataset.setting;
+        await savePageSetting(currentPageType, key, input.checked);
+      });
+    });
+
+    container.querySelectorAll(".setting-select").forEach(select => {
+      select.addEventListener("change", async () => {
+        const key = select.dataset.setting;
+        await savePageSetting(currentPageType, key, select.value);
+      });
+    });
+  }
+
+  async function savePageSetting(pageType, key, value) {
+    try {
+      const storagePageType = pageType === "dashboard" ? "bulletin" : pageType;
+      const settingsKey = `pageSettings_${storagePageType}`;
+      const existingSettings = await storageManager.get(settingsKey, {});
+      existingSettings[key] = value;
+      await storageManager.set(settingsKey, existingSettings);
+
+      const tabs = await chrome.tabs.query({});
+      tabs.forEach((tab) => {
+        chrome.tabs
+          .sendMessage(tab.id, {
+            action: "pageSettingChanged",
+            pageType: storagePageType,
+            key: key,
+            value: value,
+          })
+          .catch(() => {});
+      });
+    } catch (error) {
+      console.error("Error saving page setting:", error);
+    }
+  }
 
   async function loadCustomThemes() {
     try {
@@ -603,4 +935,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   window.addEventListener("languageChanged", (event) => {
     updateLanguageButtons(event.detail.language);
   });
+
+  await initTabs();
 });

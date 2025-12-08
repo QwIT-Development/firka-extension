@@ -5,8 +5,47 @@
   },
   "settings": {
     "title": "Settings",
+    "appearance": "Appearance",
     "theme": "Theme",
     "language": "Language",
+    "tabs": {
+      "home": "Home",
+      "settings": "Settings",
+      "about": "About"
+    },
+    "page_settings": {
+      "title": "Page Settings",
+      "current_page": "Current page",
+      "no_settings": "No custom settings available for this page.",
+      "login": {
+        "hide_system_message": "Hide system message",
+        "hide_system_message_desc": "Hide the system message shown on the login page",
+        "hide_school_info": "Hide school name and ID",
+        "hide_school_info_desc": "The school name and KRÉTA ID will not be displayed"
+      },
+      "roleselect": {
+        "auto_redirect": "Auto redirect",
+        "auto_redirect_desc": "Automatically redirect to the gradebook",
+        "hide_school_info": "Hide school and name",
+        "hide_school_info_desc": "The school name and user name will not be displayed"
+      },
+      "bulletin": {
+        "hide_grades": "Hide grades",
+        "hide_grades_desc": "Hide the grades card",
+        "hide_absences": "Hide absences",
+        "hide_absences_desc": "Hide the absences card",
+        "hide_notes": "Hide notes",
+        "hide_notes_desc": "Hide the notes card",
+        "hide_exams": "Hide announced exams",
+        "hide_exams_desc": "Hide the announced exams card"
+      },
+      "grades": {
+        "hide_chart": "Hide chart",
+        "hide_chart_desc": "Hide the grades chart",
+        "hide_class_average": "Hide class average",
+        "hide_class_average_desc": "Hide class average values"
+      }
+    },
     "themes": {
       "light_green": "Light Green",
       "dark_green": "Dark Green",

@@ -14,6 +14,8 @@ async function transformLoginPage() {
       });
     }
 
+    const loginSettings = await loadLoginSettings();
+
     const existingForm = document.querySelector("form");
     const formData = {
       action: existingForm?.getAttribute("action") || "",
@@ -58,11 +60,11 @@ async function transformLoginPage() {
               <img src=${chrome.runtime.getURL("images/firka_logo.png")} alt="Firka" class="logo">
               Firka
             </p>
-            <h1 class="school-name">${schoolInfo.name}</h1>
+            ${!loginSettings.hideSchoolInfo ? `<h1 class="school-name">${schoolInfo.name}</h1>
             <div class="school-details">
               ${schoolInfo.kretaId ? `<div>${schoolInfo.kretaId}</div>` : ""}
               ${schoolInfo.omCode ? `<div>${LanguageManager.t("login.kreta_id")}: ${schoolInfo.omCode}</div>` : ""}
-            </div>
+            </div>` : ''}
           </div>
 
           <form class="login-form" method="post" action="${formData.action}" id="loginForm" novalidate>
@@ -101,7 +103,7 @@ async function transformLoginPage() {
         </div>
 
         ${
-          systemMessage
+          systemMessage && !loginSettings.hideSystemMessage
             ? `
           <div class="system-message">
             <h4>${LanguageManager.t("login.system_message")}</h4>
@@ -202,6 +204,28 @@ function handleSubmit(event) {
 
   form.submit();
 }
+
+async function loadLoginSettings() {
+  try {
+    const settings = await storageManager.get("pageSettings_login", {});
+    return {
+      hideSystemMessage: settings.hideSystemMessage || false,
+      hideSchoolInfo: settings.hideSchoolInfo || false
+    };
+  } catch (error) {
+    console.error("Error loading login settings:", error);
+    return {
+      hideSystemMessage: false,
+      hideSchoolInfo: false
+    };
+  }
+}
+
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === "pageSettingChanged" && message.pageType === "login") {
+    transformLoginPage();
+  }
+});
 
 if (window.location.href.includes("idp.e-kreta.hu/Account/Login")) {
   (async () => {

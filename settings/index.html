@@ -22,106 +22,143 @@
       </p>
     </header>
 
-    <div class="settings-card">
-      <h2 data-i18n="settings.title">Beállítások</h2>
-      <div class="settings-group">
-        <div class="setting-section">
-          <div class="setting-header">
-            <span class="material-icons-round">palette</span>
-            <span data-i18n="settings.theme">Téma</span>
-          </div>
-          <div class="theme-grid">
-            <button class="theme-option" data-theme="light-green">
-              <div class="theme-preview light-green">
-                <div class="preview-header"></div>
-                <div class="preview-content">
-                  <div class="preview-card"></div>
+    <div class="tab-navigation">
+      <button class="tab-button active" data-tab="home">
+        <span class="material-icons-round">home</span>
+        <span data-i18n="settings.tabs.home">Főoldal</span>
+      </button>
+      <button class="tab-button" data-tab="settings">
+        <span class="material-icons-round">tune</span>
+        <span data-i18n="settings.tabs.settings">Beállítások</span>
+      </button>
+      <button class="tab-button" data-tab="about">
+        <span class="material-icons-round">info</span>
+        <span data-i18n="settings.tabs.about">Névjegy</span>
+      </button>
+    </div>
+
+    <div class="tab-content active" id="tab-home">
+      <div class="settings-card">
+        <h2 data-i18n="settings.appearance">Megjelenés</h2>
+        <div class="settings-group">
+          <div class="setting-section">
+            <div class="setting-header">
+              <span class="material-icons-round">palette</span>
+              <span data-i18n="settings.theme">Téma</span>
+            </div>
+            <div class="theme-grid">
+              <button class="theme-option" data-theme="light-green">
+                <div class="theme-preview light-green">
+                  <div class="preview-header"></div>
+                  <div class="preview-content">
+                    <div class="preview-card"></div>
+                  </div>
+                </div>
+                <span class="theme-name" data-i18n="settings.themes.light_green">Világos Zöld</span>
+              </button>
+
+              <button class="theme-option" data-theme="dark-green">
+                <div class="theme-preview dark-green">
+                  <div class="preview-header"></div>
+                  <div class="preview-content">
+                    <div class="preview-card"></div>
+                  </div>
+                </div>
+                <span class="theme-name" data-i18n="settings.themes.dark_green">Sötét Zöld</span>
+              </button>
+            </div>
+            
+            <div class="custom-themes-section">
+              <div class="custom-themes-header">
+                <span data-i18n="settings.custom_themes.title">Egyéni témák</span>
+                <div class="custom-themes-buttons">
+                  <button class="theme-btn" id="addCustomTheme" title="Új téma">
+                    <span class="material-icons-round">add</span>
+                  </button>
+                  <button class="theme-btn" id="importCustomTheme" title="Téma importálása">
+                    <span class="material-icons-round">download</span>
+                  </button>
                 </div>
               </div>
-              <span class="theme-name" data-i18n="settings.themes.light_green">Világos Zöld</span>
-            </button>
-
-            <button class="theme-option" data-theme="dark-green">
-              <div class="theme-preview dark-green">
-                <div class="preview-header"></div>
-                <div class="preview-content">
-                  <div class="preview-card"></div>
-                </div>
-              </div>
-              <span class="theme-name" data-i18n="settings.themes.dark_green">Sötét Zöld</span>
-            </button>
-          </div>
-          
-          <div class="custom-themes-section">
-            <div class="custom-themes-header">
-              <span data-i18n="settings.custom_themes.title">Egyéni témák</span>
-              <div class="custom-themes-buttons">
-                <button class="theme-btn" id="addCustomTheme" title="Új téma">
-                  <span class="material-icons-round">add</span>
-                </button>
-                <button class="theme-btn" id="importCustomTheme" title="Téma importálása">
-                  <span class="material-icons-round">download</span>
-                </button>
+              <div class="theme-grid custom-themes-grid" id="customThemesGrid">
               </div>
             </div>
-            <div class="theme-grid custom-themes-grid" id="customThemesGrid">
+          </div>
+          <div class="setting-section">
+            <div class="setting-header">
+              <span class="material-icons-round">language</span>
+              <span data-i18n="settings.language">Nyelv</span>
+            </div>
+            <div class="language-grid">
+              <button class="language-option" data-language="hu">
+                <span class="language-name" data-i18n="settings.languages.hu">Magyar</span>
+              </button>
+              <button class="language-option" data-language="en">
+                <span class="language-name" data-i18n="settings.languages.en">English</span>
+              </button>
             </div>
           </div>
         </div>
-        <div class="setting-section">
-          <div class="setting-header">
-            <span class="material-icons-round">language</span>
-            <span data-i18n="settings.language">Nyelv</span>
+      </div>
+    </div>
+
+    <div class="tab-content" id="tab-settings">
+      <div class="settings-card">
+        <h2 data-i18n="settings.page_settings.title">Oldal beállítások</h2>
+        <div class="page-settings-info">
+          <div class="current-page-indicator">
+            <span class="material-icons-round">web</span>
+            <span id="currentPageName" data-i18n="settings.page_settings.current_page">Aktuális oldal</span>
+            <span id="currentPageValue" class="page-badge">-</span>
           </div>
-          <div class="language-grid">
-            <button class="language-option" data-language="hu">
-              <span class="language-name" data-i18n="settings.languages.hu">Magyar</span>
-            </button>
-            <button class="language-option" data-language="en">
-              <span class="language-name" data-i18n="settings.languages.en">English</span>
-            </button>
+        </div>
+        <div id="pageSpecificSettings" class="page-specific-settings">
+          <div class="no-settings-placeholder">
+            <span class="material-icons-round">settings_suggest</span>
+            <p data-i18n="settings.page_settings.no_settings">Ehhez az oldalhoz nincsenek egyéni beállítások.</p>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="about-card">
-      <h2 data-i18n="settings.about.title">Névjegy</h2>
-      <div class="about-content">
-        <p data-i18n="settings.about.description">A Firka egy nyílt forráskódú projekt, amely a KRÉTA rendszerhez készít saját felhasználói felületet.</p>
-        <div class="about-links">
-          <a href="https://firka.app" target="_blank" class="about-link">
-            <span class="material-icons-round">language</span>
-            <span>Weboldal</span>
-          </a>
-          <a href="https://github.com/QwIT-Development/" target="_blank" class="about-link">
-            <span class="material-icons-round">code</span>
-            <span data-i18n="settings.about.github">GitHub</span>
-          </a>
-          <a href="https://discord.gg/firka-1111649116020285532" target="_blank" class="about-link">
-            <span class="material-icons-round">forum</span>
-            <span>Discord</span>
-          </a>
+    <div class="tab-content" id="tab-about">
+      <div class="about-card">
+        <h2 data-i18n="settings.about.title">Névjegy</h2>
+        <div class="about-content">
+          <p data-i18n="settings.about.description">A Firka egy nyílt forráskódú projekt, amely a KRÉTA rendszerhez készít saját felhasználói felületet.</p>
+          <div class="about-links">
+            <a href="https://firka.app" target="_blank" class="about-link">
+              <span class="material-icons-round">language</span>
+              <span>Weboldal</span>
+            </a>
+            <a href="https://github.com/QwIT-Development/" target="_blank" class="about-link">
+              <span class="material-icons-round">code</span>
+              <span data-i18n="settings.about.github">GitHub</span>
+            </a>
+            <a href="https://discord.gg/firka-1111649116020285532" target="_blank" class="about-link">
+              <span class="material-icons-round">forum</span>
+              <span>Discord</span>
+            </a>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div class="support-card">
-      <h2 data-i18n="settings.support.title">Támogatás</h2>
-      <div class="support-content">
-        <p data-i18n="settings.support.description">Ha tetszik a munkánk és szeretnéd támogatni a fejlesztést, az alábbi módon teheted meg:</p>
-        <div class="support-buttons">
-          <a href="https://ko-fi.com/zan1456" target="_blank" class="support-button">
-            <span class="material-icons-round">coffee</span>
-            <span data-i18n="settings.support.kofi">Ko-Fi</span>
-          </a>
+      <div class="support-card">
+        <h2 data-i18n="settings.support.title">Támogatás</h2>
+        <div class="support-content">
+          <p data-i18n="settings.support.description">Ha tetszik a munkánk és szeretnéd támogatni a fejlesztést, az alábbi módon teheted meg:</p>
+          <div class="support-buttons">
+            <a href="https://ko-fi.com/zan1456" target="_blank" class="support-button">
+              <span class="material-icons-round">coffee</span>
+              <span data-i18n="settings.support.kofi">Ko-Fi</span>
+            </a>
+          </div>
         </div>
       </div>
+
+      <div class="version-info" id="version">v1.4.0</div>
     </div>
 
-    <footer class="popup-footer">
-      <div class="version-info" id="version">v1.3.0</div>
-    </footer>
   </div>
 
   <div class="modal-overlay" id="themeEditorModal">

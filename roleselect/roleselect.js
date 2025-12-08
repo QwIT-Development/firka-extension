@@ -18,6 +18,25 @@
     return setInterval(updateTimer, 1000);
   };
 
+  async function loadRoleselectSettings() {
+    try {
+      const settings = await storageManager.get("pageSettings_roleselect", {
+        autoRedirect: false,
+        hideSchoolInfo: true
+      });
+      return {
+        autoRedirect: settings.autoRedirect || false,
+        hideSchoolInfo: settings.hideSchoolInfo !== undefined ? settings.hideSchoolInfo : true
+      };
+    } catch (error) {
+      console.error("Error loading roleselect settings:", error);
+      return {
+        autoRedirect: false,
+        hideSchoolInfo: true
+      };
+    }
+  }
+
   const handleRoleChange = async (role) => {
     try {
       const response = await fetch(
@@ -41,7 +60,7 @@
     }
   };
 
-  const createHTML = (schoolCode, fullSchoolName, userName) => `
+  const createHTML = (schoolCode, fullSchoolName, userName, settings) => `
     <div class="kreta-container">
       <header class="kreta-header">
         <div class="school-info">
@@ -49,15 +68,17 @@
             <img src=${chrome.runtime.getURL("images/firka_logo.png")} alt="Firka" class="logo">
             Firka
           </p>
-          <div class="school-details">
+          ${!settings.hideSchoolInfo ? `<div class="school-details">
             <span>${schoolCode || ""} - ${fullSchoolName || "Iskola"}</span>
-          </div>
+          </div>` : ''}
         </div>
         <div class="user-profile">
-          <div class="user-info">
+          ${!settings.hideSchoolInfo ? `<div class="user-info">
             <span class="user-name">${userName}</span>
             <span class="logout-timer" id="logoutTimer">5:00</span>
-          </div>
+          </div>` : `<div class="user-info">
+            <span class="logout-timer" id="logoutTimer">5:00</span>
+          </div>`}
         </div>
       </header>
 
@@ -108,6 +129,12 @@
           window.addEventListener("load", resolve),
         );
       }
+      const settings = await loadRoleselectSettings();
+
+      if (settings.autoRedirect) {
+        handleRoleChange("Ellenorzo");
+        return;
+      }
 
       const schoolNameEl = document.querySelector(".IntezmenyNev");
       const schoolName = schoolNameEl?.textContent.trim() || "Iskola neve";
@@ -133,6 +160,7 @@
         schoolCode,
         fullSchoolName,
         userName,
+        settings,
       ), 'text/html');
       const tempDiv = doc.body;
       while (tempDiv.firstChild) {
