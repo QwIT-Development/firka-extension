@@ -1,5 +1,13 @@
 async function transformLoginPage() {
   try {
+    while (
+      typeof window.LanguageManager === "undefined" ||
+      !window.LanguageManager.t("login.username_placeholder") ||
+      window.LanguageManager.t("login.username_placeholder") === "login.username_placeholder"
+    ) {
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    }
+
     if (document.readyState !== "complete") {
       await new Promise((resolve) => {
         window.addEventListener("load", resolve);
@@ -196,6 +204,12 @@ function handleSubmit(event) {
 }
 
 if (window.location.href.includes("idp.e-kreta.hu/Account/Login")) {
-  transformLoginPage().catch((error) => {
-  });
+  (async () => {
+    while (typeof window.LanguageManager === "undefined") {
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    }
+    transformLoginPage().catch((error) => {
+      console.error("Error transforming login page:", error);
+    });
+  })();
 }
