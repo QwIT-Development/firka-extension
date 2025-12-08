@@ -57,9 +57,12 @@ body {
   align-items:center;
   gap:8px;
 }
-.logo {
+.logos {
   width:32px;
   height:32px;
+}
+.logo {
+  display: none !important;
 }
 .search-title {
   color:var(--text-primary);

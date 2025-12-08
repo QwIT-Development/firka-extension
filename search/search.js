@@ -47,7 +47,7 @@ async function applyFirkaStyling() {
     const logoImg = document.createElement('img');
     logoImg.src = chrome.runtime.getURL('images/firka_logo.png');
     logoImg.alt = 'Firka';
-    logoImg.className = 'logo';
+    logoImg.className = 'logos';
     
     logoText.appendChild(logoImg);
     logoText.appendChild(document.createTextNode('Firka'));
