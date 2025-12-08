@@ -1,3 +1,15 @@
+chrome.runtime.onInstalled.addListener(async (details) => {
+  if (details.reason === 'install') {
+    const setupCompleted = await chrome.storage.sync.get('firka_setupCompleted');
+
+    if (!setupCompleted.firka_setupCompleted) {
+      chrome.tabs.create({
+        url: chrome.runtime.getURL('setup/setup.html')
+      });
+    }
+  }
+});
+
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   (async () => {
     try {

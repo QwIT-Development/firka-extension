@@ -309,6 +309,35 @@
     "success": "Successfully logged out!",
     "continue": "Continue"
   },
+  "setup": {
+    "welcome": "Set up the extension in a few simple steps",
+    "steps": {
+      "theme": "Theme",
+      "language": "Language",
+      "finish": "Done"
+    },
+    "theme": {
+      "title": "Choose a theme",
+      "description": "Select the appearance that suits you best"
+    },
+    "language": {
+      "title": "Choose a language",
+      "description": "Select the language you want to use"
+    },
+    "finish": {
+      "title": "All set!",
+      "description": "Settings saved successfully. Let's start learning!",
+      "about": "About",
+      "about_desc": "Learn more about the project",
+      "support": "Support",
+      "support_desc": "Support the development",
+      "github": "GitHub",
+      "github_desc": "View the source code",
+      "discord": "Discord",
+      "discord_desc": "Join the community",
+      "start": "Get Started"
+    }
+  },
   "common": {
     "save": "Save",
     "cancel": "Cancel",

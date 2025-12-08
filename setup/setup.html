@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Firxa - Kezdeti beállítások</title>
+  <link rel="icon" type="image/png" href="../images/firka_logo_128.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+  <link rel="stylesheet" href="setup.css">
+  <link rel="stylesheet" href="../global/theme.css">
+</head>
+<body>
+  <div class="setup-container">
+    <div class="setup-card">
+      <div class="setup-header">
+        <img src="../images/firka_logo.png" alt="Firka" class="setup-logo">
+        <h1 class="setup-title">Üdvözöl a Firxa!</h1>
+        <p class="setup-subtitle" data-i18n="setup.welcome">Állítsd be a bővítményt néhány egyszerű lépésben</p>
+      </div>
+
+      <div class="progress-bar">
+        <div class="progress-step active" data-step="1">
+          <div class="progress-circle">1</div>
+          <span class="progress-label" data-i18n="setup.steps.theme">Téma</span>
+        </div>
+        <div class="progress-line"></div>
+        <div class="progress-step" data-step="2">
+          <div class="progress-circle">2</div>
+          <span class="progress-label" data-i18n="setup.steps.language">Nyelv</span>
+        </div>
+        <div class="progress-line"></div>
+        <div class="progress-step" data-step="3">
+          <div class="progress-circle">3</div>
+          <span class="progress-label" data-i18n="setup.steps.finish">Kész</span>
+        </div>
+      </div>
+
+      <div class="setup-content">
+        <div class="setup-step active" data-step="1">
+          <div class="step-icon">
+            <span class="material-icons-round">palette</span>
+          </div>
+          <h2 class="step-title" data-i18n="setup.theme.title">Válassz témát</h2>
+          <p class="step-description" data-i18n="setup.theme.description">Válaszd ki a számodra legmegfelelőbb megjelenést</p>
+
+          <div class="theme-options">
+            <button class="theme-card" data-theme="light-green">
+              <div class="theme-preview light-green">
+                <div class="preview-header"></div>
+                <div class="preview-content">
+                  <div class="preview-card"></div>
+                </div>
+              </div>
+              <span class="theme-name" data-i18n="settings.themes.light_green">Világos Zöld</span>
+              <span class="theme-icon material-icons-round">light_mode</span>
+            </button>
+
+            <button class="theme-card" data-theme="dark-green">
+              <div class="theme-preview dark-green">
+                <div class="preview-header"></div>
+                <div class="preview-content">
+                  <div class="preview-card"></div>
+                </div>
+              </div>
+              <span class="theme-name" data-i18n="settings.themes.dark_green">Sötét Zöld</span>
+              <span class="theme-icon material-icons-round">dark_mode</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="setup-step" data-step="2">
+          <div class="step-icon">
+            <span class="material-icons-round">language</span>
+          </div>
+          <h2 class="step-title" data-i18n="setup.language.title">Válassz nyelvet</h2>
+          <p class="step-description" data-i18n="setup.language.description">Válaszd ki a használni kívánt nyelvet</p>
+
+          <div class="language-options">
+            <button class="language-card" data-language="hu">
+              <span class="language-flag">🇭🇺</span>
+              <span class="language-name" data-i18n="settings.languages.hu">Magyar</span>
+            </button>
+
+            <button class="language-card" data-language="en">
+              <span class="language-flag">🇬🇧</span>
+              <span class="language-name" data-i18n="settings.languages.en">English</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="setup-step" data-step="3">
+          <div class="step-icon success">
+            <span class="material-icons-round">check_circle</span>
+          </div>
+          <h2 class="step-title" data-i18n="setup.finish.title">Minden kész!</h2>
+          <p class="step-description" data-i18n="setup.finish.description">A beállítások sikeresen mentve. Indulhat a tanulás!</p>
+
+          <div class="finish-links">
+            <a href="https://firka.app" target="_blank" class="finish-link">
+              <span class="material-icons-round">info</span>
+              <div class="link-content">
+                <span class="link-title" data-i18n="setup.finish.about">Weboldal</span>
+                <span class="link-description" data-i18n="setup.finish.about_desc">Tudj meg többet a projektről</span>
+              </div>
+            </a>
+
+            <a href="https://ko-fi.com/zan1456" target="_blank" class="finish-link">
+              <span class="material-icons-round">favorite</span>
+              <div class="link-content">
+                <span class="link-title" data-i18n="setup.finish.support">Támogatás</span>
+                <span class="link-description" data-i18n="setup.finish.support_desc">Támogasd a fejlesztést</span>
+              </div>
+            </a>
+
+            <a href="https://github.com/QwIT-Development/" target="_blank" class="finish-link">
+              <span class="material-icons-round">code</span>
+              <div class="link-content">
+                <span class="link-title" data-i18n="setup.finish.github">GitHub</span>
+                <span class="link-description" data-i18n="setup.finish.github_desc">Nézd meg a forráskódot</span>
+              </div>
+            </a>
+
+            <a href="https://discord.gg/firka-1111649116020285532" target="_blank" class="finish-link">
+              <span class="material-icons-round">forum</span>
+              <div class="link-content">
+                <span class="link-title" data-i18n="setup.finish.discord">Discord</span>
+                <span class="link-description" data-i18n="setup.finish.discord_desc">Csatlakozz a közösséghez</span>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="setup-actions">
+        <button class="btn-secondary" id="backBtn" style="display: none;">
+          <span class="material-icons-round">arrow_back</span>
+          <span data-i18n="common.back">Vissza</span>
+        </button>
+        <div class="actions-spacer"></div>
+        <button class="btn-primary" id="nextBtn">
+          <span data-i18n="common.next">Tovább</span>
+          <span class="material-icons-round">arrow_forward</span>
+        </button>
+        <button class="btn-primary" id="finishBtn" style="display: none;">
+          <span data-i18n="setup.finish.start">Kezdés</span>
+          <span class="material-icons-round">check</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../tools/storageManager.js"></script>
+  <script src="../global/language.js"></script>
+  <script src="setup.js"></script>
+</body>
+</html>

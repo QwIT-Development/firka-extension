@@ -311,6 +311,35 @@
     "success": "Sikeres kijelentkezés!",
     "continue": "Tovább"
   },
+  "setup": {
+    "welcome": "Állítsd be a bővítményt néhány egyszerű lépésben",
+    "steps": {
+      "theme": "Téma",
+      "language": "Nyelv",
+      "finish": "Kész"
+    },
+    "theme": {
+      "title": "Válassz témát",
+      "description": "Válaszd ki a számodra legmegfelelőbb megjelenést"
+    },
+    "language": {
+      "title": "Válassz nyelvet",
+      "description": "Válaszd ki a használni kívánt nyelvet"
+    },
+    "finish": {
+      "title": "Minden kész!",
+      "description": "A beállítások sikeresen mentve. Indulhat a tanulás!",
+      "about": "Rólunk",
+      "about_desc": "Tudj meg többet a projektről",
+      "support": "Támogatás",
+      "support_desc": "Támogasd a fejlesztést",
+      "github": "GitHub",
+      "github_desc": "Nézd meg a forráskódot",
+      "discord": "Discord",
+      "discord_desc": "Csatlakozz a közösséghez",
+      "start": "Kezdés"
+    }
+  },
   "common": {
     "save": "Mentés",
     "cancel": "Mégse",
