@@ -65,9 +65,9 @@
   async function fetchGradesFromAPI(tanuloId) {
     try {
       const currentDomain = window.location.origin;
-      const apiUrl = `${currentDomain}/api/TanuloErtekelesByTanuloApi/GetTanuloErtekelesByTanuloGridTanuloView?sort=&group=&filter=&data=%7B%22tanuloId%22%3A%22${tanuloId}%22%2C%22oktatasiNevelesiFeladatId%22%3A%227895%22%2C%22isOsztalyAtlagMegjelenik%22%3A%22True%22%7D&_=${Date.now()}`;
+      let apiUrl = `${currentDomain}/api/TanuloErtekelesByTanuloApi/GetTanuloErtekelesByTanuloGridTanuloView?sort=&group=&filter=&data=%7B%22tanuloId%22%3A%22${tanuloId}%22%2C%22oktatasiNevelesiFeladatId%22%3A%227895%22%2C%22isOsztalyAtlagMegjelenik%22%3A%22True%22%7D&_=${Date.now()}`;
 
-      const response = await fetch(apiUrl, {
+      let response = await fetch(apiUrl, {
         method: "GET",
         credentials: "include",
         headers: {
@@ -80,7 +80,28 @@
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const data = await response.json();
+      let data = await response.json();
+
+      if (data.Data && Array.isArray(data.Data) && data.Data.length === 1 && data.Data[0].ID === 0) {
+        console.log("Received only ID: 0, retrying with alternative endpoint...");
+        apiUrl = `${currentDomain}/api/TanuloErtekelesByTanuloApi/GetTanuloErtekelesByTanuloGridTanuloView?sort=&group=&filter=&data=%7B%22tanuloId%22%3A%22${tanuloId}%22%2C%22oktatasiNevelesiFeladatId%22%3A%221160%22%2C%22isOsztalyAtlagMegjelenik%22%3A%22True%22%7D&_=${Date.now()}`;
+        
+        response = await fetch(apiUrl, {
+          method: "GET",
+          credentials: "include",
+          headers: {
+            Accept: "application/json, text/javascript, */*; q=0.01",
+            "X-Requested-With": "XMLHttpRequest",
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error on retry! status: ${response.status}`);
+        }
+
+        data = await response.json();
+      }
+
       return await processAPIGradesData(data);
     } catch (error) {
       console.error("Error fetching grades from API:", error);
