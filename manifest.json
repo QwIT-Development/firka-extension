@@ -193,18 +193,6 @@
     },
     {
       "matches": [
-        "https://*.e-kreta.hu/Adminisztracio/ElfelejtettJelszo*"
-      ],
-      "js": [
-        "forgotpassword/forgotpassword.js"
-      ],
-      "css": [
-        "forgotpassword/forgotpassword.css"
-      ],
-      "run_at": "document_end"
-    },
-    {
-      "matches": [
         "https://intezmenykereso.e-kreta.hu/"
       ],
       "js": [

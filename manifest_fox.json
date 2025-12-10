@@ -17,16 +17,14 @@
     "tabs"
   ],
   "background": {
-    "service_worker": "tools/background.js",
-    "scripts": ["tools/background.js"],
-    "persistent": false
+    "scripts": ["tools/background.js"]
   },
   "browser_specific_settings": {
     "gecko": {
       "id": "firxa@zan1456.hu",
       "strict_min_version": "109.0",
       "data_collection_permissions": {
-        "required": ["none"]
+        "required": []
       }
     }
   },
@@ -189,18 +187,6 @@
       ],
       "css": [
         "profile/profile.css"
-      ],
-      "run_at": "document_end"
-    },
-    {
-      "matches": [
-        "https://*.e-kreta.hu/Adminisztracio/ElfelejtettJelszo*"
-      ],
-      "js": [
-        "forgotpassword/forgotpassword.js"
-      ],
-      "css": [
-        "forgotpassword/forgotpassword.css"
       ],
       "run_at": "document_end"
     },
