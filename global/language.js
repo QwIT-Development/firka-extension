@@ -184,6 +184,7 @@
     getAvailableLanguages: () => [
       { code: "hu", name: "Magyar" },
       { code: "en", name: "English" },
+      { code: "de", name: "Deutsch" },
     ],
   };
 })();

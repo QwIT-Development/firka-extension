@@ -9,7 +9,7 @@
     "theme": "Theme",
     "language": "Language",
     "tabs": {
-      "home": "Home",
+      "appearance": "Appearance",
       "settings": "Settings",
       "about": "About"
     },
@@ -73,17 +73,20 @@
       "card_color": "Card color",
       "text_color": "Text color",
       "preview": "Preview",
-      "share": "Share theme",
+      "share": "Share",
       "share_description": "Copy the code and share it with others:",
-      "import": "Import theme",
+      "import": "Import",
       "import_description": "Paste the theme code:",
       "import_error_empty": "Please paste the theme code!",
       "import_error_invalid": "Invalid theme code!",
-      "delete_confirm": "Are you sure you want to delete this theme?"
+      "delete_confirm": "Are you sure you want to delete this theme?",
+      "delete": "Delete",
+      "manage": "Manage"
     },
     "languages": {
       "hu": "Magyar",
-      "en": "English"
+      "en": "English",
+      "de": "Deutsch"
     },
     "about": {
       "title": "About",
@@ -94,6 +97,13 @@
       "title": "Support",
       "description": "If you like our work and would like to support the development, you can do so in the following way:",
       "kofi": "Ko-Fi"
+    },
+    "error_reporting": {
+      "title": "Error Reporting",
+      "enable": "Enable error reporting",
+      "enable_desc": "Send automatic error reports to developers to help fix the extension",
+      "report_issue": "Report bug or idea",
+      "report_issue_desc": "Open a GitHub issue"
     }
   },
   "navigation": {

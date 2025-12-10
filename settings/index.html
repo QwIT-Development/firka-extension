@@ -23,9 +23,9 @@
     </header>
 
     <div class="tab-navigation">
-      <button class="tab-button active" data-tab="home">
-        <span class="material-icons-round">home</span>
-        <span data-i18n="settings.tabs.home">Főoldal</span>
+      <button class="tab-button active" data-tab="appearance">
+        <span class="material-icons-round">palette</span>
+        <span data-i18n="settings.tabs.appearance">Megjelenés</span>
       </button>
       <button class="tab-button" data-tab="settings">
         <span class="material-icons-round">tune</span>
@@ -37,16 +37,32 @@
       </button>
     </div>
 
-    <div class="tab-content active" id="tab-home">
+    <div class="tab-content active" id="tab-appearance">
       <div class="settings-card">
-        <h2 data-i18n="settings.appearance">Megjelenés</h2>
         <div class="settings-group">
           <div class="setting-section">
-            <div class="setting-header">
-              <span class="material-icons-round">palette</span>
-              <span data-i18n="settings.theme">Téma</span>
+            <div class="setting-header theme-header">
+              <div class="setting-header-left">
+                <span class="material-icons-round">palette</span>
+                <span data-i18n="settings.theme">Téma</span>
+              </div>
+              <div class="theme-manage-dropdown">
+                <button class="theme-manage-btn" id="themeManageBtn">
+                  <span class="material-icons-round">settings</span>
+                </button>
+                <div class="theme-manage-menu" id="themeManageMenu">
+                  <button class="theme-manage-item" id="addCustomTheme">
+                    <span class="material-icons-round">add</span>
+                    <span data-i18n="settings.custom_themes.create">Új téma létrehozása</span>
+                  </button>
+                  <button class="theme-manage-item" id="importCustomTheme">
+                    <span class="material-icons-round">download</span>
+                    <span data-i18n="settings.custom_themes.import">Importálás</span>
+                  </button>
+                </div>
+              </div>
             </div>
-            <div class="theme-grid">
+            <div class="theme-grid" id="allThemesGrid">
               <button class="theme-option" data-theme="light-green">
                 <div class="theme-preview light-green">
                   <div class="preview-header"></div>
@@ -67,22 +83,6 @@
                 <span class="theme-name" data-i18n="settings.themes.dark_green">Sötét Zöld</span>
               </button>
             </div>
-            
-            <div class="custom-themes-section">
-              <div class="custom-themes-header">
-                <span data-i18n="settings.custom_themes.title">Egyéni témák</span>
-                <div class="custom-themes-buttons">
-                  <button class="theme-btn" id="addCustomTheme" title="Új téma">
-                    <span class="material-icons-round">add</span>
-                  </button>
-                  <button class="theme-btn" id="importCustomTheme" title="Téma importálása">
-                    <span class="material-icons-round">download</span>
-                  </button>
-                </div>
-              </div>
-              <div class="theme-grid custom-themes-grid" id="customThemesGrid">
-              </div>
-            </div>
           </div>
           <div class="setting-section">
             <div class="setting-header">
@@ -95,6 +95,9 @@
               </button>
               <button class="language-option" data-language="en">
                 <span class="language-name" data-i18n="settings.languages.en">English</span>
+              </button>
+              <button class="language-option" data-language="de">
+                <span class="language-name" data-i18n="settings.languages.de">Deutsch</span>
               </button>
             </div>
           </div>
@@ -116,6 +119,30 @@
           <div class="no-settings-placeholder">
             <span class="material-icons-round">settings_suggest</span>
             <p data-i18n="settings.page_settings.no_settings">Ehhez az oldalhoz nincsenek egyéni beállítások.</p>
+          </div>
+        </div>
+      </div>
+            <div class="error-reporting-card">
+        <h2 data-i18n="settings.error_reporting.title">Hibajelentés</h2>
+        <div class="error-reporting-content">
+          <div class="setting-item">
+            <div class="setting-item-info">
+              <div class="setting-item-label" data-i18n="settings.error_reporting.enable">Hibajelentés engedélyezése</div>
+              <div class="setting-item-description" data-i18n="settings.error_reporting.enable_desc">Automatikus hibajelentés küldése a fejlesztőknek a bővítmény javításához</div>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="errorReportingToggle" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="report-issue-button-wrapper">
+            <a href="https://github.com/QwIT-Development/firka-extension/issues/new" target="_blank" class="report-issue-button">
+              <span class="material-icons-round">bug_report</span>
+              <div class="report-issue-text">
+                <span class="report-issue-title" data-i18n="settings.error_reporting.report_issue">Hiba vagy ötlet jelentése</span>
+                <span class="report-issue-desc" data-i18n="settings.error_reporting.report_issue_desc">Nyiss egy GitHub issue-t</span>
+              </div>
+            </a>
           </div>
         </div>
       </div>
@@ -277,6 +304,9 @@
     </div>
   </div>
 
+  <script src="../tools/sentry-browser.min.js"></script>
+  <script src="../tools/sentry.js"></script>
+  <script src="../tools/helper.js"></script>
   <script src="../tools/storageManager.js"></script>
     <script src="../global/language.js"></script>
     <script src="index.js"></script>

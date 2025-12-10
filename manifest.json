@@ -40,7 +40,9 @@
         "grades/chart.js",
         "i18n/*.json",
         "tools/storageManager.js",
-        "tools/storageTest.js"
+        "tools/storageTest.js",
+        "tools/sentry.js",
+        "tools/sentry-browser.min.js"
       ],
       "matches": [
         "<all_urls>"
@@ -65,6 +67,8 @@
         "https://eugyintezes.e-kreta.hu/*"
       ],
       "js": [
+        "tools/sentry-browser.min.js",
+        "tools/sentry.js",
         "global/language.js",
         "global/theme.js",
         "tools/loadingScreen.js",

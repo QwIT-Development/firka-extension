@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const tabButtons = document.querySelectorAll(".tab-button");
     const tabContents = document.querySelectorAll(".tab-content");
 
-    const lastTab = localStorage.getItem("settingsLastTab") || "home";
+    const lastTab = localStorage.getItem("settingsLastTab") || "appearance";
     switchTab(lastTab);
     
     tabButtons.forEach(button => {
@@ -369,19 +369,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function renderCustomThemes() {
-    const grid = document.getElementById("customThemesGrid");
+    const grid = document.getElementById("allThemesGrid");
     if (!grid) return;
+    grid.querySelectorAll(".custom-theme-option").forEach(el => el.remove());
+    document.querySelectorAll(".custom-theme-dropdown").forEach(el => el.remove());
 
     if (customThemes.length === 0) {
-      helper.clearElement(grid);
-      const noThemes = document.createElement('div');
-      noThemes.className = 'no-custom-themes';
-      noThemes.setAttribute('data-i18n', 'settings.custom_themes.no_themes');
-      noThemes.textContent = 'Még nincsenek egyéni témák';
-      grid.appendChild(noThemes);
-      if (window.LanguageManager) {
-        window.LanguageManager.loadTranslationsForPage();
-      }
       return;
     }
 
@@ -393,60 +386,89 @@ document.addEventListener("DOMContentLoaded", async () => {
           <div class="preview-content">
             <div class="preview-card" style="background: ${theme.colors.accent}20; border: 1px solid ${theme.colors.accent};"></div>
           </div>
-        </div>
-        <div class="theme-info">
           <span class="theme-name">${theme.name}</span>
-          <div class="theme-actions">
-            <span class="theme-action-btn edit-theme" data-id="${theme.id}" title="Szerkesztés">
-              <span class="material-icons-round">edit</span>
-            </span>
-            <span class="theme-action-btn share-theme" data-id="${theme.id}" title="Megosztás">
-              <span class="material-icons-round">share</span>
-            </span>
-            <span class="theme-action-btn delete-theme" data-id="${theme.id}" title="Törlés">
-              <span class="material-icons-round">delete</span>
-            </span>
+          <div class="custom-theme-settings-btn" role="button" tabindex="0" data-id="${theme.id}">
+            <span class="material-icons-round">settings</span>
           </div>
         </div>
       </button>
     `).join("");
-    
-    helper.clearElement(grid);
-    grid.appendChild(template.content);
 
+    grid.appendChild(template.content);
+    const dropdownTemplate = document.createElement('template');
+    dropdownTemplate.innerHTML = customThemes.map(theme => `
+      <div class="custom-theme-dropdown" data-dropdown-id="${theme.id}">
+        <button class="custom-theme-dropdown-item" data-action="share" data-id="${theme.id}">
+          <span class="material-icons-round">share</span>
+          <span data-i18n="settings.custom_themes.share">Megosztás</span>
+        </button>
+        <button class="custom-theme-dropdown-item" data-action="edit" data-id="${theme.id}">
+          <span class="material-icons-round">edit</span>
+          <span data-i18n="settings.custom_themes.edit">Szerkesztés</span>
+        </button>
+        <button class="custom-theme-dropdown-item delete" data-action="delete" data-id="${theme.id}">
+          <span class="material-icons-round">delete</span>
+          <span data-i18n="settings.custom_themes.delete">Törlés</span>
+        </button>
+      </div>
+    `).join("");
+
+    document.body.appendChild(dropdownTemplate.content);
     grid.querySelectorAll(".custom-theme-option").forEach(btn => {
       btn.addEventListener("click", (e) => {
-        if (e.target.closest(".theme-action-btn")) return;
+        if (e.target.closest(".theme-hover-btn")) return;
         const themeId = btn.dataset.theme;
         applyTheme(themeId);
       });
     });
-
-    grid.querySelectorAll(".edit-theme").forEach(btn => {
+    grid.querySelectorAll(".custom-theme-settings-btn").forEach(btn => {
       btn.addEventListener("click", (e) => {
         e.stopPropagation();
         const id = btn.dataset.id;
-        editTheme(id);
+        const dropdown = document.querySelector(`[data-dropdown-id="${id}"]`);
+        document.querySelectorAll(".custom-theme-dropdown").forEach(d => {
+          if (d !== dropdown) d.classList.remove("active");
+        });
+
+        if (dropdown) {
+          const isActive = dropdown.classList.contains("active");
+
+          if (!isActive) {
+            const btnRect = btn.getBoundingClientRect();
+            dropdown.style.top = `${btnRect.bottom + 4}px`;
+            dropdown.style.left = `${btnRect.right - 160}px`;
+          }
+
+          dropdown.classList.toggle("active");
+        }
       });
     });
 
-    grid.querySelectorAll(".share-theme").forEach(btn => {
+    document.querySelectorAll(".custom-theme-dropdown-item").forEach(btn => {
       btn.addEventListener("click", (e) => {
         e.stopPropagation();
+        const action = btn.dataset.action;
         const id = btn.dataset.id;
-        shareTheme(id);
+        const dropdown = btn.closest(".custom-theme-dropdown");
+        dropdown?.classList.remove("active");
+
+        if (action === "share") shareTheme(id);
+        else if (action === "edit") editTheme(id);
+        else if (action === "delete") deleteTheme(id);
       });
     });
 
-    grid.querySelectorAll(".delete-theme").forEach(btn => {
-      btn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        const id = btn.dataset.id;
-        deleteTheme(id);
-      });
+    document.addEventListener("click", (e) => {
+      if (!e.target.closest(".custom-theme-settings")) {
+        document.querySelectorAll(".custom-theme-dropdown").forEach(d => d.classList.remove("active"));
+      }
     });
 
     updateThemeButtons(getCurrentTheme());
+
+    if (window.LanguageManager) {
+      window.LanguageManager.loadTranslationsForPage();
+    }
   }
 
   function openThemeEditor(theme = null) {
@@ -576,8 +598,45 @@ document.addEventListener("DOMContentLoaded", async () => {
     };
 
     const code = btoa(JSON.stringify(shareData));
-    document.getElementById("shareCode").value = code;
-    document.getElementById("shareThemeModal").classList.add("active");
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(code).then(() => {
+        showNotification('Téma kód vágólapra másolva!');
+      }).catch(() => {
+        copyToClipboardFallback(code);
+        showNotification('Téma kód vágólapra másolva!');
+      });
+    } else {
+      copyToClipboardFallback(code);
+      showNotification('Téma kód vágólapra másolva!');
+    }
+  }
+
+  function copyToClipboardFallback(text) {
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.style.position = 'fixed';
+    textarea.style.opacity = '0';
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textarea);
+  }
+
+  function showNotification(message) {
+    const notification = document.createElement('div');
+    notification.className = 'notification';
+    notification.textContent = message;
+    document.body.appendChild(notification);
+    setTimeout(() => {
+      notification.classList.add('show');
+    }, 10);
+    setTimeout(() => {
+      notification.classList.remove('show');
+      setTimeout(() => {
+        notification.remove();
+      }, 300);
+    }, 3000);
   }
 
   function deleteTheme(id) {
@@ -689,19 +748,14 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   async function applyLanguage(language) {
-    localStorage.setItem("languagePreference", language);
-
-    updateLanguageButtons(language);
-
-    const tabs = await chrome.tabs.query({});
-    tabs.forEach((tab) => {
-      chrome.tabs
-        .sendMessage(tab.id, {
-          action: "changeLanguage",
-          language: language,
-        })
-        .catch(() => {});
-    });
+    try {
+      if (window.LanguageManager) {
+        await window.LanguageManager.changeLanguage(language);
+      }
+      updateLanguageButtons(language);
+    } catch (error) {
+      console.error("Error applying language:", error);
+    }
   }
 
   async function applyTheme(theme) {
@@ -736,7 +790,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   function applyCustomThemeColors(theme) {
     const root = document.documentElement;
     const isDark = theme.mode === "dark";
-    
+
     root.style.setProperty("--background", theme.colors.background);
     root.style.setProperty("--card-card", theme.colors.card);
     root.style.setProperty("--accent-accent", theme.colors.accent);
@@ -748,6 +802,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     root.style.setProperty("--accent-secondary", isDark ? lightenColor(theme.colors.accent, 20) : darkenColor(theme.colors.accent, 20));
     root.style.setProperty("--shadow-blur", isDark ? "0" : "2px");
     root.style.setProperty("--accent-shadow", isDark ? "#0000" : theme.colors.accent + "26");
+    root.style.setProperty("--warning-accent", "#FFA046");
+    root.style.setProperty("--warning-text", isDark ? "#f0b37a" : "#8F531B");
+    root.style.setProperty("--warning-15", "#ffa04626");
+    root.style.setProperty("--warning-card", isDark ? "#201203" : "#FAEBDC");
+    root.style.setProperty("--error-accent", "#FF54A1");
+    root.style.setProperty("--error-text", isDark ? "#f59ec5" : "#8F1B4F");
+    root.style.setProperty("--error-15", "#FF54A126");
+    root.style.setProperty("--error-card", isDark ? "#1e030f" : "#FADCE9");
+
     root.style.setProperty("--icon-filter", hexToFilter(theme.colors.accent));
   }
 
@@ -755,7 +818,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const root = document.documentElement;
     const properties = [
       "--background",
-      "--card-card", 
+      "--card-card",
       "--accent-accent",
       "--text-primary",
       "--text-secondary",
@@ -765,9 +828,17 @@ document.addEventListener("DOMContentLoaded", async () => {
       "--accent-secondary",
       "--shadow-blur",
       "--accent-shadow",
-      "--icon-filter"
+      "--icon-filter",
+      "--warning-accent",
+      "--warning-text",
+      "--warning-15",
+      "--warning-card",
+      "--error-accent",
+      "--error-text",
+      "--error-15",
+      "--error-card"
     ];
-    
+
     properties.forEach(prop => root.style.removeProperty(prop));
   }
 
@@ -850,12 +921,31 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   });
 
-  document.getElementById("addCustomTheme")?.addEventListener("click", () => openThemeEditor());
+  const themeManageBtn = document.getElementById("themeManageBtn");
+  const themeManageMenu = document.getElementById("themeManageMenu");
+  
+  themeManageBtn?.addEventListener("click", (e) => {
+    e.stopPropagation();
+    themeManageMenu.classList.toggle("active");
+  });
+
+  document.addEventListener("click", (e) => {
+    if (!e.target.closest(".theme-manage-dropdown")) {
+      themeManageMenu?.classList.remove("active");
+    }
+  });
+
+  document.getElementById("addCustomTheme")?.addEventListener("click", () => {
+    themeManageMenu?.classList.remove("active");
+    openThemeEditor();
+  });
+  
   document.getElementById("closeThemeEditor")?.addEventListener("click", closeThemeEditor);
   document.getElementById("cancelThemeEditor")?.addEventListener("click", closeThemeEditor);
   document.getElementById("saveTheme")?.addEventListener("click", saveThemeFromEditor);
   
   document.getElementById("importCustomTheme")?.addEventListener("click", () => {
+    themeManageMenu?.classList.remove("active");
     document.getElementById("importThemeModal").classList.add("active");
   });
   
@@ -957,4 +1047,23 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
 
   await initTabs();
+  await initErrorReporting();
 });
+
+async function initErrorReporting() {
+  const toggle = document.getElementById('errorReportingToggle');
+  if (!toggle) return;
+  const result = await storageManager.get('firka_errorReporting', true);
+  toggle.checked = result !== false;
+  toggle.addEventListener('change', async () => {
+    const enabled = toggle.checked;
+    await storageManager.set('firka_errorReporting', enabled);
+    const tabs = await chrome.tabs.query({});
+    tabs.forEach((tab) => {
+      chrome.tabs.sendMessage(tab.id, {
+        action: 'errorReportingChanged',
+        enabled: enabled
+      }).catch(() => {});
+    });
+  });
+}

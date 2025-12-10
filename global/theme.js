@@ -14,15 +14,13 @@
   function applyCustomThemeColors(theme) {
     const root = document.documentElement;
     const isDark = theme.mode === "dark";
-    
+
     root.style.setProperty("--background", theme.colors.background);
     root.style.setProperty("--background-0", theme.colors.background + "00");
     root.style.setProperty("--card-card", theme.colors.card);
     root.style.setProperty("--card-translucent", theme.colors.card + "80");
     root.style.setProperty("--accent-accent", theme.colors.accent);
     root.style.setProperty("--text-primary", theme.colors.text);
-    
-    // Származtatott színek
     root.style.setProperty("--text-secondary", theme.colors.text + "cc");
     root.style.setProperty("--text-teritary", theme.colors.text + "80");
     root.style.setProperty("--accent-15", theme.colors.accent + "26");
@@ -30,19 +28,22 @@
     root.style.setProperty("--accent-secondary", isDark ? lightenColor(theme.colors.accent, 20) : darkenColor(theme.colors.accent, 20));
     root.style.setProperty("--shadow-blur", isDark ? "0" : "2px");
     root.style.setProperty("--accent-shadow", isDark ? "#0000" : theme.colors.accent + "26");
-    
-    // SVG ikon filter beállítása a kiemelő szín alapján
+    root.style.setProperty("--warning-accent", "#FFA046");
+    root.style.setProperty("--warning-text", isDark ? "#f0b37a" : "#8F531B");
+    root.style.setProperty("--warning-15", "#ffa04626");
+    root.style.setProperty("--warning-card", isDark ? "#201203" : "#FAEBDC");
+    root.style.setProperty("--error-accent", "#FF54A1");
+    root.style.setProperty("--error-text", isDark ? "#f59ec5" : "#8F1B4F");
+    root.style.setProperty("--error-15", "#FF54A126");
+    root.style.setProperty("--error-card", isDark ? "#1e030f" : "#FADCE9");
     root.style.setProperty("--icon-filter", hexToFilter(theme.colors.accent));
   }
 
-  // Hex szín átalakítása CSS filterré
   function hexToFilter(hex) {
-    // Hex -> RGB
     const r = parseInt(hex.slice(1, 3), 16);
     const g = parseInt(hex.slice(3, 5), 16);
     const b = parseInt(hex.slice(5, 7), 16);
     
-    // RGB -> HSL
     const rNorm = r / 255;
     const gNorm = g / 255;
     const bNorm = b / 255;
@@ -66,10 +67,6 @@
     const hue = Math.round(h * 360);
     const saturation = Math.round(s * 100);
     const lightness = Math.round(l * 100);
-    
-    // Filter létrehozása
-    // Ez egy egyszerűsített megközelítés - a pontos szín reprodukálásához
-    // komplexebb számítás kellene, de ez megfelelő a legtöbb esetben
     const brightnessVal = lightness > 50 ? 1 + (lightness - 50) / 100 : 0.5 + lightness / 100;
     const saturateVal = saturation > 0 ? 1 + saturation / 100 : 0;
     
@@ -100,20 +97,20 @@
       "--background", "--background-0", "--card-card", "--card-translucent",
       "--accent-accent", "--text-primary", "--text-secondary", "--text-teritary",
       "--accent-15", "--button-secondaryFill", "--accent-secondary",
-      "--shadow-blur", "--accent-shadow", "--icon-filter"
+      "--shadow-blur", "--accent-shadow", "--icon-filter",
+      "--warning-accent", "--warning-text", "--warning-15", "--warning-card",
+      "--error-accent", "--error-text", "--error-15", "--error-card"
     ];
     customProps.forEach(prop => root.style.removeProperty(prop));
   }
 
   async function setTheme(theme) {
     try {
-      // Töröljük az előző egyéni téma stílusait
       clearCustomThemeStyles();
       
       document.documentElement.setAttribute("data-theme", theme);
       await storageManager.set("themePreference", theme);
-      
-      // Ha egyéni téma, alkalmazzuk a színeket
+
       if (theme.startsWith("custom-")) {
         await loadCustomThemes();
         const themeId = theme.replace("custom-", "");
@@ -244,7 +241,6 @@
 
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.action === "changeTheme") {
-      // Ha egyéni témák is jöttek az üzenetben, frissítsük a lokális listát
       if (message.customThemes) {
         customThemes = message.customThemes;
       }

@@ -9,7 +9,7 @@
     "theme": "Téma",
     "language": "Nyelv",
     "tabs": {
-      "home": "Főoldal",
+      "appearance": "Megjelenés",
       "settings": "Beállítások",
       "about": "Névjegy"
     },
@@ -63,7 +63,7 @@
     "custom_themes": {
       "title": "Egyéni témák",
       "no_themes": "Még nincsenek egyéni témák",
-      "create": "Új téma létrehozása",
+      "create": "Új téma",
       "edit": "Téma szerkesztése",
       "name": "Téma neve",
       "mode": "Mód",
@@ -75,17 +75,20 @@
       "card_color": "Kártya szín",
       "text_color": "Szöveg szín",
       "preview": "Előnézet",
-      "share": "Téma megosztása",
+      "share": "Megosztás",
       "share_description": "Másold ki a kódot és oszd meg másokkal:",
-      "import": "Téma importálása",
+      "import": "Importálás",
       "import_description": "Illeszd be a téma kódot:",
       "import_error_empty": "Kérlek illeszd be a téma kódot!",
       "import_error_invalid": "Érvénytelen téma kód!",
-      "delete_confirm": "Biztosan törölni szeretnéd ezt a témát?"
+      "delete_confirm": "Biztosan törölni szeretnéd ezt a témát?",
+      "delete": "Törlés",
+      "manage": "Kezelés"
     },
     "languages": {
       "hu": "Magyar",
-      "en": "English"
+      "en": "English",
+      "de": "Deutsch"
     },
     "about": {
       "title": "Névjegy",
@@ -96,6 +99,13 @@
       "title": "Támogatás",
       "description": "Ha tetszik a munkánk és szeretnéd támogatni a fejlesztést, az alábbi módon teheted meg:",
       "kofi": "Ko-Fi"
+    },
+    "error_reporting": {
+      "title": "Hibajelentés",
+      "enable": "Hibajelentés engedélyezése",
+      "enable_desc": "Automatikus hibajelentés küldése a fejlesztőknek a bővítmény javításához",
+      "report_issue": "Hiba vagy ötlet jelentése",
+      "report_issue_desc": "Nyiss egy GitHub issue-t"
     }
   },
   "navigation": {
