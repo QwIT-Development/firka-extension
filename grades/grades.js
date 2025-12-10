@@ -28,17 +28,18 @@
       const classAverage = calculateOverallClassAverage(gradesData.subjects);
 
       window.currentGradesData = gradesData;
-      document.body.innerHTML = '';
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(await generatePageHTML(
+      
+      const htmlString = await generatePageHTML(
         gradesData,
         studentAverage,
         classAverage,
-      ), 'text/html');
-      const tempDiv = doc.body;
-      while (tempDiv.firstChild) {
-        document.body.appendChild(tempDiv.firstChild);
-      }
+      );
+      
+      const template = document.createElement('template');
+      template.innerHTML = htmlString;
+      
+      helper.clearElement(document.body);
+      document.body.appendChild(template.content);
 
       
       setupUserDropdown();

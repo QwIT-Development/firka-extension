@@ -45,7 +45,7 @@ function checkMaintenancePage() {
     );
     existingStyles.forEach((style) => style.remove());
 
-    body.innerHTML = "";
+    helper.clearElement(body);
     body.classList.add("maintenance-mode");
     body.classList.add("theme-enabled");
     body.classList.add("loaded");

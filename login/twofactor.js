@@ -83,13 +83,12 @@ async function transformTwoFactorPage() {
       </div>
     `;
 
-    document.body.innerHTML = '';
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(newHTML, 'text/html');
-    const tempDiv = doc.body;
-    while (tempDiv.firstChild) {
-      document.body.appendChild(tempDiv.firstChild);
-    }
+    const template = document.createElement('template');
+    template.innerHTML = newHTML;
+    
+    helper.clearElement(document.body);
+    document.body.appendChild(template.content);
+    
     applyTheme();
     setupEventListeners();
     if (typeof loadingScreen !== "undefined") {
@@ -170,7 +169,7 @@ function handleSubmit(event) {
     const submitButton = form.querySelector(".btn-kreta");
     if (submitButton) {
       submitButton.disabled = true;
-      submitButton.innerHTML = '';
+      helper.clearElement(submitButton);
       const spinnerSpan = document.createElement('span');
       spinnerSpan.className = 'spinner';
       const textSpan = document.createElement('span');

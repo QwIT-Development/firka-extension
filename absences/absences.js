@@ -402,9 +402,9 @@ async function transformAbsencesPage() {
   container.className = 'kreta-container';
 
   const headerDiv = document.createElement('div');
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(await createTemplate.header(), 'text/html');
-  const tempDiv = doc.body;
+  const template = document.createElement('template');
+  template.innerHTML = await createTemplate.header();
+  const tempDiv = template.content;
   while (tempDiv.firstChild) {
     headerDiv.appendChild(tempDiv.firstChild);
   }

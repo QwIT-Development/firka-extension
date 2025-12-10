@@ -34,10 +34,10 @@
         </footer>
       </div>
     `;
-    document.body.innerHTML = '';
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(newHTML, 'text/html');
-    const tempDiv = doc.body;
+    helper.clearElement(document.body);
+    const template = document.createElement('template');
+    template.innerHTML = newHTML;
+    const tempDiv = template.content;
     while (tempDiv.firstChild) {
       document.body.appendChild(tempDiv.firstChild);
     }

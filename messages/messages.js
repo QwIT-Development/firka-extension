@@ -42,7 +42,7 @@
   function sanitizeHTML(html) {
     const div = document.createElement('div');
     div.textContent = html;
-    return div.innerHTML;
+    return div.textContent;
   }
 
   class APIManager {
@@ -159,18 +159,32 @@
 
       const modalContent = document.createElement('div');
       modalContent.className = 'modal-content';
-      modalContent.innerHTML = `
-        <div class="modal-header">
-          <h2>Üzenet részletei</h2>
-          <button class="modal-close">×</button>
-        </div>
-        <div class="modal-body">
-          <div class="loading-content">
-            <div class="loading-spinner"></div>
-            <p>Üzenet betöltése...</p>
-          </div>
-        </div>
-      `;
+      
+      const modalHeader = document.createElement('div');
+      modalHeader.className = 'modal-header';
+      const modalTitle = document.createElement('h2');
+      modalTitle.textContent = 'Üzenet részletei';
+      const modalClose = document.createElement('button');
+      modalClose.className = 'modal-close';
+      modalClose.textContent = '×';
+      modalHeader.appendChild(modalTitle);
+      modalHeader.appendChild(modalClose);
+      
+      const modalBody = document.createElement('div');
+      modalBody.className = 'modal-body';
+      const loadingContent = document.createElement('div');
+      loadingContent.className = 'loading-content';
+      const loadingSpinner = document.createElement('div');
+      loadingSpinner.className = 'loading-spinner';
+      const loadingText = document.createElement('p');
+      loadingText.textContent = 'Üzenet betöltése...';
+      loadingContent.appendChild(loadingSpinner);
+      loadingContent.appendChild(loadingText);
+      modalBody.appendChild(loadingContent);
+      
+      modalContent.appendChild(modalHeader);
+      modalContent.appendChild(modalBody);
+      
       modalOverlay.appendChild(modalContent);
       document.body.appendChild(modalOverlay);
       
@@ -213,13 +227,24 @@
       console.error('Error loading message details:', error);
       const modalContent = document.querySelector('.modal-content');
       if (modalContent) {
-        modalContent.querySelector('.modal-body').innerHTML = `
-          <div class="error-content">
-            <h3>Hiba történt</h3>
-            <p>Az üzenet betöltése sikertelen.</p>
-            <button class="retry-btn" onclick="openMessageModal(${messageId})">Újrapróbálás</button>
-          </div>
-        `;
+        const modalBody = modalContent.querySelector('.modal-body');
+        helper.clearElement(modalBody);
+        
+        const errorContent = document.createElement('div');
+        errorContent.className = 'error-content';
+        const errorTitle = document.createElement('h3');
+        errorTitle.textContent = 'Hiba történt';
+        const errorText = document.createElement('p');
+        errorText.textContent = 'Az üzenet betöltése sikertelen.';
+        const retryBtn = document.createElement('button');
+        retryBtn.className = 'retry-btn';
+        retryBtn.textContent = 'Újrapróbálás';
+        retryBtn.onclick = () => openMessageModal(messageId);
+        
+        errorContent.appendChild(errorTitle);
+        errorContent.appendChild(errorText);
+        errorContent.appendChild(retryBtn);
+        modalBody.appendChild(errorContent);
       }
     }
   }
@@ -231,38 +256,86 @@
     const subject = message.targy || 'Nincs tárgy';
     const content = message.szoveg || 'Nincs tartalom';
 
-    modalContent.querySelector('.modal-body').innerHTML = `
-      <div class="message-details">
-        <div class="message-info">
-          <div class="info-row">
-            <span class="info-label">Feladó:</span>
-            <span class="info-value">${sanitizeHTML(sender)}</span>
-          </div>
-          <div class="info-row">
-            <span class="info-label">Dátum:</span>
-            <span class="info-value">${date}</span>
-          </div>
-          <div class="info-row">
-            <span class="info-label">Tárgy:</span>
-            <span class="info-value">${sanitizeHTML(subject)}</span>
-          </div>
-        </div>
-        <div class="message-content">
-          <h4>Üzenet tartalma:</h4>
-          <div class="message-text">${content}</div>
-        </div>
-        ${message.csatolmanyok && message.csatolmanyok.length > 0 ? `
-          <div class="message-attachments">
-            <h4>Mellékletek:</h4>
-            <ul>
-              ${message.csatolmanyok.map(attachment => `
-                <li><a href="#" onclick="downloadAttachment('${attachment.azonosito}')">${sanitizeHTML(attachment.nev)}</a></li>
-              `).join('')}
-            </ul>
-          </div>
-        ` : ''}
-      </div>
-    `;
+    const modalBody = modalContent.querySelector('.modal-body');
+    helper.clearElement(modalBody);
+    
+    const messageDetails = document.createElement('div');
+    messageDetails.className = 'message-details';
+    
+    const messageInfo = document.createElement('div');
+    messageInfo.className = 'message-info';
+ 
+    const senderRow = document.createElement('div');
+    senderRow.className = 'info-row';
+    const senderLabel = document.createElement('span');
+    senderLabel.className = 'info-label';
+    senderLabel.textContent = 'Feladó:';
+    const senderValue = document.createElement('span');
+    senderValue.className = 'info-value';
+    senderValue.textContent = sanitizeHTML(sender);
+    senderRow.appendChild(senderLabel);
+    senderRow.appendChild(senderValue);
+    messageInfo.appendChild(senderRow);
+
+    const dateRow = document.createElement('div');
+    dateRow.className = 'info-row';
+    const dateLabel = document.createElement('span');
+    dateLabel.className = 'info-label';
+    dateLabel.textContent = 'Dátum:';
+    const dateValue = document.createElement('span');
+    dateValue.className = 'info-value';
+    dateValue.textContent = date;
+    dateRow.appendChild(dateLabel);
+    dateRow.appendChild(dateValue);
+    messageInfo.appendChild(dateRow);
+
+    const subjectRow = document.createElement('div');
+    subjectRow.className = 'info-row';
+    const subjectLabel = document.createElement('span');
+    subjectLabel.className = 'info-label';
+    subjectLabel.textContent = 'Tárgy:';
+    const subjectValue = document.createElement('span');
+    subjectValue.className = 'info-value';
+    subjectValue.textContent = sanitizeHTML(subject);
+    subjectRow.appendChild(subjectLabel);
+    subjectRow.appendChild(subjectValue);
+    messageInfo.appendChild(subjectRow);
+    
+    messageDetails.appendChild(messageInfo);
+
+    const messageContent = document.createElement('div');
+    messageContent.className = 'message-content';
+    const contentTitle = document.createElement('h4');
+    contentTitle.textContent = 'Üzenet tartalma:';
+    messageContent.appendChild(contentTitle);
+    const messageText = document.createElement('div');
+    messageText.className = 'message-text';
+    messageText.textContent = content;
+    messageContent.appendChild(messageText);
+    messageDetails.appendChild(messageContent);
+
+    if (message.csatolmanyok && message.csatolmanyok.length > 0) {
+      const messageAttachments = document.createElement('div');
+      messageAttachments.className = 'message-attachments';
+      const attachTitle = document.createElement('h4');
+      attachTitle.textContent = 'Mellékletek:';
+      messageAttachments.appendChild(attachTitle);
+      
+      const attachList = document.createElement('ul');
+      message.csatolmanyok.forEach(attachment => {
+        const li = document.createElement('li');
+        const a = document.createElement('a');
+        a.href = '#';
+        a.textContent = sanitizeHTML(attachment.nev);
+        a.onclick = () => downloadAttachment(attachment.azonosito);
+        li.appendChild(a);
+        attachList.appendChild(li);
+      });
+      messageAttachments.appendChild(attachList);
+      messageDetails.appendChild(messageAttachments);
+    }
+    
+    modalBody.appendChild(messageDetails);
   }
 
   function closeMessageModal() {
@@ -278,28 +351,39 @@
   function createLoadingState() {
     const loadingDiv = document.createElement('div');
     loadingDiv.className = 'loading-state';
-    loadingDiv.innerHTML = `
-      <div class="loading-content">
-        <div class="loading-spinner"></div>
-        <p>${LanguageManager.t('messages.loading', 'Üzenetek betöltése...')}</p>
-      </div>
-    `;
+    
+    const loadingContent = document.createElement('div');
+    loadingContent.className = 'loading-content';
+    const spinner = document.createElement('div');
+    spinner.className = 'loading-spinner';
+    const text = document.createElement('p');
+    text.textContent = LanguageManager.t('messages.loading', 'Üzenetek betöltése...');
+    loadingContent.appendChild(spinner);
+    loadingContent.appendChild(text);
+    loadingDiv.appendChild(loadingContent);
+    
     return loadingDiv;
   }
 
   function createErrorState(onRetry) {
     const errorDiv = document.createElement('div');
     errorDiv.className = 'error-state';
-    errorDiv.innerHTML = `
-      <div class="error-content">
-        <h3>${LanguageManager.t('messages.error.title', 'Hiba történt')}</h3>
-        <p>${LanguageManager.t('messages.error.description', 'Az üzenetek betöltése sikertelen volt.')}</p>
-        <button class="retry-btn">${LanguageManager.t('messages.error.retry', 'Újrapróbálás')}</button>
-      </div>
-    `;
     
-    const retryBtn = errorDiv.querySelector('.retry-btn');
+    const errorContent = document.createElement('div');
+    errorContent.className = 'error-content';
+    const title = document.createElement('h3');
+    title.textContent = LanguageManager.t('messages.error.title', 'Hiba történt');
+    const desc = document.createElement('p');
+    desc.textContent = LanguageManager.t('messages.error.description', 'Az üzenetek betöltése sikertelen volt.');
+    const retryBtn = document.createElement('button');
+    retryBtn.className = 'retry-btn';
+    retryBtn.textContent = LanguageManager.t('messages.error.retry', 'Újrapróbálás');
     retryBtn.addEventListener('click', onRetry);
+    
+    errorContent.appendChild(title);
+    errorContent.appendChild(desc);
+    errorContent.appendChild(retryBtn);
+    errorDiv.appendChild(errorContent);
     
     return errorDiv;
   }
@@ -307,12 +391,18 @@
   function createEmptyState() {
     const emptyDiv = document.createElement('div');
     emptyDiv.className = 'empty-state';
-    emptyDiv.innerHTML = `
-      <div class="empty-content">
-        <h3>${LanguageManager.t('messages.empty.title', 'Nincsenek üzenetek')}</h3>
-        <p>${LanguageManager.t('messages.empty.description', 'Jelenleg nincsenek elérhető üzenetek.')}</p>
-      </div>
-    `;
+    
+    const emptyContent = document.createElement('div');
+    emptyContent.className = 'empty-content';
+    const title = document.createElement('h3');
+    title.textContent = LanguageManager.t('messages.empty.title', 'Nincsenek üzenetek');
+    const desc = document.createElement('p');
+    desc.textContent = LanguageManager.t('messages.empty.description', 'Jelenleg nincsenek elérhető üzenetek.');
+    
+    emptyContent.appendChild(title);
+    emptyContent.appendChild(desc);
+    emptyDiv.appendChild(emptyContent);
+    
     return emptyDiv;
   }
 
@@ -332,18 +422,42 @@
     const subject = message.uzenetTargy || 'Nincs tárgy';
     const date = formatDate(message.uzenetKuldesDatum);
     const hasAttachment = message.hasCsatolmany;
+
+    const cardHeader = document.createElement('div');
+    cardHeader.className = 'message-card-header';
     
-    card.innerHTML = `
-      <div class="message-card-header">
-        <div class="sender-info">
-          <span class="sender-name">${sanitizeHTML(senderName)}</span>
-          ${!message.isElolvasva ? '<span class="unread-indicator"></span>' : ''}
-        </div>
-        <div class="message-date">${date}</div>
-      </div>
-      <div class="message-subject">${sanitizeHTML(subject)}</div>
-      ${hasAttachment ? '<div class="attachment-indicator">📎</div>' : ''}
-    `;
+    const senderInfo = document.createElement('div');
+    senderInfo.className = 'sender-info';
+    const senderNameSpan = document.createElement('span');
+    senderNameSpan.className = 'sender-name';
+    senderNameSpan.textContent = sanitizeHTML(senderName);
+    senderInfo.appendChild(senderNameSpan);
+    
+    if (!message.isElolvasva) {
+      const unreadIndicator = document.createElement('span');
+      unreadIndicator.className = 'unread-indicator';
+      senderInfo.appendChild(unreadIndicator);
+    }
+    
+    const messageDate = document.createElement('div');
+    messageDate.className = 'message-date';
+    messageDate.textContent = date;
+    
+    cardHeader.appendChild(senderInfo);
+    cardHeader.appendChild(messageDate);
+    card.appendChild(cardHeader);
+    
+    const messageSubject = document.createElement('div');
+    messageSubject.className = 'message-subject';
+    messageSubject.textContent = sanitizeHTML(subject);
+    card.appendChild(messageSubject);
+    
+    if (hasAttachment) {
+      const attachmentIndicator = document.createElement('div');
+      attachmentIndicator.className = 'attachment-indicator';
+      attachmentIndicator.textContent = '📎';
+      card.appendChild(attachmentIndicator);
+    }
     
     
     return card;
@@ -397,41 +511,111 @@
   function renderBulkActions(container) {
     const bulk = document.createElement('div');
     bulk.className = 'bulk-actions-card';
-    bulk.innerHTML = `
-      <div class="bulk-actions-left">
-        <div class="view-toggle">
-          <button id="viewInboxBtn" class="${currentView==='inbox'?'active':''}" title="Beérkezett">
-            <img src="${chrome.runtime.getURL('icons/messages-active.svg')}" alt="Beérkezett">
-          </button>
-          <button id="viewTrashBtn" class="${currentView==='trash'?'active':''}" title="Törölt">
-            <img src="${chrome.runtime.getURL('icons/delete.svg')}" alt="Törölt">
-          </button>
-        </div>
-        <button id="toggleSelectionModeBtn" class="bulk-btn" title="Kijelölés mód">
-          <img src="${chrome.runtime.getURL('icons/select.svg')}" alt="Kijelölés mód">
-        </button>
-        <button id="selectAllBtn" class="bulk-btn" title="Mind kijelöl">
-          <img src="${chrome.runtime.getURL('icons/select-all.svg')}" alt="Mind kijelöl">
-        </button>
-        <button id="clearSelectionBtn" class="bulk-btn" title="Kijelölés törlése">
-          <img src="${chrome.runtime.getURL('icons/select-none.svg')}" alt="Kijelölés törlése">
-        </button>
-      </div>
-      <div class="bulk-actions-right">
-        <button id="markReadBtn" class="bulk-btn" title="Olvasott">
-          <img src="${chrome.runtime.getURL('icons/eye-on.svg')}" alt="Olvasott">
-        </button>
-        <button id="markUnreadBtn" class="bulk-btn" title="Olvasatlan">
-          <img src="${chrome.runtime.getURL('icons/eye-off.svg')}" alt="Olvasatlan">
-        </button>
-        <button id="deleteBtn" class="bulk-btn" title="Törlés">
-          <img src="${chrome.runtime.getURL('icons/trash.svg')}" alt="Törlés">
-        </button>
-        <button id="restoreBtn" class="bulk-btn" title="Visszaállítás">
-          <img src="${chrome.runtime.getURL('icons/undo.svg')}" alt="Visszaállítás">
-        </button>
-      </div>
-    `;
+
+    const bulkActionsLeft = document.createElement('div');
+    bulkActionsLeft.className = 'bulk-actions-left';
+    
+    const viewToggle = document.createElement('div');
+    viewToggle.className = 'view-toggle';
+    
+    const viewInboxBtn = document.createElement('button');
+    viewInboxBtn.id = 'viewInboxBtn';
+    viewInboxBtn.className = currentView === 'inbox' ? 'active' : '';
+    viewInboxBtn.title = 'Beérkezett';
+    const inboxImg = document.createElement('img');
+    inboxImg.src = chrome.runtime.getURL('icons/messages-active.svg');
+    inboxImg.alt = 'Beérkezett';
+    viewInboxBtn.appendChild(inboxImg);
+    
+    const viewTrashBtn = document.createElement('button');
+    viewTrashBtn.id = 'viewTrashBtn';
+    viewTrashBtn.className = currentView === 'trash' ? 'active' : '';
+    viewTrashBtn.title = 'Törölt';
+    const trashImg = document.createElement('img');
+    trashImg.src = chrome.runtime.getURL('icons/delete.svg');
+    trashImg.alt = 'Törölt';
+    viewTrashBtn.appendChild(trashImg);
+    
+    viewToggle.appendChild(viewInboxBtn);
+    viewToggle.appendChild(viewTrashBtn);
+    bulkActionsLeft.appendChild(viewToggle);
+    
+    const toggleSelBtn = document.createElement('button');
+    toggleSelBtn.id = 'toggleSelectionModeBtn';
+    toggleSelBtn.className = 'bulk-btn';
+    toggleSelBtn.title = 'Kijelölés mód';
+    const selectImg = document.createElement('img');
+    selectImg.src = chrome.runtime.getURL('icons/select.svg');
+    selectImg.alt = 'Kijelölés mód';
+    toggleSelBtn.appendChild(selectImg);
+    bulkActionsLeft.appendChild(toggleSelBtn);
+    
+    const selectAllBtn = document.createElement('button');
+    selectAllBtn.id = 'selectAllBtn';
+    selectAllBtn.className = 'bulk-btn';
+    selectAllBtn.title = 'Mind kijelöl';
+    const selectAllImg = document.createElement('img');
+    selectAllImg.src = chrome.runtime.getURL('icons/select-all.svg');
+    selectAllImg.alt = 'Mind kijelöl';
+    selectAllBtn.appendChild(selectAllImg);
+    bulkActionsLeft.appendChild(selectAllBtn);
+    
+    const clearSelBtn = document.createElement('button');
+    clearSelBtn.id = 'clearSelectionBtn';
+    clearSelBtn.className = 'bulk-btn';
+    clearSelBtn.title = 'Kijelölés törlése';
+    const clearSelImg = document.createElement('img');
+    clearSelImg.src = chrome.runtime.getURL('icons/select-none.svg');
+    clearSelImg.alt = 'Kijelölés törlése';
+    clearSelBtn.appendChild(clearSelImg);
+    bulkActionsLeft.appendChild(clearSelBtn);
+    
+    bulk.appendChild(bulkActionsLeft);
+    
+    const bulkActionsRight = document.createElement('div');
+    bulkActionsRight.className = 'bulk-actions-right';
+    
+    const markReadBtn = document.createElement('button');
+    markReadBtn.id = 'markReadBtn';
+    markReadBtn.className = 'bulk-btn';
+    markReadBtn.title = 'Olvasott';
+    const markReadImg = document.createElement('img');
+    markReadImg.src = chrome.runtime.getURL('icons/eye-on.svg');
+    markReadImg.alt = 'Olvasott';
+    markReadBtn.appendChild(markReadImg);
+    bulkActionsRight.appendChild(markReadBtn);
+    
+    const markUnreadBtn = document.createElement('button');
+    markUnreadBtn.id = 'markUnreadBtn';
+    markUnreadBtn.className = 'bulk-btn';
+    markUnreadBtn.title = 'Olvasatlan';
+    const markUnreadImg = document.createElement('img');
+    markUnreadImg.src = chrome.runtime.getURL('icons/eye-off.svg');
+    markUnreadImg.alt = 'Olvasatlan';
+    markUnreadBtn.appendChild(markUnreadImg);
+    bulkActionsRight.appendChild(markUnreadBtn);
+    
+    const deleteBtn = document.createElement('button');
+    deleteBtn.id = 'deleteBtn';
+    deleteBtn.className = 'bulk-btn';
+    deleteBtn.title = 'Törlés';
+    const deleteImg = document.createElement('img');
+    deleteImg.src = chrome.runtime.getURL('icons/trash.svg');
+    deleteImg.alt = 'Törlés';
+    deleteBtn.appendChild(deleteImg);
+    bulkActionsRight.appendChild(deleteBtn);
+    
+    const restoreBtn = document.createElement('button');
+    restoreBtn.id = 'restoreBtn';
+    restoreBtn.className = 'bulk-btn';
+    restoreBtn.title = 'Visszaállítás';
+    const restoreImg = document.createElement('img');
+    restoreImg.src = chrome.runtime.getURL('icons/undo.svg');
+    restoreImg.alt = 'Visszaállítás';
+    restoreBtn.appendChild(restoreImg);
+    bulkActionsRight.appendChild(restoreBtn);
+    
+    bulk.appendChild(bulkActionsRight);
     container.appendChild(bulk);
 
     bulk.querySelector('#viewInboxBtn').addEventListener('click', () => switchView('inbox'));
@@ -568,13 +752,13 @@ async function switchView(view) {
   async function transformMessagesPage() {
     try {
       await waitForTranslations();
-      document.body.innerHTML = '';
+      helper.clearElement(document.body);
       const kretaContainer = document.createElement('div');
       kretaContainer.className = 'kreta-container';
       const headerDiv = document.createElement('div');
-      const parser = new DOMParser();
-      const headerDoc = parser.parseFromString(await createTemplate.header(), 'text/html');
-      const headerContent = headerDoc.body;
+      const template = document.createElement('template');
+      template.innerHTML = await createTemplate.header();
+      const headerContent = template.content;
       while (headerContent.firstChild) {
         headerDiv.appendChild(headerContent.firstChild);
       }

@@ -37,4 +37,28 @@ const helper = {
     const [hours, minutes] = timeStr.split(":").map(Number);
     return hours * 60 + minutes;
   },
+
+  createElementFromHTML(htmlString) {
+    const template = document.createElement('template');
+    template.innerHTML = htmlString.trim();
+    return template.content;
+  },
+
+  setTextContent(element, text) {
+    element.textContent = text;
+  },
+
+  clearElement(element) {
+    while (element.firstChild) {
+      element.removeChild(element.firstChild);
+    }
+  },
+
+  appendChildren(parent, children) {
+    if (Array.isArray(children)) {
+      children.forEach(child => parent.appendChild(child));
+    } else {
+      parent.appendChild(children);
+    }
+  }
 };

@@ -120,13 +120,11 @@ async function transformLoginPage() {
       </div>
     `;
 
-    document.body.innerHTML = '';
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(newHTML, 'text/html');
-    const tempDiv = doc.body;
-    while (tempDiv.firstChild) {
-      document.body.appendChild(tempDiv.firstChild);
-    }
+    const template = document.createElement('template');
+    template.innerHTML = newHTML;
+    
+    helper.clearElement(document.body);
+    document.body.appendChild(template.content);
 
     setupEventListeners();
   } catch (error) {

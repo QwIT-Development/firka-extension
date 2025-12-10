@@ -499,22 +499,22 @@ class DashboardRenderer {
 
   async render() {
     await this.init();
-    document.body.innerHTML = '';
+    helper.clearElement(document.body);
     
     const kretaContainer = document.createElement('div');
     kretaContainer.className = 'kreta-container';
     const headerDiv = document.createElement('div');
-    const parser = new DOMParser();
-    const headerDoc = parser.parseFromString(await createTemplate.header(), 'text/html');
-    const headerContent = headerDoc.body;
+    const template = document.createElement('template');
+    template.innerHTML = await createTemplate.header();
+    const headerContent = template.content;
     while (headerContent.firstChild) {
       headerDiv.appendChild(headerContent.firstChild);
     }
     kretaContainer.appendChild(headerDiv);
     const mainContentDiv = document.createElement('div');
-    const parser2 = new DOMParser();
-    const mainDoc = parser2.parseFromString(this.generateMainContent(), 'text/html');
-    const mainContent = mainDoc.body;
+    const template2 = document.createElement('template');
+    template2.innerHTML = this.generateMainContent();
+    const mainContent = template2.content;
     while (mainContent.firstChild) {
       mainContentDiv.appendChild(mainContent.firstChild);
     }

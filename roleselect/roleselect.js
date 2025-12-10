@@ -154,15 +154,15 @@
       if (userName) {
         await storageManager.set("userName", userName);
       }
-      document.body.innerHTML = '';
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(createHTML(
+      helper.clearElement(document.body);
+      const template = document.createElement('template');
+      template.innerHTML = createHTML(
         schoolCode,
         fullSchoolName,
         userName,
         settings,
-      ), 'text/html');
-      const tempDiv = doc.body;
+      );
+      const tempDiv = template.content;
       while (tempDiv.firstChild) {
         document.body.appendChild(tempDiv.firstChild);
       }

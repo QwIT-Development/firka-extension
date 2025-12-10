@@ -30,7 +30,7 @@
 
         const backButton = document.createElement('button');
         backButton.id = 'firka-back-button';
-        backButton.innerHTML = '← Vissza';
+        backButton.textContent = '← Vissza';
         backButton.style.cssText = `
             position: static;
             margin: 20px;

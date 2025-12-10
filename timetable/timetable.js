@@ -197,8 +197,9 @@
       }
 
       const htmlText = await response.text();
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(htmlText, 'text/html');
+      const template = document.createElement('template');
+      template.innerHTML = htmlText;
+      const doc = template.content;
       const panelBody = doc.querySelector('.panel-body');
       const panelFooter = doc.querySelector('.panel-footer');
       const teacherInfo = doc.querySelector('.panel-heading');
@@ -887,18 +888,27 @@
             detailsDiv.className = 'homework-details';
             
             const contentP = document.createElement('p');
-            contentP.innerHTML = `<strong>Feladat:</strong> ${homeworkDetails.content}`;
+            const contentStrong = document.createElement('strong');
+            contentStrong.textContent = 'Feladat: ';
+            contentP.appendChild(contentStrong);
+            contentP.appendChild(document.createTextNode(homeworkDetails.content));
             detailsDiv.appendChild(contentP);
             
             if (homeworkDetails.deadline) {
               const deadlineP = document.createElement('p');
-              deadlineP.innerHTML = `<strong>Határidő:</strong> ${homeworkDetails.deadline}`;
+              const deadlineStrong = document.createElement('strong');
+              deadlineStrong.textContent = 'Határidő: ';
+              deadlineP.appendChild(deadlineStrong);
+              deadlineP.appendChild(document.createTextNode(homeworkDetails.deadline));
               detailsDiv.appendChild(deadlineP);
             }
             
             if (homeworkDetails.teacher) {
               const teacherP = document.createElement('p');
-              teacherP.innerHTML = `<strong>Tanár:</strong> ${homeworkDetails.teacher}`;
+              const teacherStrong = document.createElement('strong');
+              teacherStrong.textContent = 'Tanár: ';
+              teacherP.appendChild(teacherStrong);
+              teacherP.appendChild(document.createTextNode(homeworkDetails.teacher));
               detailsDiv.appendChild(teacherP);
             }
 
@@ -908,7 +918,9 @@
               attachmentsDiv.style.marginTop = '1rem';
               
               const attachmentsTitle = document.createElement('p');
-              attachmentsTitle.innerHTML = '<strong>Csatolmányok:</strong>';
+              const attachStrong = document.createElement('strong');
+              attachStrong.textContent = 'Csatolmányok:';
+              attachmentsTitle.appendChild(attachStrong);
               attachmentsTitle.style.marginBottom = '0.5rem';
               attachmentsDiv.appendChild(attachmentsTitle);
               
@@ -1213,15 +1225,24 @@
             detailsDiv.className = 'test-details';
             
             const nameP = document.createElement('p');
-            nameP.innerHTML = `<strong>Megnevezés:</strong> ${testDetails.name}`;
+            const nameStrong = document.createElement('strong');
+            nameStrong.textContent = 'Megnevezés: ';
+            nameP.appendChild(nameStrong);
+            nameP.appendChild(document.createTextNode(testDetails.name));
             detailsDiv.appendChild(nameP);
             
             const typeP = document.createElement('p');
-            typeP.innerHTML = `<strong>Típus:</strong> ${testDetails.type}`;
+            const typeStrong = document.createElement('strong');
+            typeStrong.textContent = 'Típus: ';
+            typeP.appendChild(typeStrong);
+            typeP.appendChild(document.createTextNode(testDetails.type));
             detailsDiv.appendChild(typeP);
             
             const dateP = document.createElement('p');
-            dateP.innerHTML = `<strong>Bejelentés dátuma:</strong> ${testDetails.announceDate}`;
+            const dateStrong = document.createElement('strong');
+            dateStrong.textContent = 'Bejelentés dátuma: ';
+            dateP.appendChild(dateStrong);
+            dateP.appendChild(document.createTextNode(testDetails.announceDate));
             detailsDiv.appendChild(dateP);
             
             testContent.appendChild(detailsDiv);
@@ -1632,7 +1653,7 @@
     modalContent.appendChild(header);
     modalContent.appendChild(body);
     
-    modal.innerHTML = '';
+    helper.clearElement(modal);
     modal.appendChild(modalContent);
 
     document.body.appendChild(modal);
@@ -1703,11 +1724,11 @@
       if (timetableGrid) {
     
         const newContent = await generateTimeGrid(allLessons, weekDates);
-        timetableGrid.innerHTML = '';
+        helper.clearElement(timetableGrid);
     
-        const parser1 = new DOMParser();
-        const doc = parser1.parseFromString(`<div>${newContent}</div>`, 'text/html');
-        const tempDiv = doc.querySelector('div');
+        const template = document.createElement('template');
+        template.innerHTML = `<div>${newContent}</div>`;
+        const tempDiv = template.content.querySelector('div');
         while (tempDiv.firstChild) {
           timetableGrid.appendChild(tempDiv.firstChild);
         }
@@ -2186,7 +2207,7 @@
     }
 
 
-    modalGrid.innerHTML = '';
+    helper.clearElement(modalGrid);
     allWeeks.forEach((week) => {
       const weekCell = document.createElement('div');
       weekCell.className = `week-cell ${week.selected ? 'selected' : ''} ${week.selected ? 'current-week' : ''}`;
@@ -2274,7 +2295,7 @@
     const weekGrid = document.getElementById("week-grid");
     if (weekGrid) {
   
-      weekGrid.innerHTML = '';
+      helper.clearElement(weekGrid);
       newWeekOptions.forEach((opt) => {
         const weekCell = document.createElement('div');
         weekCell.className = `week-cell ${opt.selected ? 'selected' : ''}`;
@@ -2321,7 +2342,7 @@
       };
 
 
-      document.body.innerHTML = '';
+      helper.clearElement(document.body);
       
   
       const kretaContainer = document.createElement('div');
@@ -2330,9 +2351,9 @@
   
       const headerDiv = document.createElement('div');
   
-      const parser2 = new DOMParser();
-      const headerDoc = parser2.parseFromString(await createTemplate.header(), 'text/html');
-      const headerContent = headerDoc.body;
+      const template = document.createElement('template');
+      template.innerHTML = await createTemplate.header();
+      const headerContent = template.content;
       while (headerContent.firstChild) {
         headerDiv.appendChild(headerContent.firstChild);
       }
@@ -2480,9 +2501,9 @@
   
       const gridContent = await generateTimeGrid(data.lessons, data.weekDates);
   
-      const parser3 = new DOMParser();
-      const doc = parser3.parseFromString(`<div>${gridContent}</div>`, 'text/html');
-      const tempDiv = doc.querySelector('div');
+      const template3 = document.createElement('template');
+      template3.innerHTML = `<div>${gridContent}</div>`;
+      const tempDiv = template3.content.querySelector('div');
       while (tempDiv.firstChild) {
         timetableGrid.appendChild(tempDiv.firstChild);
       }
@@ -2541,7 +2562,7 @@
     }
 
 
-    weekDisplay.innerHTML = '';
+    helper.clearElement(weekDisplay);
     visibleWeeks.forEach((weekNum, index) => {
       const isSelected = index === 2;
       const isCurrent = weekNum === currentWeekNumber;
@@ -2637,12 +2658,12 @@
     const timetableContainer = document.querySelector(".timetable-grid");
     if (timetableContainer) {
   
-      timetableContainer.innerHTML = '';
+      helper.clearElement(timetableContainer);
       const gridContent = await generateTimeGrid(lessons, weekDates);
       
-          const parser2 = new DOMParser();
-      const doc = parser2.parseFromString(`<div>${gridContent}</div>`, 'text/html');
-      const tempDiv = doc.querySelector('div');
+      const template2 = document.createElement('template');
+      template2.innerHTML = `<div>${gridContent}</div>`;
+      const tempDiv = template2.content.querySelector('div');
       while (tempDiv.firstChild) {
         timetableContainer.appendChild(tempDiv.firstChild);
       }
@@ -2670,7 +2691,7 @@
     }
 
     
-    modalGrid.innerHTML = '';
+    helper.clearElement(modalGrid);
     allWeeks.forEach((weekNumber) => {
       const isSelected = weekNumber === selectedWeekNumber;
       const isCurrent = weekNumber === currentWeekNumber;

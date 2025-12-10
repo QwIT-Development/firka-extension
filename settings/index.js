@@ -242,19 +242,30 @@ document.addEventListener("DOMContentLoaded", async () => {
     const settings = pageSettings[pageType] || [];
 
     if (settings.length === 0) {
-      container.innerHTML = `
-        <div class="no-settings-placeholder">
-          <span class="material-icons-round">settings_suggest</span>
-          <p data-i18n="settings.page_settings.no_settings">Ehhez az oldalhoz nincsenek egyéni beállítások.</p>
-        </div>
-      `;
+      helper.clearElement(container);
+      
+      const placeholder = document.createElement('div');
+      placeholder.className = 'no-settings-placeholder';
+      const icon = document.createElement('span');
+      icon.className = 'material-icons-round';
+      icon.textContent = 'settings_suggest';
+      const text = document.createElement('p');
+      text.setAttribute('data-i18n', 'settings.page_settings.no_settings');
+      text.textContent = 'Ehhez az oldalhoz nincsenek egyéni beállítások.';
+      placeholder.appendChild(icon);
+      placeholder.appendChild(text);
+      container.appendChild(placeholder);
+      
       if (window.LanguageManager) {
         window.LanguageManager.loadTranslationsForPage();
       }
       return;
     }
 
-    container.innerHTML = settings.map(setting => renderSettingItem(setting)).join("");
+    const template = document.createElement('template');
+    template.innerHTML = settings.map(setting => renderSettingItem(setting)).join("");
+    helper.clearElement(container);
+    container.appendChild(template.content);
     initSettingItems(container);
     
     if (window.LanguageManager) {
@@ -362,14 +373,20 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (!grid) return;
 
     if (customThemes.length === 0) {
-      grid.innerHTML = `<div class="no-custom-themes" data-i18n="settings.custom_themes.no_themes">Még nincsenek egyéni témák</div>`;
+      helper.clearElement(grid);
+      const noThemes = document.createElement('div');
+      noThemes.className = 'no-custom-themes';
+      noThemes.setAttribute('data-i18n', 'settings.custom_themes.no_themes');
+      noThemes.textContent = 'Még nincsenek egyéni témák';
+      grid.appendChild(noThemes);
       if (window.LanguageManager) {
         window.LanguageManager.loadTranslationsForPage();
       }
       return;
     }
 
-    grid.innerHTML = customThemes.map(theme => `
+    const template = document.createElement('template');
+    template.innerHTML = customThemes.map(theme => `
       <button class="theme-option custom-theme-option" data-theme="custom-${theme.id}">
         <div class="theme-preview" style="background: ${theme.colors.background};">
           <div class="preview-header" style="background: ${theme.colors.card};"></div>
@@ -393,6 +410,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         </div>
       </button>
     `).join("");
+    
+    helper.clearElement(grid);
+    grid.appendChild(template.content);
 
     grid.querySelectorAll(".custom-theme-option").forEach(btn => {
       btn.addEventListener("click", (e) => {
