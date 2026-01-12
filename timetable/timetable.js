@@ -160,7 +160,7 @@
   }
 
   function getLessonKey(lesson) {
-    return `${lesson.subject}_${lesson.startTime}_${lesson.day}`;
+    return `${lesson.subject}_${lesson.startTime}_${lesson.date}`;
   }
 
   async function updateHomeworkIconsFromCookie() {
@@ -410,6 +410,7 @@
             originalTeacher: "",
             room: "",
             day: dayIndex,
+            date: weekDates[dayIndex]?.fullDate || eventDate.toISOString().split('T')[0],
             isSubstituted: false,
             isCancelled: false,
             hasHomework: false,
@@ -446,9 +447,9 @@
             "Ismeretlen tantárgy";
 
           if (startTimeStr && subject) {
-            const isCancelled = event.isElmaradt || event.Elmaradt || event.cancelled || event.isCancelled || 
+            const isCancelled = event.isElmaradt || event.Elmaradt || event.cancelled || event.isCancelled ||
                                event.oraType === 6 || (event.title && event.title.toLowerCase().includes('elmarad'));
-            
+
             const lesson = {
               startTime: startTimeStr,
               endTime: endTimeStr,
@@ -457,14 +458,15 @@
               originalTeacher: event.helyettesitoId ? teacher : "",
               room: room,
               day: dayIndex,
+              date: weekDates[dayIndex]?.fullDate || eventDate.toISOString().split('T')[0],
               isSubstituted: !!event.helyettesitoId,
               isCancelled: isCancelled,
               hasHomework: event.hasHaziFeladat || false,
               testInfo: event.hasBejelentettSzamonkeres
                 ? event.Tema || LanguageManager.t("timetable.test_indicator")
                 : "",
-              testId: event.hasBejelentettSzamonkeres && event.BejelentettSzamonkeresIdList && event.BejelentettSzamonkeresIdList.length > 0 
-                ? event.BejelentettSzamonkeresIdList[0] 
+              testId: event.hasBejelentettSzamonkeres && event.BejelentettSzamonkeresIdList && event.BejelentettSzamonkeresIdList.length > 0
+                ? event.BejelentettSzamonkeresIdList[0]
                 : null,
               testDetails: "",
               homeworkDetails: "",
@@ -619,11 +621,15 @@
                   </div>
                   ${
                     (() => {
-                      const lessonKey = `${lesson.subject}_${lesson.startTime}_${lesson.day}`;
-                      const hasCustomHomework = customHomework[lessonKey] && customHomework[lessonKey].length > 0;
-                      const hasCustomTests = customTests[lessonKey] && customTests[lessonKey].length > 0;
+                      const lessonKey = `${lesson.subject}_${lesson.startTime}_${lesson.date}`;
+                      const customHomeworkItems = customHomework[lessonKey] || [];
+                      const customTestItems = customTests[lessonKey] || [];
+                      const hasCustomHomework = customHomeworkItems.length > 0;
+                      const hasCustomTests = customTestItems.length > 0;
+                      const allCustomHomeworkCompleted = hasCustomHomework && customHomeworkItems.every(hw => hw.completed);
+                      const allCustomTestsCompleted = hasCustomTests && customTestItems.every(test => test.completed);
                       const hasAnyIndicators = lesson.hasHomework || lesson.testInfo || hasCustomHomework || hasCustomTests;
-                      
+
                       return hasAnyIndicators ? `
                     <div class="lesson-indicators">
                       ${
@@ -648,7 +654,7 @@
                         hasCustomHomework
                           ? `
                         <span class="lesson-indicator custom-homework-indicator" title="Saját házi feladat">
-                          <img src="${chrome.runtime.getURL("icons/homework.svg")}" alt="Saját házi feladat" style="width: 20px; height: 20px; opacity: 0.7;">
+                          <img src="${chrome.runtime.getURL(allCustomHomeworkCompleted ? "icons/pipa.svg" : "icons/homework.svg")}" alt="${allCustomHomeworkCompleted ? 'Megoldott saját házi feladat' : 'Saját házi feladat'}" style="width: 20px; height: 20px; opacity: 0.7;">
                         </span>
                       `
                           : ""
@@ -657,7 +663,7 @@
                         hasCustomTests
                           ? `
                         <span class="lesson-indicator custom-test-indicator" title="Saját számonkérés">
-                          <img src="${chrome.runtime.getURL("icons/assigment.svg")}" alt="Saját számonkérés" style="width: 20px; height: 20px; opacity: 0.7;">
+                          <img src="${chrome.runtime.getURL(allCustomTestsCompleted ? "icons/pipa.svg" : "icons/assigment.svg")}" alt="${allCustomTestsCompleted ? 'Megoldott saját számonkérés' : 'Saját számonkérés'}" style="width: 20px; height: 20px; opacity: 0.7;">
                         </span>
                       `
                           : ""
