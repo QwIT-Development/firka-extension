@@ -593,29 +593,6 @@ h2 {
   margin: 0;
 }
 
-.modal-close {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border: none;
-  border-radius: 8px;
-  background: var(--button-secondaryFill);
-  color: var(--text-secondary);
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.modal-close:hover {
-  background: var(--accent-15);
-  color: var(--accent-accent);
-}
-
-.modal-close .material-icons-round {
-  font-size: 20px;
-}
-
 .modal-body {
   padding: 16px;
 }

@@ -1159,8 +1159,6 @@ function showUpdateModal(currentVersion, latestVersion, releaseData) {
   updateButton.href = releaseData.html_url;
 
   modal.classList.add('active');
-
-  document.getElementById('closeUpdateModal').addEventListener('click', closeUpdateModal);
   document.getElementById('dismissUpdate').addEventListener('click', closeUpdateModal);
 }
 
