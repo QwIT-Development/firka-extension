@@ -47,6 +47,7 @@ body {
   color: var(--text-primary);
   margin-bottom: 20px;
   background-color: transparent !important;
+  margin-top: 0px !important;
 }
 
 .stats-grid {
