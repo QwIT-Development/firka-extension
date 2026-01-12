@@ -29,129 +29,48 @@ body {
 }
 
 .absences-page {
-  display: grid;
-  grid-template-columns: 300px 1fr;
-  grid-template-rows: 1fr;
-  grid-template-areas:
-    "sidebar content";
-  gap: 24px;
-  min-height: calc(100vh - 200px);
-}
-
-.absences-sidebar {
-  grid-area: sidebar;
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  position: sticky;
-  top: 24px;
-  height: fit-content;
+  gap: 24px;
 }
 
-.filter-card {
+.stats-section {
   background: var(--card-card);
   border-radius: 20px;
   padding: 24px;
   box-shadow: 0px 1px var(--shadow-blur) 0px var(--accent-shadow);
 }
 
-.filter-header {
+.stats-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
   margin-bottom: 20px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.filter-header h2 {
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin: 0;
-  background-color: #00000000 !important;
-}
-
-.filter-content {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.filter-group {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.filter-group label {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  color: var(--text-secondary);
-  font-size: 14px;
-  font-weight: 500;
-}
-
-.filter-group label img {
-  width: 20px;
-  height: 20px;
-  opacity: 0.8;
-}
-
-.filter-input {
-  padding: 12px 16px;
-  border: 2px solid transparent;
-  border-radius: 12px;
-  background: var(--button-secondaryFill);
-  color: var(--text-primary);
-  font-family: inherit;
-  font-size: 14px;
-  transition: all 0.2s ease;
-  cursor: pointer;
-}
-
-.filter-input:hover {
-  background: var(--accent-15);
-}
-
-.filter-input:focus {
-  outline: none;
-  border-color: var(--accent-accent);
-  background: var(--button-secondaryFill);
-}
-
-.stats-section {
-  grid-area: stats;
+  background-color: transparent !important;
 }
 
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(6, 1fr);
   gap: 12px;
 }
 
 .stat-card {
-  background: var(--card-card);
+  background: var(--button-secondaryFill);
   border-radius: 16px;
-  padding: 20px;
+  padding: 20px 16px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
-  box-shadow: 0px 1px var(--shadow-blur) 0px var(--accent-shadow);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   min-height: 100px;
+  border: 2px solid transparent;
 }
 
 .stat-card:hover {
   transform: translateY(-2px);
-}
-
-.stat-icon {
-  width: 24px;
-  height: 24px;
-  margin-bottom: 8px;
-  opacity: 0.8;
 }
 
 .stat-number {
@@ -166,16 +85,44 @@ body {
   color: var(--accent-accent);
 }
 
+.stat-card.total {
+  border-color: var(--accent-15);
+}
+
+.stat-card.absence .stat-number {
+  color: var(--accent-accent);
+}
+
+.stat-card.late .stat-number {
+  color: var(--grades-2);
+}
+
+.stat-card.late {
+  border-color: var(--grades-background-2);
+}
+
 .stat-card.justified .stat-number {
   color: var(--grades-4);
+}
+
+.stat-card.justified {
+  border-color: var(--grades-background-4);
 }
 
 .stat-card.unjustified .stat-number {
   color: var(--grades-1);
 }
 
+.stat-card.unjustified {
+  border-color: var(--grades-background-1);
+}
+
 .stat-card.pending .stat-number {
   color: var(--grades-3);
+}
+
+.stat-card.pending {
+  border-color: var(--grades-background-3);
 }
 
 .stat-label {
@@ -186,163 +133,369 @@ body {
   letter-spacing: 0.5px;
 }
 
-.absences-content {
-  grid-area: content;
+.calendar-legend {
   display: flex;
-  flex-direction: column;
-  gap: 24px;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 16px 24px;
+  background: var(--card-card);
+  border-radius: 16px;
+  box-shadow: 0px 1px var(--shadow-blur) 0px var(--accent-shadow);
 }
 
-.day-group {
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.legend-color {
+  width: 24px;
+  height: 24px;
+  border-radius: 8px;
+}
+
+.legend-color.status-justified {
+  background: var(--grades-background-4);
+  border: 2px solid var(--grades-4);
+}
+
+.legend-color.status-pending {
+  background: var(--grades-background-3);
+  border: 2px solid var(--grades-3);
+}
+
+.legend-color.status-unjustified {
+  background: var(--grades-background-1);
+  border: 2px solid var(--grades-1);
+}
+
+.legend-color.type-late-legend {
+  background: var(--grades-background-2);
+  border: 2px dashed var(--grades-2);
+}
+
+.legend-item span {
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.calendar-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.month-container {
   background: var(--card-card);
   border-radius: 20px;
   overflow: hidden;
   box-shadow: 0px 1px var(--shadow-blur) 0px var(--accent-shadow);
 }
 
-.day-header {
+.month-header {
+  background: var(--button-secondaryFill);
+  color: white;
+  padding: 16px 20px;
+  font-size: 16px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  padding: 12px;
+}
+
+.calendar-day-header {
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  padding: 8px 0;
+  text-transform: uppercase;
+}
+
+.calendar-day {
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: var(--button-secondaryFill);
+  position: relative;
+  min-height: 40px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.calendar-day.empty {
+  background: transparent;
+}
+
+.calendar-day.future {
+  background: var(--accent-15);
+  opacity: 0.5;
+}
+
+.calendar-day.future .day-number {
+  color: var(--text-teritary);
+}
+
+.calendar-day.today .day-number {
+  color: var(--accent-accent);
+  font-weight: 700;
+}
+
+.calendar-day .day-number {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  z-index: 1;
+}
+
+.calendar-day.has-absence {
+  cursor: pointer;
+}
+
+.calendar-day.has-absence:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px var(--accent-shadow);
+  z-index: 2;
+}
+
+.calendar-day.status-justified {
+  background: var(--grades-background-4);
+  border: 2px solid var(--grades-4);
+}
+
+.calendar-day.status-justified .day-number {
+  color: var(--grades-4);
+  font-weight: 700;
+}
+
+.calendar-day.status-pending {
+  background: var(--grades-background-3);
+  border: 2px solid var(--grades-3);
+}
+
+.calendar-day.status-pending .day-number {
+  color: var(--grades-3);
+  font-weight: 700;
+}
+
+.calendar-day.status-unjustified {
+  background: var(--grades-background-1);
+  border: 2px solid var(--grades-1);
+}
+
+.calendar-day.status-unjustified .day-number {
+  color: var(--grades-1);
+  font-weight: 700;
+}
+
+.calendar-day.type-late {
+  border-style: dashed;
+}
+
+.calendar-day.type-mixed {
+  border-style: double;
+  border-width: 3px;
+}
+
+.absence-count {
+  position: absolute;
+  top: 2px;
+  right: 2px;
   background: var(--accent-accent);
   color: white;
-  padding: 16px 24px;
+  font-size: 9px;
+  font-weight: 700;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.calendar-day.status-justified .absence-count {
+  background: var(--grades-4);
+}
+
+.calendar-day.status-pending .absence-count {
+  background: var(--grades-3);
+}
+
+.calendar-day.status-unjustified .absence-count {
+  background: var(--grades-1);
+}
+
+.absence-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  padding: 20px;
+}
+
+.absence-modal-overlay.visible {
+  opacity: 1;
+}
+
+.absence-modal {
+  background: var(--card-card);
+  border-radius: 24px;
+  max-width: 500px;
+  width: 100%;
+  max-height: 80vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  transform: scale(0.95);
+  transition: transform 0.2s ease;
+}
+
+.absence-modal-overlay.visible .absence-modal {
+  transform: scale(1);
+}
+
+.modal-header {
+  background: var(--button-secondaryFill);
+  border-bottom: 1px solid #00000000 !important;
+  color: white;
+  padding: 14px 18px !important;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-weight: 600;
 }
 
-.day-date {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+.modal-header h2 {
   font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+  background: transparent !important;
 }
 
-.day-date img {
-  width: 20px;
-  height: 20px;
-  filter: brightness(0) invert(1);
+.modal-content {
+  background-color: var(--card-card) !important;
+  padding: 16px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
-.day-count {
-  background: rgba(255, 255, 255, 0.2);
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 13px;
-}
-
-.day-absences {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-  gap: 16px;
-  padding: 20px;
-}
-
-.absence-card {
+.modal-absence-card {
   background: var(--button-secondaryFill);
-  border-radius: 16px;
-  padding: 20px;
-  display: grid;
-  grid-template-columns: auto 1fr minmax(auto, max-content);
-  grid-template-rows: auto auto;
-  grid-template-areas:
-    "lesson subject status"
-    "lesson topic status";
-  gap: 8px 12px;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  border: 1px solid var(--accent-15);
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border-left: 3px solid transparent;
 }
 
-.absence-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px var(--accent-shadow);
-}
-
-.absence-lesson {
-  grid-area: lesson;
+.modal-card-header {
   display: flex;
   align-items: center;
-  justify-content: center;
-  width: 48px;
-  height: 48px;
-  background: var(--accent-15);
-  border-radius: 12px;
-  font-size: 20px;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.modal-lesson {
+  font-size: 16px;
   font-weight: 700;
+  color: var(--accent-accent);
+  min-width: 24px;
+}
+
+.type-indicator {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px 1px 8px;
+  border-radius: 12px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.type-indicator.absence {
+  background: var(--accent-15);
   color: var(--accent-accent);
 }
 
-.absence-subject {
-  grid-area: subject;
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--text-primary);
-  align-self: end;
+.type-indicator.late {
+  background: var(--grades-background-2);
+  color: var(--grades-2);
 }
 
-.absence-topic {
-  grid-area: topic;
-  font-size: 13px;
-  color: var(--text-secondary);
-  align-self: start;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.absence-status {
-  grid-area: status;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.status-badge {
+.modal-status-badge {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 14px;
-  border-radius: 24px;
-  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 10px;
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.2px;
-  white-space: nowrap;
-  flex-shrink: 0;
+  margin-left: auto;
 }
 
-.status-badge img {
-  width: 16px;
-  height: 16px;
-}
-
-.status-badge.justified {
+.modal-status-badge.justified {
   background: var(--grades-background-4);
   color: var(--grades-4);
 }
 
-.status-badge.justified img {
-  filter: brightness(0) saturate(100%) invert(76%) sepia(43%) saturate(609%) hue-rotate(53deg) brightness(101%) contrast(92%);
-}
-
-.status-badge.unjustified {
-  background: var(--grades-background-1);
-  color: var(--grades-1);
-}
-
-.status-badge.unjustified .material-icons-round {
-  font-size: 16px;
-}
-
-.status-badge.pending {
+.modal-status-badge.pending {
   background: var(--grades-background-3);
   color: var(--grades-3);
 }
 
-.status-badge.pending .material-icons-round {
-  font-size: 16px;
+.modal-status-badge.unjustified {
+  background: var(--grades-background-1);
+  color: var(--grades-1);
+}
+
+.modal-subject {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.3;
+}
+
+.modal-info-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.modal-info-item {
+  display: inline-block;
+}
+
+.modal-info-item:not(:last-child)::after {
+  content: '•';
+  margin-left: 6px;
+  color: var(--text-teritary);
+}
+
+.modal-minutes {
+  color: var(--grades-2);
+  font-weight: 600;
 }
 
 .empty-state {
@@ -375,14 +528,9 @@ body {
   color: var(--text-secondary);
 }
 
-@media (max-width: 1024px) {
-  .absences-page {
-    grid-template-columns: 260px 1fr;
-    gap: 20px;
-  }
-
-  .day-absences {
-    grid-template-columns: 1fr;
+@media (max-width: 1200px) {
+  .stats-grid {
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
@@ -395,41 +543,18 @@ body {
     padding: 16px;
   }
 
-  .absences-page {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto 1fr;
-    grid-template-areas:
-      "sidebar"
-      "content";
-    gap: 16px;
-  }
-
-  .absences-sidebar {
-    position: static;
-  }
-
-  .filter-card {
+  .stats-section {
     padding: 20px;
     border-radius: 16px;
   }
 
-  .filter-content {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-  }
-
-  .filter-group label {
-    font-size: 12px;
-  }
-
-  .filter-input {
-    padding: 10px 12px;
-    font-size: 13px;
+  .stats-title {
+    font-size: 18px;
+    margin-bottom: 16px;
   }
 
   .stats-grid {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 10px;
   }
 
@@ -447,33 +572,78 @@ body {
     font-size: 10px;
   }
 
-  .day-group {
+  .calendar-section {
+    grid-template-columns: 1fr;
+  }
+
+  .calendar-legend {
+    gap: 12px;
+    padding: 14px 18px;
+  }
+
+  .legend-item span {
+    font-size: 12px;
+  }
+
+  .month-container {
     border-radius: 16px;
   }
 
-  .day-header {
-    padding: 14px 18px;
+  .month-header {
+    padding: 14px 16px;
+    font-size: 15px;
+  }
+
+  .calendar-grid {
+    gap: 3px;
+    padding: 10px;
+  }
+
+  .calendar-day {
+    min-height: 36px;
+    border-radius: 8px;
+  }
+
+  .calendar-day .day-number {
+    font-size: 13px;
+  }
+
+  .absence-count {
+    width: 14px;
+    height: 14px;
+    font-size: 8px;
+  }
+
+  .absence-modal {
+    max-width: 100%;
+    max-height: 90vh;
+    border-radius: 20px;
+  }
+
+  .modal-header {
+    padding: 12px 16px;
+  }
+
+  .modal-header h2 {
+    font-size: 15px;
+  }
+
+  .modal-content {
+    padding: 12px;
+    gap: 6px;
+  }
+
+  .modal-absence-card {
+    padding: 10px;
+    gap: 5px;
+  }
+
+  .modal-subject {
     font-size: 14px;
   }
 
-  .day-absences {
-    padding: 14px;
-    gap: 12px;
-  }
-
-  .absence-card {
-    padding: 16px;
-    border-radius: 12px;
-  }
-
-  .absence-lesson {
-    width: 44px;
-    height: 44px;
-    font-size: 18px;
-  }
-
-  .absence-subject {
-    font-size: 15px;
+  .modal-info-row {
+    font-size: 11px;
   }
 }
 
@@ -483,24 +653,11 @@ body {
   }
 
   .absences-page {
-    gap: 12px;
+    gap: 16px;
   }
 
-  .filter-card {
+  .stats-section {
     padding: 16px;
-  }
-
-  .filter-header {
-    margin-bottom: 16px;
-  }
-
-  .filter-header h2 {
-    font-size: 16px;
-  }
-
-  .filter-content {
-    grid-template-columns: 1fr;
-    gap: 14px;
   }
 
   .stats-grid {
@@ -523,62 +680,34 @@ body {
     letter-spacing: 0.3px;
   }
 
-  .day-header {
-    padding: 12px 16px;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-
-  .day-date {
-    font-size: 14px;
-  }
-
-  .day-count {
-    font-size: 12px;
-    padding: 3px 10px;
-  }
-
-  .day-absences {
-    padding: 12px;
+  .calendar-legend {
+    flex-direction: column;
     gap: 10px;
   }
 
-  .absence-card {
-    padding: 14px;
-    grid-template-columns: auto 1fr;
-    grid-template-rows: auto auto auto;
-    grid-template-areas:
-      "lesson subject"
-      "lesson topic"
-      "status status";
-    gap: 6px 12px;
+  .calendar-grid {
+    gap: 2px;
+    padding: 8px;
   }
 
-  .absence-lesson {
-    width: 40px;
-    height: 40px;
-    font-size: 16px;
-    grid-row: span 2;
+  .calendar-day {
+    min-height: 32px;
   }
 
-  .absence-status {
-    justify-content: flex-start;
-    margin-top: 8px;
-    padding-top: 10px;
-    border-top: 1px solid var(--accent-15);
-  }
-
-  .status-badge {
-    padding: 6px 12px;
-    font-size: 11px;
-  }
-
-  .absence-subject {
-    font-size: 14px;
-  }
-
-  .absence-topic {
+  .calendar-day .day-number {
     font-size: 12px;
+  }
+
+  .absence-modal-overlay {
+    padding: 12px;
+  }
+
+  .modal-absence-card {
+    padding: 14px;
+  }
+
+  .modal-subject {
+    font-size: 16px;
   }
 }
 
@@ -593,17 +722,15 @@ body {
   }
 }
 
-.day-group {
+.month-container {
   animation: fadeIn 0.3s ease forwards;
 }
 
-.day-group:nth-child(1) { animation-delay: 0.05s; }
-.day-group:nth-child(2) { animation-delay: 0.1s; }
-.day-group:nth-child(3) { animation-delay: 0.15s; }
-.day-group:nth-child(4) { animation-delay: 0.2s; }
-.day-group:nth-child(5) { animation-delay: 0.25s; }
-
-
+.month-container:nth-child(1) { animation-delay: 0.05s; }
+.month-container:nth-child(2) { animation-delay: 0.1s; }
+.month-container:nth-child(3) { animation-delay: 0.15s; }
+.month-container:nth-child(4) { animation-delay: 0.2s; }
+.month-container:nth-child(5) { animation-delay: 0.25s; }
 
 .loading-overlay {
   position: fixed;

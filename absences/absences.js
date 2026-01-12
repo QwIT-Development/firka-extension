@@ -15,7 +15,7 @@ async function collectAbsencesData() {
   try {
     const currentDomain = window.location.hostname;
     const response = await fetch(
-      `https://${currentDomain}/api/HianyzasokApi/GetHianyzasGrid?sort=MulasztasDatum-desc&page=1&pageSize=100&group=&filter=&data=%7B%7D&_=${Date.now()}`,
+      `https://${currentDomain}/api/HianyzasokApi/GetHianyzasGrid?sort=MulasztasDatum-desc&page=1&pageSize=500&group=&filter=&data=%7B%7D&_=${Date.now()}`,
       {
         method: "GET",
         credentials: "include",
@@ -45,359 +45,414 @@ async function collectAbsencesData() {
           justificationStatus = "unjustified";
         }
 
+        const absenceType = item.MulasztasTipus === 1500 ? 'absence' : item.MulasztasTipus === 1499 ? 'late' : 'other';
+
         absences.push({
           date: formattedDate,
           rawDate: date,
+          dateKey: `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, "0")}-${date.getDate().toString().padStart(2, "0")}`,
           lesson: item.Oraszam?.toString() || "",
           subject: item.Targy || "",
           topic: item.Tema || "",
           type: item.MulasztasTipus_DNAME || "",
+          absenceType: absenceType,
+          absenceTypeId: item.MulasztasTipus,
           justified: item.Igazolt_BOOL === true,
           justificationStatus: justificationStatus,
           purposeful: item.TanoraiCeluMulasztas_BNAME || "",
           justificationType: item.IgazolasTipus_DNAME || "",
+          minutes: item.KesesPercben || 0,
         });
       });
     }
 
-    
-    const groupedAbsences = absences.reduce((groups, absence) => {
-      const date = absence.date;
-      if (!groups[date]) {
-        groups[date] = [];
+    const groupedByDate = absences.reduce((groups, absence) => {
+      const key = absence.dateKey;
+      if (!groups[key]) {
+        groups[key] = [];
       }
-      groups[date].push(absence);
+      groups[key].push(absence);
       return groups;
     }, {});
 
-    
-    Object.keys(groupedAbsences).forEach(date => {
-      groupedAbsences[date].sort((a, b) => parseInt(a.lesson) - parseInt(b.lesson));
+    Object.keys(groupedByDate).forEach(date => {
+      groupedByDate[date].sort((a, b) => parseInt(a.lesson) - parseInt(b.lesson));
     });
 
-    return { basicData, absences, groupedAbsences };
+    return { basicData, absences, groupedByDate };
   } catch (error) {
     console.error("Hiba az API hívás során:", error);
-    return { basicData, absences: [], groupedAbsences: {} };
+    return { basicData, absences: [], groupedByDate: {} };
   }
-}
-
-function createFilterCard(absences) {
-  const filterCard = document.createElement('div');
-  filterCard.className = 'filter-card';
-  
-  const filterHeader = document.createElement('div');
-  filterHeader.className = 'filter-header';
-  const h2 = document.createElement('h2');
-  h2.textContent = LanguageManager.t('absences.filter_title');
-  filterHeader.appendChild(h2);
-  
-  const filterContent = document.createElement('div');
-  filterContent.className = 'filter-content';
-
-  const dateGroup = document.createElement('div');
-  dateGroup.className = 'filter-group';
-  
-  const dateLabel = document.createElement('label');
-  const dateImg = document.createElement('img');
-  dateImg.src = chrome.runtime.getURL('icons/Calendar.svg');
-  dateImg.alt = 'Dátum';
-  dateLabel.appendChild(dateImg);
-  dateLabel.appendChild(document.createTextNode(' ' + LanguageManager.t('absences.date')));
-  
-  const dateInput = document.createElement('input');
-  dateInput.type = 'date';
-  dateInput.id = 'dateFilter';
-  dateInput.className = 'filter-input';
-  
-  dateGroup.appendChild(dateLabel);
-  dateGroup.appendChild(dateInput);
-  filterContent.appendChild(dateGroup);
-
-  const subjectGroup = document.createElement('div');
-  subjectGroup.className = 'filter-group';
-  
-  const subjectLabel = document.createElement('label');
-  const subjectImg = document.createElement('img');
-  subjectImg.src = chrome.runtime.getURL('icons/Subject.svg');
-  subjectImg.alt = 'Tantárgy';
-  subjectLabel.appendChild(subjectImg);
-  subjectLabel.appendChild(document.createTextNode(' ' + LanguageManager.t('absences.subject')));
-  
-  const subjectSelect = document.createElement('select');
-  subjectSelect.id = 'subjectFilter';
-  subjectSelect.className = 'filter-input';
-  
-  const defaultSubjectOption = document.createElement('option');
-  defaultSubjectOption.value = '';
-  defaultSubjectOption.textContent = LanguageManager.t('absences.all_subjects');
-  subjectSelect.appendChild(defaultSubjectOption);
-  
-  const subjects = [...new Set(absences.map(a => a.subject))].sort();
-  subjects.forEach(subject => {
-    const option = document.createElement('option');
-    option.value = subject;
-    option.textContent = subject;
-    subjectSelect.appendChild(option);
-  });
-  
-  subjectGroup.appendChild(subjectLabel);
-  subjectGroup.appendChild(subjectSelect);
-  filterContent.appendChild(subjectGroup);
-
-  const justificationGroup = document.createElement('div');
-  justificationGroup.className = 'filter-group';
-  
-  const justificationLabel = document.createElement('label');
-  const justificationImg = document.createElement('img');
-  justificationImg.src = chrome.runtime.getURL('icons/BadgeCheck.svg');
-  justificationImg.alt = 'Igazolás';
-  justificationLabel.appendChild(justificationImg);
-  justificationLabel.appendChild(document.createTextNode(' ' + LanguageManager.t('absences.justification')));
-  
-  const justificationSelect = document.createElement('select');
-  justificationSelect.id = 'justificationFilter';
-  justificationSelect.className = 'filter-input';
-  
-  const justificationOptions = [
-    { value: '', text: LanguageManager.t('absences.all_types') },
-    { value: 'justified', text: LanguageManager.t('absences.justified') },
-    { value: 'unjustified', text: LanguageManager.t('absences.unjustified') },
-    { value: 'pending', text: LanguageManager.t('absences.pending') }
-  ];
-  
-  justificationOptions.forEach(optionData => {
-    const option = document.createElement('option');
-    option.value = optionData.value;
-    option.textContent = optionData.text;
-    justificationSelect.appendChild(option);
-  });
-  
-  justificationGroup.appendChild(justificationLabel);
-  justificationGroup.appendChild(justificationSelect);
-  filterContent.appendChild(justificationGroup);
-  
-  filterCard.appendChild(filterHeader);
-  filterCard.appendChild(filterContent);
-  
-  return filterCard;
 }
 
 function createStatsSection(absences) {
   const statsSection = document.createElement('div');
   statsSection.className = 'stats-section';
-  
+
+  const statsTitle = document.createElement('h2');
+  statsTitle.className = 'stats-title';
+  statsTitle.textContent = LanguageManager.t('absences.title');
+  statsSection.appendChild(statsTitle);
+
   const statsGrid = document.createElement('div');
   statsGrid.className = 'stats-grid';
-  
+
+  const totalAbsences = absences.filter(a => a.absenceType === 'absence').length;
+  const totalLates = absences.filter(a => a.absenceType === 'late').length;
+  const justified = absences.filter(a => a.justificationStatus === 'justified').length;
+  const unjustified = absences.filter(a => a.justificationStatus === 'unjustified').length;
+  const pending = absences.filter(a => a.justificationStatus === 'pending').length;
+
   const stats = [
-    { 
-      type: 'total',
-      number: absences.length, 
-      label: LanguageManager.t('absences.total_absences')
-    },
-    { 
-      type: 'justified',
-      number: absences.filter(a => a.justificationStatus === 'justified').length, 
-      label: LanguageManager.t('absences.justified')
-    },
-    { 
-      type: 'unjustified',
-      number: absences.filter(a => a.justificationStatus === 'unjustified').length, 
-      label: LanguageManager.t('absences.unjustified')
-    },
-    { 
-      type: 'pending',
-      number: absences.filter(a => a.justificationStatus === 'pending').length, 
-      label: LanguageManager.t('absences.pending')
-    }
+    { type: 'total', number: absences.length, label: LanguageManager.t('absences.total_absences') },
+    { type: 'absence', number: totalAbsences, label: LanguageManager.t('absences.absence_type') },
+    { type: 'late', number: totalLates, label: LanguageManager.t('absences.late_type') },
+    { type: 'justified', number: justified, label: LanguageManager.t('absences.justified') },
+    { type: 'unjustified', number: unjustified, label: LanguageManager.t('absences.unjustified') },
+    { type: 'pending', number: pending, label: LanguageManager.t('absences.pending') },
   ];
-  
+
   stats.forEach(stat => {
     const statCard = document.createElement('div');
     statCard.className = `stat-card ${stat.type}`;
-    statCard.dataset.type = stat.type;
-    
+
     const statNumber = document.createElement('div');
     statNumber.className = 'stat-number';
     statNumber.textContent = stat.number;
-    
+
     const statLabel = document.createElement('div');
     statLabel.className = 'stat-label';
     statLabel.textContent = stat.label;
-    
+
     statCard.appendChild(statNumber);
     statCard.appendChild(statLabel);
     statsGrid.appendChild(statCard);
   });
-  
+
   statsSection.appendChild(statsGrid);
   return statsSection;
 }
 
-function createDayGroup(date, dayAbsences) {
-  const dayGroup = document.createElement('div');
-  dayGroup.className = 'day-group';
-  dayGroup.dataset.date = date;
-  
-  
-  const dayHeader = document.createElement('div');
-  dayHeader.className = 'day-header';
-  
-  const dayDate = document.createElement('div');
-  dayDate.className = 'day-date';
-  
-  const calendarIcon = document.createElement('img');
-  calendarIcon.src = chrome.runtime.getURL('icons/Calendar.svg');
-  calendarIcon.alt = 'Dátum';
-  
-  const dateText = document.createElement('span');
-  dateText.textContent = formatDateWithDay(date);
-  
-  dayDate.appendChild(calendarIcon);
-  dayDate.appendChild(dateText);
-  
-  const dayCount = document.createElement('div');
-  dayCount.className = 'day-count';
-  dayCount.textContent = `${dayAbsences.length} ${LanguageManager.t('absences.hours')}`;
-  
-  dayHeader.appendChild(dayDate);
-  dayHeader.appendChild(dayCount);
-  
-  const dayAbsencesContainer = document.createElement('div');
-  dayAbsencesContainer.className = 'day-absences';
-  
-  dayAbsences.forEach(absence => {
-    const absenceCard = createAbsenceCard(absence);
-    dayAbsencesContainer.appendChild(absenceCard);
-  });
-  
-  dayGroup.appendChild(dayHeader);
-  dayGroup.appendChild(dayAbsencesContainer);
-  
-  return dayGroup;
+function getSchoolYearStart() {
+  const now = new Date();
+  const year = now.getMonth() >= 8 ? now.getFullYear() : now.getFullYear() - 1;
+  return new Date(year, 8, 1);
 }
 
-function formatDateWithDay(dateStr) {
-  const parts = dateStr.split('.');
-  const year = parseInt(parts[0]);
-  const month = parseInt(parts[1]) - 1;
-  const day = parseInt(parts[2]);
-  
-  const date = new Date(year, month, day);
-  const days = [
-    LanguageManager.t('common.sunday'),
-    LanguageManager.t('common.monday'),
-    LanguageManager.t('common.tuesday'),
-    LanguageManager.t('common.wednesday'),
-    LanguageManager.t('common.thursday'),
-    LanguageManager.t('common.friday'),
-    LanguageManager.t('common.saturday')
-  ];
-  
-  const dayName = days[date.getDay()];
-  return `${dateStr} - ${dayName.charAt(0).toUpperCase() + dayName.slice(1)}`;
-}
+function createCalendarSection(groupedByDate, absences) {
+  const calendarSection = document.createElement('div');
+  calendarSection.className = 'calendar-section';
 
-function createAbsenceCard(absence) {
-  const card = document.createElement('div');
-  card.className = 'absence-card';
-  card.dataset.subject = absence.subject;
-  card.dataset.status = absence.justificationStatus;
-  card.dataset.date = absence.date;
+  const schoolYearStart = getSchoolYearStart();
+  const now = new Date();
 
-  const lessonDiv = document.createElement('div');
-  lessonDiv.className = 'absence-lesson';
-  lessonDiv.textContent = absence.lesson + '.';
+  const months = [];
+  let currentDate = new Date(schoolYearStart);
 
-  const subjectDiv = document.createElement('div');
-  subjectDiv.className = 'absence-subject';
-  subjectDiv.textContent = absence.subject;
-
-  const topicDiv = document.createElement('div');
-  topicDiv.className = 'absence-topic';
-  topicDiv.textContent = absence.topic || '-';
-  topicDiv.title = absence.topic;
-
-  const statusDiv = document.createElement('div');
-  statusDiv.className = 'absence-status';
-  
-  const statusBadge = document.createElement('span');
-  statusBadge.className = `status-badge ${absence.justificationStatus}`;
-  
-  if (absence.justificationStatus === 'justified') {
-    const img = document.createElement('img');
-    img.src = chrome.runtime.getURL('icons/BadgeCheck.svg');
-    img.alt = 'Igazolt';
-    statusBadge.appendChild(img);
-    statusBadge.appendChild(document.createTextNode(' ' + LanguageManager.t('absences.justified')));
-  } else if (absence.justificationStatus === 'unjustified') {
-    const span = document.createElement('span');
-    span.className = 'material-icons-round';
-    span.textContent = 'cancel';
-    statusBadge.appendChild(span);
-    statusBadge.appendChild(document.createTextNode(' ' + LanguageManager.t('absences.unjustified')));
-  } else {
-    const img = document.createElement('img');
-    img.src = chrome.runtime.getURL('icons/pending.svg');
-    img.alt = 'Függőben';
-    statusBadge.appendChild(img);
-    statusBadge.appendChild(document.createTextNode(' ' + LanguageManager.t('absences.pending')));
-  }
-  
-  statusDiv.appendChild(statusBadge);
-  
-  card.appendChild(lessonDiv);
-  card.appendChild(subjectDiv);
-  card.appendChild(topicDiv);
-  card.appendChild(statusDiv);
-  
-  return card;
-}
-
-function createAbsencesContent(groupedAbsences) {
-  const content = document.createElement('div');
-  content.className = 'absences-content';
-
-  const sortedDates = Object.keys(groupedAbsences).sort((a, b) => {
-    const dateA = new Date(a.replace(/\./g, '-').slice(0, -1));
-    const dateB = new Date(b.replace(/\./g, '-').slice(0, -1));
-    return dateB - dateA;
-  });
-  
-  if (sortedDates.length === 0) {
-    const emptyState = document.createElement('div');
-    emptyState.className = 'empty-state';
-    
-    const emptyIcon = document.createElement('img');
-    emptyIcon.src = chrome.runtime.getURL('icons/BadgeCheck.svg');
-    emptyIcon.alt = 'Nincs hiányzás';
-    
-    const emptyTitle = document.createElement('h3');
-    emptyTitle.textContent = LanguageManager.t('absences.title');
-    
-    const emptyText = document.createElement('p');
-    emptyText.textContent = LanguageManager.t('dashboard.not_supported');
-    
-    emptyState.appendChild(emptyIcon);
-    emptyState.appendChild(emptyTitle);
-    emptyState.appendChild(emptyText);
-    content.appendChild(emptyState);
-  } else {
-    sortedDates.forEach(date => {
-      const dayGroup = createDayGroup(date, groupedAbsences[date]);
-      content.appendChild(dayGroup);
+  while (currentDate <= now) {
+    months.push({
+      year: currentDate.getFullYear(),
+      month: currentDate.getMonth()
     });
+    currentDate.setMonth(currentDate.getMonth() + 1);
   }
-  
-  return content;
+
+  months.forEach(({ year, month }) => {
+    const monthCalendar = createMonthCalendar(year, month, groupedByDate, absences);
+    calendarSection.appendChild(monthCalendar);
+  });
+
+  return calendarSection;
+}
+
+function createMonthCalendar(year, month, groupedByDate, absences) {
+  const monthContainer = document.createElement('div');
+  monthContainer.className = 'month-container';
+
+  const monthHeader = document.createElement('div');
+  monthHeader.className = 'month-header';
+
+  const monthNames = [
+    LanguageManager.t('common.january') || 'Január',
+    LanguageManager.t('common.february') || 'Február',
+    LanguageManager.t('common.march') || 'Március',
+    LanguageManager.t('common.april') || 'Április',
+    LanguageManager.t('common.may') || 'Május',
+    LanguageManager.t('common.june') || 'Június',
+    LanguageManager.t('common.july') || 'Július',
+    LanguageManager.t('common.august') || 'Augusztus',
+    LanguageManager.t('common.september') || 'Szeptember',
+    LanguageManager.t('common.october') || 'Október',
+    LanguageManager.t('common.november') || 'November',
+    LanguageManager.t('common.december') || 'December'
+  ];
+
+  monthHeader.textContent = `${monthNames[month]} ${year}`;
+  monthContainer.appendChild(monthHeader);
+
+  const calendarGrid = document.createElement('div');
+  calendarGrid.className = 'calendar-grid';
+
+  const dayNames = [
+    LanguageManager.t('common.mon') || 'H',
+    LanguageManager.t('common.tue') || 'K',
+    LanguageManager.t('common.wed') || 'Sze',
+    LanguageManager.t('common.thu') || 'Cs',
+    LanguageManager.t('common.fri') || 'P',
+    LanguageManager.t('common.sat') || 'Szo',
+    LanguageManager.t('common.sun') || 'V'
+  ];
+
+  dayNames.forEach(day => {
+    const dayHeader = document.createElement('div');
+    dayHeader.className = 'calendar-day-header';
+    dayHeader.textContent = day;
+    calendarGrid.appendChild(dayHeader);
+  });
+
+  const firstDay = new Date(year, month, 1);
+  const lastDay = new Date(year, month + 1, 0);
+  const daysInMonth = lastDay.getDate();
+
+  let startDay = firstDay.getDay() - 1;
+  if (startDay < 0) startDay = 6;
+
+  for (let i = 0; i < startDay; i++) {
+    const emptyCell = document.createElement('div');
+    emptyCell.className = 'calendar-day empty';
+    calendarGrid.appendChild(emptyCell);
+  }
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  for (let day = 1; day <= daysInMonth; day++) {
+    const dateKey = `${year}-${(month + 1).toString().padStart(2, "0")}-${day.toString().padStart(2, "0")}`;
+    const dayAbsences = groupedByDate[dateKey] || [];
+    const currentDayDate = new Date(year, month, day);
+    currentDayDate.setHours(0, 0, 0, 0);
+
+    const dayCell = document.createElement('div');
+    dayCell.className = 'calendar-day';
+
+    if (currentDayDate > today) {
+      dayCell.classList.add('future');
+    }
+
+    if (currentDayDate.getTime() === today.getTime()) {
+      dayCell.classList.add('today');
+    }
+
+    if (dayAbsences.length > 0) {
+      dayCell.classList.add('has-absence');
+
+      const hasUnjustified = dayAbsences.some(a => a.justificationStatus === 'unjustified');
+      const hasPending = dayAbsences.some(a => a.justificationStatus === 'pending');
+      const hasJustified = dayAbsences.some(a => a.justificationStatus === 'justified');
+      const hasAbsence = dayAbsences.some(a => a.absenceType === 'absence');
+      const hasLate = dayAbsences.some(a => a.absenceType === 'late');
+
+      if (hasUnjustified) {
+        dayCell.classList.add('status-unjustified');
+      } else if (hasPending) {
+        dayCell.classList.add('status-pending');
+      } else if (hasJustified) {
+        dayCell.classList.add('status-justified');
+      }
+
+      if (hasAbsence && hasLate) {
+        dayCell.classList.add('type-mixed');
+      } else if (hasLate) {
+        dayCell.classList.add('type-late');
+      }
+
+      dayCell.addEventListener('click', () => {
+        openAbsenceModal(dateKey, dayAbsences);
+      });
+
+      const countBadge = document.createElement('span');
+      countBadge.className = 'absence-count';
+      countBadge.textContent = dayAbsences.length;
+      dayCell.appendChild(countBadge);
+    }
+
+    const dayNumber = document.createElement('span');
+    dayNumber.className = 'day-number';
+    dayNumber.textContent = day;
+    dayCell.appendChild(dayNumber);
+
+    calendarGrid.appendChild(dayCell);
+  }
+
+  monthContainer.appendChild(calendarGrid);
+  return monthContainer;
+}
+
+function openAbsenceModal(dateKey, dayAbsences) {
+  const existingModal = document.querySelector('.absence-modal-overlay');
+  if (existingModal) {
+    existingModal.remove();
+  }
+
+  const overlay = document.createElement('div');
+  overlay.className = 'absence-modal-overlay';
+
+  const modal = document.createElement('div');
+  modal.className = 'absence-modal';
+
+  const modalHeader = document.createElement('div');
+  modalHeader.className = 'modal-header';
+
+  const dateParts = dateKey.split('-');
+  const displayDate = new Date(parseInt(dateParts[0]), parseInt(dateParts[1]) - 1, parseInt(dateParts[2]));
+  const dayNames = [
+    LanguageManager.t('common.sunday') || 'Vasárnap',
+    LanguageManager.t('common.monday') || 'Hétfő',
+    LanguageManager.t('common.tuesday') || 'Kedd',
+    LanguageManager.t('common.wednesday') || 'Szerda',
+    LanguageManager.t('common.thursday') || 'Csütörtök',
+    LanguageManager.t('common.friday') || 'Péntek',
+    LanguageManager.t('common.saturday') || 'Szombat'
+  ];
+
+  const modalTitle = document.createElement('h2');
+  modalTitle.textContent = `${dateParts[0]}.${dateParts[1]}.${dateParts[2]}. - ${dayNames[displayDate.getDay()]}`;
+
+  modalHeader.appendChild(modalTitle);
+
+  const modalContent = document.createElement('div');
+  modalContent.className = 'modal-content';
+
+  dayAbsences.forEach(absence => {
+    const absenceCard = document.createElement('div');
+    absenceCard.className = `modal-absence-card ${absence.justificationStatus}`;
+
+    const headerRow = document.createElement('div');
+    headerRow.className = 'modal-card-header';
+
+    const lessonSpan = document.createElement('span');
+    lessonSpan.className = 'modal-lesson';
+    lessonSpan.textContent = `${absence.lesson}.`;
+
+    const typeIndicator = document.createElement('span');
+    typeIndicator.className = `type-indicator ${absence.absenceType}`;
+    typeIndicator.textContent = absence.absenceType === 'late' 
+      ? (LanguageManager.t('absences.late_type') || 'Késés') 
+      : (LanguageManager.t('absences.absence_type') || 'Hiányzás');
+
+    const statusBadge = document.createElement('span');
+    statusBadge.className = `modal-status-badge ${absence.justificationStatus}`;
+    let statusText = '';
+    if (absence.justificationStatus === 'justified') {
+      statusText = LanguageManager.t('absences.justified') || 'Igazolt';
+    } else if (absence.justificationStatus === 'unjustified') {
+      statusText = LanguageManager.t('absences.unjustified') || 'Igazolatlan';
+    } else {
+      statusText = LanguageManager.t('absences.pending') || 'Igazolásra vár';
+    }
+    statusBadge.textContent = statusText;
+
+    headerRow.appendChild(lessonSpan);
+    headerRow.appendChild(typeIndicator);
+    headerRow.appendChild(statusBadge);
+
+    const subjectDiv = document.createElement('div');
+    subjectDiv.className = 'modal-subject';
+    subjectDiv.textContent = absence.subject;
+
+    const infoRow = document.createElement('div');
+    infoRow.className = 'modal-info-row';
+
+    if (absence.topic) {
+      const topicSpan = document.createElement('span');
+      topicSpan.className = 'modal-info-item';
+      topicSpan.textContent = absence.topic;
+      infoRow.appendChild(topicSpan);
+    }
+
+    if (absence.justificationType) {
+      const justificationSpan = document.createElement('span');
+      justificationSpan.className = 'modal-info-item';
+      justificationSpan.textContent = absence.justificationType;
+      infoRow.appendChild(justificationSpan);
+    }
+
+    if (absence.absenceType === 'late' && absence.minutes > 0) {
+      const minutesSpan = document.createElement('span');
+      minutesSpan.className = 'modal-info-item modal-minutes';
+      minutesSpan.textContent = `${absence.minutes} ${LanguageManager.t('absences.minutes') || 'perc'}`;
+      infoRow.appendChild(minutesSpan);
+    }
+
+    absenceCard.appendChild(headerRow);
+    absenceCard.appendChild(subjectDiv);
+    if (infoRow.children.length > 0) {
+      absenceCard.appendChild(infoRow);
+    }
+
+    modalContent.appendChild(absenceCard);
+  });
+
+  modal.appendChild(modalHeader);
+  modal.appendChild(modalContent);
+  overlay.appendChild(modal);
+
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) {
+      overlay.remove();
+    }
+  });
+
+  const handleEscape = (e) => {
+    if (e.key === 'Escape') {
+      overlay.remove();
+      document.removeEventListener('keydown', handleEscape);
+    }
+  };
+  document.addEventListener('keydown', handleEscape);
+
+  document.body.appendChild(overlay);
+
+  requestAnimationFrame(() => {
+    overlay.classList.add('visible');
+  });
+}
+
+function createLegend() {
+  const legend = document.createElement('div');
+  legend.className = 'calendar-legend';
+
+  const legendItems = [
+    { class: 'status-justified', label: LanguageManager.t('absences.justified') || 'Igazolt' },
+    { class: 'status-pending', label: LanguageManager.t('absences.pending') || 'Igazolásra vár' },
+    { class: 'status-unjustified', label: LanguageManager.t('absences.unjustified') || 'Igazolatlan' },
+    { class: 'type-late-legend', label: LanguageManager.t('absences.late_type') || 'Késés', isType: true },
+  ];
+
+  legendItems.forEach(item => {
+    const legendItem = document.createElement('div');
+    legendItem.className = 'legend-item';
+
+    const legendColor = document.createElement('div');
+    legendColor.className = `legend-color ${item.class}`;
+
+    const legendLabel = document.createElement('span');
+    legendLabel.textContent = item.label;
+
+    legendItem.appendChild(legendColor);
+    legendItem.appendChild(legendLabel);
+    legend.appendChild(legendItem);
+  });
+
+  return legend;
 }
 
 async function transformAbsencesPage() {
-  const { basicData, absences, groupedAbsences } = await collectAbsencesData();
-  
+  const { basicData, absences, groupedByDate } = await collectAbsencesData();
+
   document.body.textContent = '';
-  
+
   const container = document.createElement('div');
   container.className = 'kreta-container';
 
@@ -409,164 +464,28 @@ async function transformAbsencesPage() {
     headerDiv.appendChild(tempDiv.firstChild);
   }
   container.appendChild(headerDiv);
-  
+
   const main = document.createElement('main');
   main.className = 'kreta-main';
-  
-  const pageGrid = document.createElement('div');
-  pageGrid.className = 'absences-page';
-  
-  const sidebar = document.createElement('div');
-  sidebar.className = 'absences-sidebar';
-  const filterCard = createFilterCard(absences);
-  sidebar.appendChild(filterCard);
-  
+
+  const pageContent = document.createElement('div');
+  pageContent.className = 'absences-page';
+
   const statsSection = createStatsSection(absences);
-  sidebar.appendChild(statsSection);
-  
-  const absencesContent = createAbsencesContent(groupedAbsences);
-  
-  pageGrid.appendChild(sidebar);
-  pageGrid.appendChild(absencesContent);
-  
-  main.appendChild(pageGrid);
+  pageContent.appendChild(statsSection);
+
+  const legend = createLegend();
+  pageContent.appendChild(legend);
+
+  const calendarSection = createCalendarSection(groupedByDate, absences);
+  pageContent.appendChild(calendarSection);
+
+  main.appendChild(pageContent);
   container.appendChild(main);
   document.body.appendChild(container);
 
   setupUserDropdown();
-  setupFilters(groupedAbsences);
-
   loadingScreen.hide();
-}
-
-function setupFilters(originalGroupedAbsences) {
-  try {
-    const dateFilter = document.getElementById("dateFilter");
-    const subjectFilter = document.getElementById("subjectFilter");
-    const justificationFilter = document.getElementById("justificationFilter");
-
-    if (!dateFilter || !subjectFilter || !justificationFilter) {
-      console.warn("Some filter elements were not found in the DOM");
-      return;
-    }
-
-    const filterAbsences = () => {
-      try {
-        const dateFilterValue = dateFilter.value;
-        const subject = subjectFilter.value;
-        const justified = justificationFilter.value;
-        const selectedDate = dateFilterValue ? new Date(dateFilterValue) : null;
-
-        document.querySelectorAll(".absence-card").forEach((card) => {
-          const dateStr = card.dataset.date;
-          const dateParts = dateStr.split(".");
-
-          if (dateParts.length < 3) {
-            return;
-          }
-
-          const parsedYear = parseInt(dateParts[0].trim(), 10);
-          const parsedMonth = parseInt(dateParts[1].trim(), 10) - 1;
-          const parsedDay = parseInt(dateParts[2].trim(), 10);
-
-          const cardDate = new Date(parsedYear, parsedMonth, parsedDay);
-
-          let showCard = true;
-
-          if (selectedDate) {
-            if (
-              cardDate.getFullYear() !== selectedDate.getFullYear() ||
-              cardDate.getMonth() !== selectedDate.getMonth() ||
-              cardDate.getDate() !== selectedDate.getDate()
-            ) {
-              showCard = false;
-            }
-          }
-
-          if (subject && card.dataset.subject !== subject) {
-            showCard = false;
-          }
-
-          if (justified && card.dataset.status !== justified) {
-            showCard = false;
-          }
-
-          card.style.display = showCard ? "" : "none";
-        });
-
-        updateDayGroupsVisibility();
-
-        updateStatistics();
-      } catch (err) {
-        console.error("Error during filtering absences:", err);
-      }
-    };
-
-    [dateFilter, subjectFilter, justificationFilter].forEach((filter) => {
-      if (filter) {
-        filter.addEventListener("change", filterAbsences);
-      }
-    });
-
-  } catch (err) {
-    console.error("Error setting up filters:", err);
-  }
-}
-
-function updateDayGroupsVisibility() {
-  document.querySelectorAll(".day-group").forEach((group) => {
-    const visibleCards = group.querySelectorAll('.absence-card:not([style*="display: none"])');
-    const dayCount = group.querySelector('.day-count');
-    
-    if (visibleCards.length > 0) {
-      group.style.display = "";
-      if (dayCount) {
-        dayCount.textContent = `${visibleCards.length} ${LanguageManager.t('absences.hours')}`;
-      }
-    } else {
-      group.style.display = "none";
-    }
-  });
-}
-
-function updateStatistics() {
-  try {
-    const visibleCards = document.querySelectorAll('.absence-card:not([style*="display: none"])');
-    const totalVisible = visibleCards.length;
-    const justifiedVisible = Array.from(visibleCards).filter(
-      card => card.dataset.status === 'justified'
-    ).length;
-    const unjustifiedVisible = Array.from(visibleCards).filter(
-      card => card.dataset.status === 'unjustified'
-    ).length;
-    const pendingVisible = Array.from(visibleCards).filter(
-      card => card.dataset.status === 'pending'
-    ).length;
-
-    const statCards = document.querySelectorAll(".stat-card");
-    statCards.forEach(card => {
-      const type = card.dataset.type;
-      const numberEl = card.querySelector('.stat-number');
-      if (numberEl) {
-        switch(type) {
-          case 'total':
-            numberEl.textContent = totalVisible;
-            break;
-          case 'justified':
-            numberEl.textContent = justifiedVisible;
-            break;
-          case 'unjustified':
-            numberEl.textContent = unjustifiedVisible;
-            break;
-          case 'pending':
-            numberEl.textContent = pendingVisible;
-            break;
-        }
-      }
-    });
-  } catch (err) {
-    console.error("Error updating statistics:", err);
-  }
 }
 
 if (window.location.href.includes("/Hianyzas/Hianyzasok")) {

@@ -266,9 +266,12 @@
     "last_month": "Előző hónap",
     "current_semester": "Aktuális félév",
     "last_30_days": "Utolsó 30 nap",
-    "total_absences": "Összes hiányzás",
+    "total_absences": "Összes mulasztás",
     "topic": "Téma",
-    "status": "Állapot"
+    "status": "Állapot",
+    "absence_type": "Hiányzás",
+    "late_type": "Késés",
+    "minutes": "perc"
   },
   "profile": {
     "title": "Profil",
@@ -420,8 +423,27 @@
     "friday": "péntek",
     "saturday": "szombat",
     "sunday": "vasárnap",
+    "mon": "H",
+    "tue": "K",
+    "wed": "Sze",
+    "thu": "Cs",
+    "fri": "P",
+    "sat": "Szo",
+    "sun": "V",
     "today": "Ma",
-    "tomorrow": "Holnap"
+    "tomorrow": "Holnap",
+    "january": "Január",
+    "february": "Február",
+    "march": "Március",
+    "april": "Április",
+    "may": "Május",
+    "june": "Június",
+    "july": "Július",
+    "august": "Augusztus",
+    "september": "Szeptember",
+    "october": "Október",
+    "november": "November",
+    "december": "December"
   },
   "months": {
     "january": "január",

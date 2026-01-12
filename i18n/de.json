@@ -266,7 +266,10 @@
     "last_30_days": "Letzte 30 Tage",
     "total_absences": "Alle Fehlzeiten",
     "topic": "Thema",
-    "status": "Status"
+    "status": "Status",
+    "absence_type": "Abwesenheit",
+    "late_type": "Verspätung",
+    "minutes": "Minuten"
   },
   "profile": {
     "title": "Profil",
@@ -418,8 +421,27 @@
     "friday": "Freitag",
     "saturday": "Samstag",
     "sunday": "Sonntag",
+    "mon": "M",
+    "tue": "D",
+    "wed": "M",
+    "thu": "D",
+    "fri": "F",
+    "sat": "S",
+    "sun": "S",
     "today": "Heute",
-    "tomorrow": "Morgen"
+    "tomorrow": "Morgen",
+    "january": "Januar",
+    "february": "Februar",
+    "march": "März",
+    "april": "April",
+    "may": "Mai",
+    "june": "Juni",
+    "july": "Juli",
+    "august": "August",
+    "september": "September",
+    "october": "Oktober",
+    "november": "November",
+    "december": "Dezember"
   },
   "months": {
     "january": "Januar",
