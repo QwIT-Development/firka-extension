@@ -570,7 +570,10 @@ body {
   display:flex;
 }
 .timetable-container {
-  overflow:hidden;
+  overflow: hidden;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 .timetable-grid {
   grid-template-columns:60px 1fr;
@@ -1410,3 +1413,331 @@ to {
   transition:gap 0.2s ease;
   font-size:clamp(0.875rem,1.5vw,1rem);
 }
+
+.timetable-calendar {
+  display: flex;
+  flex-direction: column;
+  background: var(--card-card);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0px 1px 2px 0px var(--accent-shadow);
+  flex: 1;
+}
+
+.calendar-header {
+  display: grid;
+  grid-template-columns: 80px repeat(5, 1fr);
+  background: var(--background-0);
+  border-bottom: 1px solid var(--background-0);
+  padding: 0;
+  gap: 0;
+}
+
+.time-column-header {
+  padding: 12px;
+  border-right: 1px solid var(--background-0);
+}
+
+.calendar-day-header {
+  padding: 12px;
+  border-right: 1px solid var(--background-0);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.calendar-day-header:last-child {
+  border-right: none;
+}
+
+.calendar-day-header .day-name {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 14px;
+}
+
+.calendar-day-header .day-date {
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.calendar-notices {
+  display: grid;
+  grid-template-columns: 80px repeat(5, 1fr);
+  border-bottom: 1px solid var(--background-0);
+  padding: 0;
+  gap: 0;
+  background: var(--background);
+}
+
+.notices-time-column {
+  border-right: 1px solid var(--background-0);
+}
+
+.notice-day-slot {
+  padding: 8px;
+  border-right: 1px solid var(--background-0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60px;
+}
+
+.notice-day-slot:last-child {
+  border-right: none;
+}
+
+.notice-day-slot .special-day-notice {
+  width: 100%;
+  margin: 0;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: 80px repeat(5, 1fr);
+  gap: 0;
+  background: var(--background);
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+
+.time-column {
+  border-right: 1px solid var(--background-0);
+  background: var(--background-0);
+  position: sticky;
+  left: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.time-marker {
+  padding: 8px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--background);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.time-marker:last-child {
+  border-bottom: none;
+}
+
+.calendar-day-column {
+  position: relative;
+  border-right: 1px solid var(--background-0);
+  background: var(--background);
+  height: 100%;
+}
+
+.calendar-day-column:last-child {
+  border-right: none;
+}
+
+.day-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  pointer-events: none;
+  width: 100%;
+}
+
+.time-slot-bg {
+  border-bottom: 1px solid var(--background-0);
+  flex-shrink: 0;
+}
+
+.time-slot-bg:last-child {
+  border-bottom: none;
+}
+
+.lessons-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.calendar-lesson-card {
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  width: calc(100% - 8px);
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  border-radius: 12px;
+  background: var(--card-card);
+  box-shadow: 0px 1px 2px 0px var(--accent-shadow);
+  border: 1px solid var(--background-0);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  overflow: hidden;
+  z-index: 2;
+}
+
+.calendar-lesson-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px var(--accent-shadow);
+  z-index: 5;
+}
+
+.calendar-lesson-card.substituted {
+  background: var(--warning-card);
+  border-color: var(--warning-15);
+}
+
+.calendar-lesson-card.cancelled {
+  background: var(--card-translucent);
+  opacity: 0.6;
+}
+
+.calendar-lesson-card.cancelled .lesson-subject,
+.calendar-lesson-card.cancelled .lesson-teacher,
+.calendar-lesson-card.cancelled .lesson-time-info {
+  opacity: 0.5;
+  text-decoration: line-through;
+}
+
+.calendar-lesson-card .lesson-subject {
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--text-primary);
+  line-height: 1.2;
+  margin-bottom: 2px;
+}
+
+.calendar-lesson-card .lesson-teacher {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+  line-height: 1.2;
+}
+
+.calendar-lesson-card .lesson-time-info {
+  font-size: 11px;
+  color: var(--text-secondary);
+  display: flex;
+  justify-content: space-between;
+  gap: 4px;
+  margin-top: auto;
+}
+
+.calendar-lesson-card .lesson-room {
+  background: var(--accent-15);
+  padding: 2px 6px;
+  border-radius: 8px;
+  font-size: 10px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.calendar-lesson-card.substituted .lesson-room {
+  background: var(--warning-15);
+}
+
+.calendar-lesson-card .lesson-time {
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.calendar-lesson-card .lesson-indicators {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  display: flex;
+  gap: 2px;
+  flex-wrap: wrap;
+}
+
+.calendar-lesson-card .lesson-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--accent-15);
+  color: var(--accent-accent);
+}
+
+.calendar-lesson-card .lesson-indicator.test-indicator {
+  background: var(--warning-15);
+  color: var(--warning-accent);
+}
+
+.calendar-lesson-card .lesson-indicator.custom-homework-indicator,
+.calendar-lesson-card .lesson-indicator.custom-test-indicator {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 768px) {
+  .calendar-grid {
+    grid-template-columns: 60px repeat(5, 1fr);
+  }
+
+  .time-column-header {
+    padding: 8px;
+  }
+
+  .calendar-day-header {
+    padding: 8px;
+  }
+
+  .calendar-day-header .day-name {
+    font-size: 12px;
+  }
+
+  .calendar-day-header .day-date {
+    font-size: 10px;
+  }
+
+  .time-marker {
+    padding: 4px;
+    font-size: 10px;
+  }
+
+  .calendar-lesson-card {
+    padding: 6px;
+  }
+
+  .calendar-lesson-card .lesson-subject {
+    font-size: 11px;
+  }
+
+  .calendar-lesson-card .lesson-teacher {
+    font-size: 9px;
+  }
+
+  .calendar-lesson-card .lesson-time-info {
+    font-size: 9px;
+  }
+
+  .calendar-lesson-card .lesson-indicator {
+    width: 20px;
+    height: 20px;
+  }
+
+  .calendar-lesson-card .lesson-indicator img {
+    width: 14px !important;
+    height: 14px !important;
+  }
+}
+
