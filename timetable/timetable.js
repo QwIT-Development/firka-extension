@@ -504,6 +504,26 @@
         return timeA - timeB;
       },
     );
+
+    const timeDurations = {};
+    times.forEach(time => {
+      const lessonsAtTime = regularLessons.filter(l => l.startTime === time);
+      let maxDuration = 45;
+
+      lessonsAtTime.forEach(lesson => {
+        if (lesson.endTime) {
+          const startMinutes = helper.convertTimeToMinutes(lesson.startTime);
+          const endMinutes = helper.convertTimeToMinutes(lesson.endTime);
+          const duration = endMinutes - startMinutes;
+          if (duration > maxDuration) {
+            maxDuration = duration;
+          }
+        }
+      });
+
+      timeDurations[time] = maxDuration;
+    });
+
     const days = [
       LanguageManager.t("timetable.monday"),
       LanguageManager.t("timetable.tuesday"),
@@ -561,24 +581,27 @@
               return lastTime;
             });
             
+            const duration = timeDurations[time] || 45;
+            const slotHeight = Math.max(84, (duration / 45) * 100);
+
             return `
-        <div class="time-slot">${time}</div>
+        <div class="time-slot" style="min-height: ${slotHeight}px;">${time}</div>
         ${Array(5)
           .fill()
           .map((_, dayIndex) => {
             const dayLessons = regularLessons.filter(
               (l) => l.startTime === time && l.day === dayIndex,
             );
-            
+
             const lastLessonTime = lastLessonTimes[dayIndex];
             const isAfterLastLesson = lastLessonTime && helper.convertTimeToMinutes(time) > helper.convertTimeToMinutes(lastLessonTime);
-        
+
             if (dayLessons.length === 0 && isAfterLastLesson) {
-              return `<div class="lesson-slot"></div>`;
+              return `<div class="lesson-slot" style="min-height: ${slotHeight}px;"></div>`;
             }
-            
+
               return `
-            <div class="lesson-slot ${dayLessons.length === 0 ? 'empty-slot' : ''}">
+            <div class="lesson-slot ${dayLessons.length === 0 ? 'empty-slot' : ''}" style="min-height: ${slotHeight}px;">
               ${dayLessons.length === 0 ? '<div class="empty-lesson-placeholder"></div>' : ''}
               ${dayLessons
                       .map(
