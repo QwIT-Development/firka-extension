@@ -1048,6 +1048,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   await initTabs();
   await initErrorReporting();
+  await checkForUpdates();
 });
 
 async function initErrorReporting() {
@@ -1066,4 +1067,104 @@ async function initErrorReporting() {
       }).catch(() => {});
     });
   });
+}
+
+async function checkForUpdates() {
+  try {
+    const manifest = chrome.runtime.getManifest();
+    const currentVersion = manifest.version;
+
+    const response = await fetch('https://api.github.com/repos/QwIT-Development/firka-extension/releases/latest');
+    if (!response.ok) {
+      console.error('Failed to fetch latest release');
+      return;
+    }
+
+    const latestRelease = await response.json();
+    const latestVersion = latestRelease.tag_name.replace(/^v/, '');
+
+    if (compareVersions(latestVersion, currentVersion) > 0) {
+      showUpdateModal(currentVersion, latestVersion, latestRelease);
+    }
+  } catch (error) {
+    console.error('Error checking for updates:', error);
+  }
+}
+
+function compareVersions(v1, v2) {
+  const parts1 = v1.split('.').map(Number);
+  const parts2 = v2.split('.').map(Number);
+
+  for (let i = 0; i < Math.max(parts1.length, parts2.length); i++) {
+    const part1 = parts1[i] || 0;
+    const part2 = parts2[i] || 0;
+
+    if (part1 > part2) return 1;
+    if (part1 < part2) return -1;
+  }
+
+  return 0;
+}
+
+function parseMarkdown(markdown) {
+  let html = markdown;
+
+  html = html.replace(/^### (.*$)/gim, '<h3>$1</h3>');
+  html = html.replace(/^## (.*$)/gim, '<h2>$1</h2>');
+  html = html.replace(/^# (.*$)/gim, '<h1>$1</h1>');
+
+  html = html.replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>');
+  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+  html = html.replace(/__(.+?)__/g, '<strong>$1</strong>');
+  html = html.replace(/_(.+?)_/g, '<em>$1</em>');
+
+  html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+
+  html = html.replace(/```([^```]+)```/g, '<pre><code>$1</code></pre>');
+
+  html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
+
+  html = html.replace(/^> (.+)/gim, '<blockquote>$1</blockquote>');
+
+  html = html.replace(/^\* (.+)$/gim, '<li>$1</li>');
+  html = html.replace(/^- (.+)$/gim, '<li>$1</li>');
+  html = html.replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>');
+
+  html = html.replace(/^\d+\. (.+)$/gim, '<li>$1</li>');
+
+  html = html.replace(/\n\n/g, '</p><p>');
+  html = html.replace(/^(?!<[hou]|<li|<pre|<blockquote)(.+)$/gim, '<p>$1</p>');
+
+  html = html.replace(/<p><\/p>/g, '');
+  html = html.replace(/<p>(<[hou])/g, '$1');
+  html = html.replace(/(<\/[hou]l?>)<\/p>/g, '$1');
+
+  return html;
+}
+
+function showUpdateModal(currentVersion, latestVersion, releaseData) {
+  const modal = document.getElementById('updateModal');
+  const currentVersionEl = document.getElementById('currentVersion');
+  const latestVersionEl = document.getElementById('latestVersion');
+  const changelogEl = document.getElementById('updateChangelog');
+  const updateButton = document.getElementById('updateButton');
+
+  currentVersionEl.textContent = `v${currentVersion}`;
+  latestVersionEl.textContent = `v${latestVersion}`;
+
+  const changelog = releaseData.body || 'Nincs elérhető változásnapló.';
+  changelogEl.innerHTML = parseMarkdown(changelog);
+
+  updateButton.href = releaseData.html_url;
+
+  modal.classList.add('active');
+
+  document.getElementById('closeUpdateModal').addEventListener('click', closeUpdateModal);
+  document.getElementById('dismissUpdate').addEventListener('click', closeUpdateModal);
+}
+
+function closeUpdateModal() {
+  const modal = document.getElementById('updateModal');
+  modal.classList.remove('active');
 }

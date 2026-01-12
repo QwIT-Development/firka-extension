@@ -188,6 +188,43 @@
 
   </div>
 
+  <div class="modal-overlay" id="updateModal">
+    <div class="modal-content update-modal">
+      <div class="modal-header">
+        <h3 data-i18n="settings.update.title">Új verzió érhető el!</h3>
+        <button class="modal-close" id="closeUpdateModal">
+          <span class="material-icons-round">close</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="update-version-info">
+          <div class="version-badge current">
+            <span class="version-label" data-i18n="settings.update.current_version">Jelenlegi verzió:</span>
+            <span class="version-number" id="currentVersion">-</span>
+          </div>
+          <span class="material-icons-round version-arrow">arrow_forward</span>
+          <div class="version-badge latest">
+            <span class="version-label" data-i18n="settings.update.latest_version">Legújabb verzió:</span>
+            <span class="version-number" id="latestVersion">-</span>
+          </div>
+        </div>
+        <div class="update-changelog-section">
+          <h4 data-i18n="settings.update.whats_new">Újdonságok:</h4>
+          <div class="update-changelog" id="updateChangelog">
+            <p data-i18n="settings.update.loading">Betöltés...</p>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" id="dismissUpdate" data-i18n="settings.update.dismiss">Bezárás</button>
+        <a class="btn-primary update-button" id="updateButton" href="#" target="_blank">
+          <span class="material-icons-round">download</span>
+          <span data-i18n="settings.update.download">Letöltés</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
   <div class="modal-overlay" id="themeEditorModal">
     <div class="modal-content theme-editor-modal">
       <div class="modal-header">
