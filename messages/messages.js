@@ -310,7 +310,8 @@
     messageContent.appendChild(contentTitle);
     const messageText = document.createElement('div');
     messageText.className = 'message-text';
-    messageText.textContent = content;
+    messageText.innerHTML = content;
+
     messageContent.appendChild(messageText);
     messageDetails.appendChild(messageContent);
 
