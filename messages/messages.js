@@ -321,14 +321,17 @@
       const attachTitle = document.createElement('h4');
       attachTitle.textContent = 'Mellékletek:';
       messageAttachments.appendChild(attachTitle);
-      
+
       const attachList = document.createElement('ul');
       message.csatolmanyok.forEach(attachment => {
         const li = document.createElement('li');
         const a = document.createElement('a');
         a.href = '#';
-        a.textContent = sanitizeHTML(attachment.nev);
-        a.onclick = () => downloadAttachment(attachment.azonosito);
+        a.textContent = sanitizeHTML(attachment.fajlNev || attachment.nev || 'Ismeretlen fájl');
+        a.onclick = (e) => {
+          e.preventDefault();
+          downloadAttachment(attachment.azonosito, attachment.fajlNev || attachment.nev);
+        };
         li.appendChild(a);
         attachList.appendChild(li);
       });
@@ -346,6 +349,32 @@
     }
     document.body.classList.remove('modal-open');
   }
+
+  async function downloadAttachment(azonosito, fileName) {
+    try {
+      const response = await chrome.runtime.sendMessage({
+        action: 'download_attachment',
+        azonosito: azonosito,
+        fileName: fileName
+      });
+
+      if (response.success && response.data) {
+        const a = document.createElement('a');
+        a.href = response.data;
+        a.download = response.fileName || 'letoltes';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      } else {
+        console.error('Melléklet letöltési hiba:', response.error);
+        alert('Nem sikerült letölteni a mellékletet.');
+      }
+    } catch (error) {
+      console.error('Melléklet letöltési hiba:', error);
+      alert('Hiba történt a melléklet letöltése során.');
+    }
+  }
+
   window.openMessageModal = openMessageModal;
   window.closeMessageModal = closeMessageModal;
 

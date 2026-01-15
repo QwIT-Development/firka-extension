@@ -34,6 +34,11 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           sendResponse({ success: true });
           break;
 
+        case 'download_attachment':
+          const downloadResult = await handleDownloadAttachment(request.azonosito, request.fileName);
+          sendResponse(downloadResult);
+          break;
+
         default:
           console.warn('[Background] Unknown action:', request.action);
           sendResponse({ success: false, error: 'Unknown action' });
@@ -79,7 +84,7 @@ async function handleStorageClear() {
   try {
     const allData = await chrome.storage.sync.get(null);
     const firkaKeys = Object.keys(allData).filter(key => key.startsWith('firka_'));
-    
+
     if (firkaKeys.length > 0) {
       await chrome.storage.sync.remove(firkaKeys);
     }
@@ -87,6 +92,82 @@ async function handleStorageClear() {
     console.error('[Background] Failed to clear storage:', error);
     throw error;
   }
+}
+
+async function handleDownloadAttachment(azonosito, fileName) {
+  try {
+    const apiUrl = `https://eugyintezes.e-kreta.hu/api/v1/dokumentumok/uzenetek/${azonosito}`;
+
+    const redirectResponse = await fetch(apiUrl, {
+      method: 'GET',
+      credentials: 'include',
+      headers: {
+        'Accept': 'application/json, text/plain, */*',
+        'x-csrf': '1',
+        'x-uzenet-json-formatum': 'CamelCase',
+        'x-uzenet-lokalizacio': 'hu-HU',
+        'x-uzenet-verzio-szam': '1.2.3'
+      },
+      redirect: 'manual'
+    });
+
+    let fileUrl;
+    if (redirectResponse.type === 'opaqueredirect' || redirectResponse.status === 0) {
+      const followResponse = await fetch(apiUrl, {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Accept': 'application/json, text/plain, */*',
+          'x-csrf': '1',
+          'x-uzenet-json-formatum': 'CamelCase',
+          'x-uzenet-lokalizacio': 'hu-HU',
+          'x-uzenet-verzio-szam': '1.2.3'
+        },
+        redirect: 'follow'
+      });
+
+      if (followResponse.ok) {
+        const blob = await followResponse.blob();
+        const base64 = await blobToBase64(blob);
+        return { success: true, data: base64, fileName: fileName };
+      }
+    } else if (redirectResponse.status === 302 || redirectResponse.status === 301) {
+      fileUrl = redirectResponse.headers.get('location');
+    }
+
+    if (fileUrl) {
+      const fileResponse = await fetch(fileUrl, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json, text/plain, */*',
+          'x-csrf': '1',
+          'x-uzenet-json-formatum': 'CamelCase',
+          'x-uzenet-lokalizacio': 'hu-HU',
+          'x-uzenet-verzio-szam': '1.2.3'
+        }
+      });
+
+      if (fileResponse.ok) {
+        const blob = await fileResponse.blob();
+        const base64 = await blobToBase64(blob);
+        return { success: true, data: base64, fileName: fileName };
+      }
+    }
+
+    return { success: false, error: 'Nem sikerült letölteni a mellékletet.' };
+  } catch (error) {
+    console.error('[Background] Attachment download error:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+function blobToBase64(blob) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
 }
 
 chrome.storage.onChanged.addListener((changes, namespace) => {

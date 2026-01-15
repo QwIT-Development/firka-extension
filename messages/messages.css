@@ -525,7 +525,7 @@ body.modal-open {
  }
 
 .message-info {
-  background-color: var(--card-card);
+  background-color: var(--button-secondaryFill);
   padding: 15px;
   border-radius: 6px;
   margin-bottom: 20px;
@@ -564,7 +564,7 @@ body.modal-open {
 }
 
 .message-text {
-  background-color: var(--card-card);
+  background-color: var(--button-secondaryFill);
   border-radius: 6px;
   padding: 15px;
   line-height: 1.6;
@@ -591,14 +591,14 @@ body.modal-open {
 }
 
 .message-attachments {
-  background: #f9f9f9;
+  background: var(--button-secondaryFill);
   padding: 15px;
   border-radius: 6px;
 }
 
 .message-attachments h4 {
   margin: 0 0 10px 0;
-  color: #333;
+  color: var(--text-secondary);
   font-size: 1.1em;
 }
 
