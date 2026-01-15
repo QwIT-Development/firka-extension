@@ -313,7 +313,16 @@
     }
   }
 
-  async function loadTestDetailsFromAPI(testId) {
+  let cachedTestData = null;
+  let testDataTimestamp = 0;
+  const TEST_DATA_CACHE_DURATION = 60000;
+
+  async function loadAllTestDataFromAPI() {
+    const now = Date.now();
+    if (cachedTestData && (now - testDataTimestamp) < TEST_DATA_CACHE_DURATION) {
+      return cachedTestData;
+    }
+
     try {
       const timestamp = Date.now();
       const apiUrl = `https://${window.location.hostname}/api/TanuloBejelentettSzamonkeresekApi/GetBejelentettSzamonkeresekGrid?sort=SzamonkeresDatuma-asc~Oraszam-asc&page=1&pageSize=1000&group=&filter=&data=%7B%22RegiSzamonkeresekElrejtese%22%3Afalse%7D&_=${timestamp}`;
@@ -327,15 +336,30 @@
       });
 
       if (!response.ok) {
-        throw new Error(
-          `Számonkérés API hiba: ${response.status}`,
-        );
+        throw new Error(`Számonkérés API hiba: ${response.status}`);
       }
 
       const data = await response.json();
-      const testData = data.Data || [];
+      cachedTestData = data.Data || [];
+      testDataTimestamp = now;
+      return cachedTestData;
+    } catch (error) {
+      console.error("Számonkérés adatok betöltési hiba:", error);
+      return [];
+    }
+  }
+
+  async function getTestTypeById(testId) {
+    const testData = await loadAllTestDataFromAPI();
+    const testDetail = testData.find(test => test.ID === testId.toString());
+    return testDetail ? testDetail.ErtekelesModNev : null;
+  }
+
+  async function loadTestDetailsFromAPI(testId) {
+    try {
+      const testData = await loadAllTestDataFromAPI();
       const testDetail = testData.find(test => test.ID === testId.toString());
-      
+
       if (testDetail) {
         return {
           name: testDetail.SzamonkeresMegnevezes || 'Nincs megnevezés',
@@ -343,7 +367,7 @@
           announceDate: testDetail.BejelentesDatuma ? new Date(testDetail.BejelentesDatuma).toLocaleDateString('hu-HU') : 'Nincs dátum'
         };
       }
-      
+
       return null;
     } catch (error) {
       console.error("Számonkérés adatok betöltési hiba:", error);
@@ -499,6 +523,15 @@
       }
     }
 
+    const testTypeMap = {};
+    const lessonsWithTests = lessons.filter(l => l.testId);
+    if (lessonsWithTests.length > 0) {
+      await loadAllTestDataFromAPI();
+      for (const lesson of lessonsWithTests) {
+        testTypeMap[lesson.testId] = await getTestTypeById(lesson.testId);
+      }
+    }
+
     const times = [...new Set(regularLessons.map((l) => l.startTime))].sort(
       (a, b) => {
         const timeA = helper.convertTimeToMinutes(a);
@@ -620,11 +653,21 @@
                       }
                       ${
                         lesson.testInfo
-                          ? `
-                        <span class="lesson-indicator test-indicator" title="${LanguageManager.t("timetable.test_indicator")}">
-                          <img src="${chrome.runtime.getURL("icons/assigment.svg")}" alt="Teszt" style="width: 20px; height: 20px;">
+                          ? (() => {
+                              const testType = lesson.testId ? testTypeMap[lesson.testId] : null;
+                              if (testType === "KONTAKT ÓRA") {
+                                return "";
+                              }
+                              const isProjektOra = testType === "PROJEKT ÓRA";
+                              const indicatorClass = isProjektOra ? "homework-indicator" : "test-indicator";
+                              const iconPath = isProjektOra ? "icons/online.svg" : "icons/assigment.svg";
+                              const titleText = isProjektOra ? "Online óra" : LanguageManager.t("timetable.test_indicator");
+                              return `
+                        <span class="lesson-indicator ${indicatorClass}" title="${titleText}">
+                          <img src="${chrome.runtime.getURL(iconPath)}" alt="${isProjektOra ? 'Online óra' : 'Teszt'}" style="width: 20px; height: 20px;">
                         </span>
-                      `
+                      `;
+                            })()
                           : ""
                       }
                       ${
@@ -1202,206 +1245,201 @@
     }
     
     if (lesson.testInfo) {
-      const testSection = document.createElement('div');
-      testSection.className = 'modal-section test-section';
-      
-      const testH4 = document.createElement('h4');
-      const testIcon = document.createElement('img');
-      testIcon.src = chrome.runtime.getURL('icons/assigment.svg');
-      testIcon.alt = 'Teszt';
-      testIcon.style.width = '20px';
-      testIcon.style.height = '20px';
-      testH4.appendChild(testIcon);
-      testH4.appendChild(document.createTextNode(LanguageManager.t('timetable.test_indicator')));
-      
-      const testContent = document.createElement('div');
-      testContent.className = 'test-content';
-
+      let testDetails = null;
       if (lesson.testId) {
-        const loadingDiv = document.createElement('div');
-        loadingDiv.className = 'test-details-loading';
-        loadingDiv.textContent = 'Részletek betöltése...';
-        testContent.appendChild(loadingDiv);
+        testDetails = await loadTestDetailsFromAPI(lesson.testId);
+      }
+      
+      const isKontaktOra = testDetails && testDetails.type === "KONTAKT ÓRA";
+      const isProjektOra = testDetails && testDetails.type === "PROJEKT ÓRA";
 
-        loadTestDetailsFromAPI(lesson.testId).then(testDetails => {
-          loadingDiv.remove();
-          
-          if (testDetails) {
-            const detailsDiv = document.createElement('div');
-            detailsDiv.className = 'test-details';
-            
-            const nameP = document.createElement('p');
-            const nameStrong = document.createElement('strong');
-            nameStrong.textContent = 'Megnevezés: ';
-            nameP.appendChild(nameStrong);
-            nameP.appendChild(document.createTextNode(testDetails.name));
-            detailsDiv.appendChild(nameP);
-            
-            const typeP = document.createElement('p');
-            const typeStrong = document.createElement('strong');
-            typeStrong.textContent = 'Típus: ';
-            typeP.appendChild(typeStrong);
-            typeP.appendChild(document.createTextNode(testDetails.type));
-            detailsDiv.appendChild(typeP);
-            
-            const dateP = document.createElement('p');
-            const dateStrong = document.createElement('strong');
-            dateStrong.textContent = 'Bejelentés dátuma: ';
-            dateP.appendChild(dateStrong);
-            dateP.appendChild(document.createTextNode(testDetails.announceDate));
-            detailsDiv.appendChild(dateP);
-            
-            testContent.appendChild(detailsDiv);
-          } else {
-            const errorP = document.createElement('p');
-            errorP.className = 'test-details-error';
-            errorP.textContent = 'Nem sikerült betölteni a számonkérés részleteit.';
-            testContent.appendChild(errorP);
-          }
-        }).catch(error => {
-          loadingDiv.remove();
+      if (!isKontaktOra) {
+        const testSection = document.createElement('div');
+        testSection.className = isProjektOra ? 'modal-section homework-section' : 'modal-section test-section';
+
+        const testH4 = document.createElement('h4');
+        const testIcon = document.createElement('img');
+        testIcon.src = chrome.runtime.getURL(isProjektOra ? 'icons/online.svg' : 'icons/assigment.svg');
+        testIcon.alt = isProjektOra ? 'Online óra' : 'Teszt';
+        testIcon.style.width = '20px';
+        testIcon.style.height = '20px';
+        testH4.appendChild(testIcon);
+        testH4.appendChild(document.createTextNode(isProjektOra ? 'Online óra' : LanguageManager.t('timetable.test_indicator')));
+        if (isProjektOra) {
+          testH4.style.color = 'var(--accent-accent)';
+        }
+
+        const testContent = document.createElement('div');
+        testContent.className = 'test-content';
+
+        if (testDetails) {
+          const detailsDiv = document.createElement('div');
+          detailsDiv.className = 'test-details';
+
+          const nameP = document.createElement('p');
+          const nameStrong = document.createElement('strong');
+          nameStrong.textContent = 'Megnevezés: ';
+          nameP.appendChild(nameStrong);
+          nameP.appendChild(document.createTextNode(testDetails.name));
+          detailsDiv.appendChild(nameP);
+
+          const typeP = document.createElement('p');
+          const typeStrong = document.createElement('strong');
+          typeStrong.textContent = 'Típus: ';
+          typeP.appendChild(typeStrong);
+          typeP.appendChild(document.createTextNode(testDetails.type));
+          detailsDiv.appendChild(typeP);
+
+          const dateP = document.createElement('p');
+          const dateStrong = document.createElement('strong');
+          dateStrong.textContent = 'Bejelentés dátuma: ';
+          dateP.appendChild(dateStrong);
+          dateP.appendChild(document.createTextNode(testDetails.announceDate));
+          detailsDiv.appendChild(dateP);
+
+          testContent.appendChild(detailsDiv);
+        } else if (lesson.testId) {
           const errorP = document.createElement('p');
           errorP.className = 'test-details-error';
-          errorP.textContent = 'Hiba történt a számonkérés részletek betöltése során.';
+          errorP.textContent = 'Nem sikerült betölteni a számonkérés részleteit.';
           testContent.appendChild(errorP);
-        });
-      }
-      
-      
-      const lessonKey = getLessonKey(lesson);
-      const customTests = await getCustomTests();
-      const customTestItems = customTests[lessonKey] || [];
-      
-      if (customTestItems.length > 0) {
-        const customTestsDiv = document.createElement('div');
-        customTestsDiv.className = 'custom-tests-in-section';
-        customTestsDiv.style.marginTop = '1rem';
-        customTestsDiv.style.paddingTop = '1rem';
-        customTestsDiv.style.borderTop = '1px solid var(--background-0)';
-        
-        const customTestsTitle = document.createElement('h5');
-        customTestsTitle.textContent = 'Saját számonkérések:';
-        customTestsTitle.style.fontSize = '14px';
-        customTestsTitle.style.fontWeight = '600';
-        customTestsTitle.style.color = 'var(--warning-accent)';
-        customTestsTitle.style.marginBottom = '0.5rem';
-        customTestsDiv.appendChild(customTestsTitle);
-        
-        const customTestsList = document.createElement('div');
-        customTestsList.className = 'custom-tests-list-integrated';
-        
-        customTestItems.forEach(test => {
-          const testItem = document.createElement('div');
-          testItem.className = `custom-test-item-integrated ${test.completed ? 'completed' : ''}`;
-          testItem.style.display = 'flex';
-          testItem.style.alignItems = 'center';
-          testItem.style.justifyContent = 'space-between';
-          testItem.style.padding = '0.5rem';
-          testItem.style.marginBottom = '0.5rem';
-          testItem.style.background = 'var(--background)';
-          testItem.style.borderRadius = '6px';
-          testItem.style.border = '1px solid var(--background-0)';
-          
-          const testText = document.createElement('span');
-          testText.className = 'test-text-integrated';
-          testText.textContent = test.text;
-          testText.style.flex = '1';
-          testText.style.color = 'var(--text-primary)';
-          if (test.completed) {
-            testText.style.textDecoration = 'line-through';
-            testText.style.opacity = '0.6';
-          }
-          
-          const testActions = document.createElement('div');
-          testActions.className = 'test-actions-integrated';
-          testActions.style.display = 'flex';
-          testActions.style.gap = '0.5rem';
-          
-          const completeBtn = document.createElement('button');
-          completeBtn.className = 'test-complete-btn-integrated';
-          completeBtn.title = test.completed ? 'Megoldva - kattints a visszavonáshoz' : 'Megoldottként jelöl';
-          completeBtn.style.background = 'none';
-          completeBtn.style.border = 'none';
-          completeBtn.style.cursor = 'pointer';
-          completeBtn.style.padding = '4px';
-          completeBtn.style.borderRadius = '4px';
-          completeBtn.style.display = 'flex';
-          completeBtn.style.alignItems = 'center';
-          completeBtn.style.justifyContent = 'center';
-          
-          const completeIcon = document.createElement('img');
-          completeIcon.src = chrome.runtime.getURL('icons/pipa.svg');
-          completeIcon.alt = 'Megoldva';
-          completeIcon.style.width = '16px';
-          completeIcon.style.height = '16px';
-          if (test.completed) {
-            completeIcon.style.opacity = '1';
-            completeBtn.style.background = 'var(--warning-accent)';
-          } else {
-            completeIcon.style.opacity = '0.5';
-          }
-          completeBtn.appendChild(completeIcon);
-          
-          const deleteBtn = document.createElement('button');
-          deleteBtn.className = 'test-delete-btn-integrated';
-          deleteBtn.title = 'Törlés';
-          deleteBtn.style.background = 'none';
-          deleteBtn.style.border = 'none';
-          deleteBtn.style.cursor = 'pointer';
-          deleteBtn.style.padding = '4px';
-          deleteBtn.style.borderRadius = '4px';
-          deleteBtn.style.display = 'flex';
-          deleteBtn.style.alignItems = 'center';
-          deleteBtn.style.justifyContent = 'center';
-          
-          const deleteIcon = document.createElement('img');
-          deleteIcon.src = chrome.runtime.getURL('icons/delete.svg');
-          deleteIcon.alt = 'Törlés';
-          deleteIcon.style.width = '16px';
-          deleteIcon.style.height = '16px';
-          deleteIcon.style.opacity = '0.5';
-          deleteBtn.appendChild(deleteIcon);
-          
-          completeBtn.addEventListener('click', async () => {
-            const newCompleted = await toggleCustomTestCompletion(lessonKey, test.id);
-            if (newCompleted) {
+        }
+
+        const lessonKey = getLessonKey(lesson);
+        const customTests = await getCustomTests();
+        const customTestItems = customTests[lessonKey] || [];
+
+        if (customTestItems.length > 0) {
+          const customTestsDiv = document.createElement('div');
+          customTestsDiv.className = 'custom-tests-in-section';
+          customTestsDiv.style.marginTop = '1rem';
+          customTestsDiv.style.paddingTop = '1rem';
+          customTestsDiv.style.borderTop = '1px solid var(--background-0)';
+
+          const customTestsTitle = document.createElement('h5');
+          customTestsTitle.textContent = 'Saját számonkérések:';
+          customTestsTitle.style.fontSize = '14px';
+          customTestsTitle.style.fontWeight = '600';
+          customTestsTitle.style.color = 'var(--warning-accent)';
+          customTestsTitle.style.marginBottom = '0.5rem';
+          customTestsDiv.appendChild(customTestsTitle);
+
+          const customTestsList = document.createElement('div');
+          customTestsList.className = 'custom-tests-list-integrated';
+
+          customTestItems.forEach(test => {
+            const testItem = document.createElement('div');
+            testItem.className = `custom-test-item-integrated ${test.completed ? 'completed' : ''}`;
+            testItem.style.display = 'flex';
+            testItem.style.alignItems = 'center';
+            testItem.style.justifyContent = 'space-between';
+            testItem.style.padding = '0.5rem';
+            testItem.style.marginBottom = '0.5rem';
+            testItem.style.background = 'var(--background)';
+            testItem.style.borderRadius = '6px';
+            testItem.style.border = '1px solid var(--background-0)';
+
+            const testText = document.createElement('span');
+            testText.className = 'test-text-integrated';
+            testText.textContent = test.text;
+            testText.style.flex = '1';
+            testText.style.color = 'var(--text-primary)';
+            if (test.completed) {
               testText.style.textDecoration = 'line-through';
               testText.style.opacity = '0.6';
+            }
+
+            const testActions = document.createElement('div');
+            testActions.className = 'test-actions-integrated';
+            testActions.style.display = 'flex';
+            testActions.style.gap = '0.5rem';
+
+            const completeBtn = document.createElement('button');
+            completeBtn.className = 'test-complete-btn-integrated';
+            completeBtn.title = test.completed ? 'Megoldva - kattints a visszavonáshoz' : 'Megoldottként jelöl';
+            completeBtn.style.background = 'none';
+            completeBtn.style.border = 'none';
+            completeBtn.style.cursor = 'pointer';
+            completeBtn.style.padding = '4px';
+            completeBtn.style.borderRadius = '4px';
+            completeBtn.style.display = 'flex';
+            completeBtn.style.alignItems = 'center';
+            completeBtn.style.justifyContent = 'center';
+
+            const completeIcon = document.createElement('img');
+            completeIcon.src = chrome.runtime.getURL('icons/pipa.svg');
+            completeIcon.alt = 'Megoldva';
+            completeIcon.style.width = '16px';
+            completeIcon.style.height = '16px';
+            if (test.completed) {
               completeIcon.style.opacity = '1';
               completeBtn.style.background = 'var(--warning-accent)';
-              completeBtn.title = 'Megoldva - kattints a visszavonáshoz';
             } else {
-              testText.style.textDecoration = 'none';
-              testText.style.opacity = '1';
               completeIcon.style.opacity = '0.5';
-              completeBtn.style.background = 'none';
-              completeBtn.title = 'Megoldottként jelöl';
             }
+            completeBtn.appendChild(completeIcon);
+
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'test-delete-btn-integrated';
+            deleteBtn.title = 'Törlés';
+            deleteBtn.style.background = 'none';
+            deleteBtn.style.border = 'none';
+            deleteBtn.style.cursor = 'pointer';
+            deleteBtn.style.padding = '4px';
+            deleteBtn.style.borderRadius = '4px';
+            deleteBtn.style.display = 'flex';
+            deleteBtn.style.alignItems = 'center';
+            deleteBtn.style.justifyContent = 'center';
+
+            const deleteIcon = document.createElement('img');
+            deleteIcon.src = chrome.runtime.getURL('icons/delete.svg');
+            deleteIcon.alt = 'Törlés';
+            deleteIcon.style.width = '16px';
+            deleteIcon.style.height = '16px';
+            deleteIcon.style.opacity = '0.5';
+            deleteBtn.appendChild(deleteIcon);
+
+            completeBtn.addEventListener('click', async () => {
+              const newCompleted = await toggleCustomTestCompletion(lessonKey, test.id);
+              if (newCompleted) {
+                testText.style.textDecoration = 'line-through';
+                testText.style.opacity = '0.6';
+                completeIcon.style.opacity = '1';
+                completeBtn.style.background = 'var(--warning-accent)';
+                completeBtn.title = 'Megoldva - kattints a visszavonáshoz';
+              } else {
+                testText.style.textDecoration = 'none';
+                testText.style.opacity = '1';
+                completeIcon.style.opacity = '0.5';
+                completeBtn.style.background = 'none';
+                completeBtn.title = 'Megoldottként jelöl';
+              }
+            });
+
+            deleteBtn.addEventListener('click', async () => {
+              if (confirm('Biztosan törölni szeretnéd ezt a számonkérést?')) {
+                await removeCustomTest(lessonKey, test.id);
+                testItem.remove();
+              }
+            });
+
+            testActions.appendChild(completeBtn);
+            testActions.appendChild(deleteBtn);
+            testItem.appendChild(testText);
+            testItem.appendChild(testActions);
+            customTestsList.appendChild(testItem);
           });
-          
-          deleteBtn.addEventListener('click', async () => {
-            if (confirm('Biztosan törölni szeretnéd ezt a számonkérést?')) {
-              await removeCustomTest(lessonKey, test.id);
-              testItem.remove();
-            }
-          });
-          
-          testActions.appendChild(completeBtn);
-          testActions.appendChild(deleteBtn);
-          testItem.appendChild(testText);
-          testItem.appendChild(testActions);
-          customTestsList.appendChild(testItem);
-        });
-        
-        customTestsDiv.appendChild(customTestsList);
-        testContent.appendChild(customTestsDiv);
+
+          customTestsDiv.appendChild(customTestsList);
+          testContent.appendChild(customTestsDiv);
+        }
+
+        testSection.appendChild(testH4);
+        testSection.appendChild(testContent);
+        body.appendChild(testSection);
       }
-      
-      testSection.appendChild(testH4);
-      testSection.appendChild(testContent);
-      body.appendChild(testSection);
     }
-    
+
 
     const lessonKey = getLessonKey(lesson);
     const customHomework = await getCustomHomework();
