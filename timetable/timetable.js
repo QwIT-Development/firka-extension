@@ -313,6 +313,10 @@
     }
   }
 
+  let cachedTestData = null;
+  let testDataTimestamp = 0;
+  const TEST_DATA_CACHE_DURATION = 60000;
+
   async function loadAllTestDataFromAPI() {
     const now = Date.now();
     if (cachedTestData && (now - testDataTimestamp) < TEST_DATA_CACHE_DURATION) {
