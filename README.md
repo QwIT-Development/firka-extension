@@ -1,5 +1,5 @@
 <p align="center">
-  <img width="150" height="150" alt="firka_logo_128" src="https://github.com/user-attachments/assets/089b37c8-bdb1-48af-93e5-9fc656fe8c15" />
+  <img width="150" height="150" alt="firka_logo_128" src="https://github.com/QwIT-Development/firka-extension/blob/main/images/firka_logo_128.png?raw=true" />
   <h1 align="center">Firka extension</h1>
 </p>
 
