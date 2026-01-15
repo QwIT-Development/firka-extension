@@ -1,24 +1,3 @@
-const SENTRY_DSN = 'https://c7d88b71f550a276f973885a44b6536d@o4510511576055808.ingest.de.sentry.io/4510511935193168';
-
-async function initSentry() {
-  try {
-    const result = await chrome.storage.sync.get('firka_errorReporting');
-    const enabled = result.firka_errorReporting !== false;
-
-    if (enabled) {
-      self.addEventListener('error', (event) => {
-        console.error('[Background Error]', event.error || event);
-      });
-
-      self.addEventListener('unhandledrejection', (event) => {
-        console.error('[Background Unhandled Rejection]', event.reason);
-      });
-    }
-  } catch (error) {
-    console.error('[Sentry] Nem sikerült inicializálni:', error);
-  }
-}
-
 chrome.runtime.onInstalled.addListener(async (details) => {
   if (details.reason === 'install') {
     const setupCompleted = await chrome.storage.sync.get('firka_setupCompleted');
@@ -29,8 +8,6 @@ chrome.runtime.onInstalled.addListener(async (details) => {
       });
     }
   }
-
-  await initSentry();
 });
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
