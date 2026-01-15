@@ -313,10 +313,6 @@
     }
   }
 
-  let cachedTestData = null;
-  let testDataTimestamp = 0;
-  const TEST_DATA_CACHE_DURATION = 60000;
-
   async function loadAllTestDataFromAPI() {
     const now = Date.now();
     if (cachedTestData && (now - testDataTimestamp) < TEST_DATA_CACHE_DURATION) {
@@ -539,6 +535,26 @@
         return timeA - timeB;
       },
     );
+
+    function getLessonTimeSlots(lesson, allTimes) {
+      const startMinutes = helper.convertTimeToMinutes(lesson.startTime);
+      const endMinutes = helper.convertTimeToMinutes(lesson.endTime);
+      const slots = [];
+      for (let i = 0; i < allTimes.length; i++) {
+        const slotMinutes = helper.convertTimeToMinutes(allTimes[i]);
+        if (slotMinutes >= startMinutes && slotMinutes < endMinutes) {
+          slots.push(i);
+        }
+      }
+      return slots.length > 0 ? slots : [allTimes.indexOf(lesson.startTime)];
+    }
+
+    const lessonSlotMap = new Map();
+    regularLessons.forEach(lesson => {
+      const slots = getLessonTimeSlots(lesson, times);
+      lessonSlotMap.set(lesson, slots);
+    });
+
     const days = [
       LanguageManager.t("timetable.monday"),
       LanguageManager.t("timetable.tuesday"),
@@ -604,31 +620,73 @@
             const dayLessons = regularLessons.filter(
               (l) => l.startTime === time && l.day === dayIndex,
             );
+
+            const continuingInSlot = regularLessons.filter(lesson => {
+              if (lesson.day !== dayIndex) return false;
+              const slots = lessonSlotMap.get(lesson);
+              return slots && slots.includes(timeIndex) && slots[0] !== timeIndex;
+            });
             
+            const hasMultiLesson = dayLessons.some(lesson => {
+              const slots = lessonSlotMap.get(lesson);
+              return slots && slots.length > 1;
+            });
+
             const lastLessonTime = lastLessonTimes[dayIndex];
             const isAfterLastLesson = lastLessonTime && helper.convertTimeToMinutes(time) > helper.convertTimeToMinutes(lastLessonTime);
-        
-            if (dayLessons.length === 0 && isAfterLastLesson) {
+
+            if (dayLessons.length === 0 && continuingInSlot.length === 0 && isAfterLastLesson) {
               return `<div class="lesson-slot"></div>`;
             }
-            
+
+            if (continuingInSlot.length > 0) {
               return `
-            <div class="lesson-slot ${dayLessons.length === 0 ? 'empty-slot' : ''}">
-              ${dayLessons.length === 0 ? '<div class="empty-lesson-placeholder"></div>' : ''}
-              ${dayLessons
-                      .map(
-                        (lesson) => `
-                <div class="lesson-card ${lesson.isSubstituted ? "substituted" : ""} 
+            <div class="lesson-slot has-continuation">
+              ${continuingInSlot.map(lesson => {
+                const slots = lessonSlotMap.get(lesson);
+                const isLastSlot = slots[slots.length - 1] === timeIndex;
+                const lessonGroupId = `${lesson.subject}_${lesson.day}_${lesson.date}_${lesson.startTime}`;
+                return `
+                <div class="lesson-card ${lesson.isSubstituted ? "substituted" : ""}
                                       ${lesson.isCancelled ? "cancelled" : ""}
-                                      ${lesson.hasHomework ? "has-homework" : ""}"
+                                      lesson-continuation ${isLastSlot ? 'continuation-end' : 'continuation-middle'}"
                      data-lesson='${JSON.stringify(lesson)}'
-                     data-lesson-id='${lesson.lessonId || ""}'>
-                  <div class="lesson-subject">${lesson.subject}</div>
-                  <div class="lesson-teacher">${lesson.teacher}</div>
+                     data-lesson-id='${lesson.lessonId || ""}'
+                     data-lesson-group='${lessonGroupId}'>
                   <div class="lesson-bottom">
                     <div class="lesson-room">${lesson.room}</div>
                     <div class="lesson-time">${lesson.isCancelled ? LanguageManager.t("timetable.cancelled") : lesson.startTime}</div>
                   </div>
+                </div>
+              `}).join('')}
+            </div>
+          `;
+            }
+
+              return `
+            <div class="lesson-slot ${dayLessons.length === 0 ? 'empty-slot' : ''} ${hasMultiLesson ? 'has-multi-start' : ''}">
+              ${dayLessons.length === 0 ? '<div class="empty-lesson-placeholder"></div>' : ''}
+              ${dayLessons
+                      .map(
+                        (lesson) => {
+                          const slots = lessonSlotMap.get(lesson);
+                          const spansMultiple = slots && slots.length > 1;
+                          const lessonGroupId = `${lesson.subject}_${lesson.day}_${lesson.date}_${lesson.startTime}`;
+                          return `
+                <div class="lesson-card ${lesson.isSubstituted ? "substituted" : ""}
+                                      ${lesson.isCancelled ? "cancelled" : ""}
+                                      ${lesson.hasHomework ? "has-homework" : ""}
+                                      ${spansMultiple ? "lesson-spans-multiple" : ""}"
+                     data-lesson='${JSON.stringify(lesson)}'
+                     data-lesson-id='${lesson.lessonId || ""}'
+                     data-spans='${slots ? slots.length : 1}'
+                     data-lesson-group='${lessonGroupId}'>
+                  <div class="lesson-subject">${lesson.subject}</div>
+                  <div class="lesson-teacher">${lesson.teacher}</div>
+                  ${!spansMultiple ? `<div class="lesson-bottom">
+                    <div class="lesson-room">${lesson.room}</div>
+                    <div class="lesson-time">${lesson.isCancelled ? LanguageManager.t("timetable.cancelled") : lesson.startTime}</div>
+                  </div>` : ''}
                   ${
                     (() => {
                       const lessonKey = `${lesson.subject}_${lesson.startTime}_${lesson.date}`;
@@ -705,8 +763,8 @@
                     })()
                   }
                 </div>
-              `,
-                      )
+              `;
+                        })
                       .join("")
               }
             </div>
@@ -1959,6 +2017,24 @@
       card.addEventListener("click", async () => {
         const lessonData = JSON.parse(card.dataset.lesson);
         await showLessonModal(lessonData);
+      });
+      
+      card.addEventListener("mouseenter", () => {
+        const groupId = card.dataset.lessonGroup;
+        if (groupId) {
+          document.querySelectorAll(`[data-lesson-group="${groupId}"]`).forEach(relatedCard => {
+            relatedCard.classList.add('group-hover');
+          });
+        }
+      });
+      
+      card.addEventListener("mouseleave", () => {
+        const groupId = card.dataset.lessonGroup;
+        if (groupId) {
+          document.querySelectorAll(`[data-lesson-group="${groupId}"]`).forEach(relatedCard => {
+            relatedCard.classList.remove('group-hover');
+          });
+        }
       });
     });
   }

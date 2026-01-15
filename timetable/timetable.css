@@ -147,7 +147,8 @@ body {
   transition:all 0.3s cubic-bezier(0.4,0,0.2,1);
   transform:translateY(0);
 }
-.lesson-card:hover {
+.lesson-card:hover,
+.lesson-card.group-hover {
   transform:translateY(-4px);
   box-shadow:0 8px 12px var(--accent-shadow);
 }
@@ -162,6 +163,28 @@ body {
   opacity:0.5;
   text-decoration:line-through;
 }
+
+.lesson-card.lesson-spans-multiple {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.lesson-card.lesson-continuation.continuation-middle {
+  border-radius: 0;
+}
+.lesson-card.lesson-continuation.continuation-end {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+.lesson-slot.has-multi-start {
+  padding-bottom: 0;
+}
+
+.lesson-slot.has-continuation {
+  padding-top: 0;
+}
+
 .lesson-subject {
   align-self:stretch;
   color:var(--text-primary);
