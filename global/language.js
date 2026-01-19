@@ -186,5 +186,6 @@
       { code: "en", name: "English" },
       { code: "de", name: "Deutsch" },
     ],
+    init: initializeLanguage,
   };
 })();

@@ -197,7 +197,7 @@
 }
 
 .dropdown-item:hover img {
-  filter: none;
+  filter: brightness(0) saturate(100%) invert(25%) sepia(50%) saturate(2000%) hue-rotate(90deg) brightness(90%) contrast(95%);
 }
 
 @keyframes dropdownShow {
@@ -418,7 +418,7 @@
   }
 
   .mobile-dropdown-item:hover img {
-    filter: none;
+    filter: brightness(0) saturate(100%) invert(25%) sepia(50%) saturate(2000%) hue-rotate(90deg) brightness(90%) contrast(95%);
   }
 
   body {
