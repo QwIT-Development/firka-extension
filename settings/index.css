@@ -817,7 +817,6 @@ h2 {
   width: 100%;
   min-height: 80px;
   padding: 12px;
-  border: 1px solid var(--text-teritary);
   border-radius: 8px;
   background: var(--button-secondaryFill);
   color: var(--text-primary);
@@ -826,11 +825,6 @@ h2 {
   resize: none;
   outline: none;
   transition: border-color 0.2s ease;
-}
-
-.share-code-wrapper textarea:focus,
-#importCode:focus {
-  border-color: var(--accent-accent);
 }
 
 .copy-btn {
