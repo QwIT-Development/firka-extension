@@ -1,71 +1,82 @@
-name: Package and Release Extension
+name: Build and Release
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - test
+    inputs:
+      version:
+        description: 'Release version (pl. v1.0.0)'
+        required: true
+        default: 'v1.0.0'
 
 jobs:
-  build-and-release:
+  build:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
 
-      - name: Get current date
-        id: date
+      - name: Set up build directories
         run: |
-          echo "DATE=$(date +'%Y.%m.%d. %H:%M')" >> $GITHUB_ENV
-          echo "DATE_FOR_ZIP=$(date +'%Y%m%d-%H%M')" >> $GITHUB_ENV
+          mkdir -p build/chrome
+          mkdir -p build/firefox
 
-      - name: Create ZIP file
+      - name: Copy files – Chrome
         run: |
-          zip -r "pre-firxa-${{ env.DATE_FOR_ZIP }}.zip" . -x "*.git*" "*.github*" "*.idea*"
+          rsync -av \
+            --exclude='.git' \
+            --exclude='.gitea' \
+            --exclude='README*' \
+            --exclude='readme*' \
+            --exclude='LICENSE*' \
+            --exclude='license*' \
+            --exclude='*.md' \
+            --exclude='build/' \
+            . build/chrome/
 
-      - name: Delete previous pre-release
-        uses: dev-drprasad/delete-tag-and-release@v0.2.1
-        with:
-          delete_release: true
-          tag_name: pre-release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        continue-on-error: true
+      - name: Copy files – Firefox
+        run: |
+          rsync -av \
+            --exclude='.git' \
+            --exclude='.gitea' \
+            --exclude='README*' \
+            --exclude='readme*' \
+            --exclude='LICENSE*' \
+            --exclude='license*' \
+            --exclude='*.md' \
+            --exclude='build/' \
+            . build/firefox/
 
-      - name: Create new pre-release
-        id: create_release
-        uses: softprops/action-gh-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Prepare Chrome build
+        run: |
+          rm -f build/chrome/manifest_fox.json
+
+      - name: Prepare Firefox build
+        run: |
+          rm -f build/firefox/manifest.json
+          mv build/firefox/manifest_fox.json build/firefox/manifest.json
+
+      - name: Create ZIP archives
+        run: |
+          cd build/chrome
+          zip -r ../../firka-extension-chrome-${{ github.event.inputs.version }}.zip .
+          cd ../firefox
+          zip -r ../../firka-extension-firefox-${{ github.event.inputs.version }}.zip .
+
+      - name: Create Release
+        uses: actions/gitea-release@v1
         with:
-          tag_name: pre-release
-          release_name: Fejlesztői build
+          token: ${{ secrets.GITEA_TOKEN }}
+          tag_name: ${{ github.event.inputs.version }}
+          release_name: ${{ github.event.inputs.version }}
           body: |
-            Ez egy kiadás előtti build, amely minden egyes commit után frissül!
-            A build automatikusan készült ekkor: ${{ env.DATE }}
+            ## Firka Extension ${{ github.event.inputs.version }}
+            
+            ### Letöltések
+            - **Chrome / Chromium** – `firka-extension-chrome-${{ github.event.inputs.version }}.zip`
+            - **Firefox** – `firka-extension-firefox-${{ github.event.inputs.version }}.zip`
+          files: |
+            firka-extension-chrome-${{ github.event.inputs.version }}.zip
+            firka-extension-firefox-${{ github.event.inputs.version }}.zip
           draft: false
-          prerelease: true
-
-      - name: Upload ZIP to release
-        if: steps.create_release.outputs.upload_url != ''
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./pre-firxa-${{ env.DATE_FOR_ZIP }}.zip
-          asset_name: pre-firxa-${{ env.DATE_FOR_ZIP }}.zip
-          asset_content_type: application/zip
-
-  check-links:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Link Checker
-        id: lychee
-        uses: lycheeverse/lychee-action@v2
-        with:
-          fail: false
+          prerelease: false
