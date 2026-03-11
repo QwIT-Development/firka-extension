@@ -197,7 +197,7 @@ body {
 
 .month-header {
   background: var(--button-secondaryFill);
-  color: white;
+  color: var(--text-primary);
   padding: 16px 20px;
   font-size: 16px;
   font-weight: 600;
@@ -377,7 +377,7 @@ body {
 .modal-header {
   background: var(--button-secondaryFill);
   border-bottom: 1px solid #00000000 !important;
-  color: white;
+  color: var(--text-primary);
   padding: 14px 18px !important;
   display: flex;
   align-items: center;
